@@ -4,6 +4,9 @@ html {
 	padding: 0;
 	height: 100%;
 }
+
+/*Login*/
+
 .user_card {
 	height: 400px;
 	width: 350px;
@@ -71,4 +74,114 @@ html {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+
+
+
+/*Dashboard*/
+.db-sec-wrap > div {
+    padding: 0;
+}
+
+/*  Aside Bar  */
+.wrap-aside {
+    background-color: #22292f;
+    height: 100vh;
+    overflow-y: scroll;
+    color: #fff;
+    font-size: 18px;
+}
+/* width */
+.wrap-aside::-webkit-scrollbar {
+  width: 8px;
+}
+/* Track */
+.wrap-aside::-webkit-scrollbar-track {
+  background: #22292f; 
+}
+/* Handle */
+.wrap-aside::-webkit-scrollbar-thumb {
+  background: #2e353a; 
+}
+/* Handle on hover */
+.wrap-aside::-webkit-scrollbar-thumb:hover {
+  background: #2e353a; 
+}
+.wa-logo {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+    position: relative;
+}
+.wa-logo img {
+    height: 80%;
+    width: auto;
+}
+ul.wa-nav {
+    padding: 0;
+    list-style-type: none;
+}
+li.wa-item.active {
+    background-color: #2e353a;
+}
+li.wa-item {
+    padding: 20px;
+}
+li.wa-item, li.wa-item a {
+    color: #8e9498;
+    font-size: 18px;
+    width: 100%;
+    text-decoration: none;
+    position: relative;
+}
+ul.wa-nav > li.wa-item:hover, ul.wa-nav > li.wa-item:hover > a,
+ul.wa-nav > li.wa-item ul.wa-sub-nav > li.wa-item:hover, ul.wa-nav > li.wa-item ul.wa-sub-nav > li.wa-item:hover > a,
+li.wa-item.active, li.wa-item.active a {
+    background-color: #2e353a;
+    color: #fff;
+}
+li.wa-item:before {
+    padding-right: 10px;
+}
+ul.wa-nav li.wa-item.wa-sub:after {
+    content: "\f054";
+    position: absolute;
+    top: 22px;
+    right: 30px;
+}
+ul.wa-nav li.wa-item.wa-sub.open:after {
+    content: "\f078";
+}
+ul.wa-nav li.wa-item.wa-sub ul.wa-sub-nav {
+    padding-left: 20px;
+    padding-top: 20px;
+    list-style-type: none;
+}
+
+/*  Content  */
+.wrap-content {
+    padding: 0 20px 20px;
+    height: 100vh;
+    background-color: #eff2f4;
+}
+.wc-title {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    flex-wrap: wrap;
+}
+.wc-content {
+    background-color: #fff;
+    padding: 30px;
+}
+.wc-content table {
+    width: 100%;
+}
+.wc-content table th {
+    font-size: 18px;
 }
