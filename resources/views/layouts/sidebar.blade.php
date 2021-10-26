@@ -1,7 +1,7 @@
 <div class="col-lg-3">
 	<div class="wrap-aside">
 		<div class="wa-logo">
-			<img src="http://the-willis-consults.dev.geeksroot.net/wp-content/uploads/2021/09/logo.svg">
+			<img src="{{ asset('images/logo.png') }}">
 		</div>
 		<div class="wa-menu">
 			<ul class="wa-nav">

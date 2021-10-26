@@ -6,12 +6,12 @@
 		<div class="wrap-content">
 			<div class="wc-title">
 				<h2>Add User</h2>
-				 @if (Session::get('danger')) 
-			    	@foreach (Session::get('danger')[0] as $error)
-			    		<div class="alert alert-danger">{{$error}}</div>
-			    	@endforeach
-			    @endif
 			</div>
+			@if (Session::get('danger')) 
+		    	@foreach (Session::get('danger')[0] as $error)
+		    		<div class="alert alert-danger">{{$error}}</div>
+		    	@endforeach
+		    @endif
 			<div class="wc-content">
 				<form action="{{route('addusers')}}" method="POST">
 					   @csrf

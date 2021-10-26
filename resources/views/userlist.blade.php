@@ -6,12 +6,12 @@
 		<div class="wrap-content">
 			<div class="wc-title">
 				<h2>All Users</h2>
-				@if (session('success'))
-				    <div class="alert alert-success mb-3">
-				        {{ session('success') }}
-				    </div>
-				@endif
 			</div>
+			@if (session('success'))
+			    <div class="alert alert-success mb-3">
+			        {{ session('success') }}
+			    </div>
+			@endif
 			<div class="wc-content">
 				<table id="wc-table" class="display">
 					<thead>
