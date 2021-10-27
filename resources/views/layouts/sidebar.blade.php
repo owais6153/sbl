@@ -1,7 +1,7 @@
 
   <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
   
-<div class="col-lg-2 col-md-3">
+<div class="col-lg-3 col-md-4">
 	<div class="wrap-aside">
 		<div class="wa-logo">
 			<img src="{{ asset('images/logo.png') }}" style="filter: invert(1);" alt="Logo">
@@ -29,7 +29,7 @@
 
 
 			        <li class="dropdown">
-			        <a class="dropdown-toggle" data-toggle="dropdown" href="{{route('user_list')}}"><i class="fas fa-users"></i>Inventory Aging Reporrt</a>
+			        <a class="dropdown-toggle" data-toggle="dropdown" href="{{route('user_list')}}"><i class="fas fa-users"></i>Inventory Aging Report</a>
 					<ul class="dropdown-menu">
 						<li><a href="{{route('user_list')}}"><i class="fas fa-user"></i>List All on Hands</a></li>
 						<li><a href="{{route('add_user')}}" ><i class="fas fa-user-plus"></i>List All on Receive</a></li>

@@ -2,7 +2,7 @@
 
 @section('content')
 
-	<div class="col-lg-10 col-md-9">
+	<div class="col-lg-9 col-md-8">
 		<div class="wrap-content">
 			<div class="wc-title">
 				<h2>All Users</h2>
