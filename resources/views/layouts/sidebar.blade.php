@@ -1,6 +1,8 @@
 
   <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
-  
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
 <div class="col-lg-2 col-md-3">
 	<div class="wrap-aside">
 		<div class="wa-logo">
@@ -40,8 +42,8 @@
 				<li class="dropdown">
 				<a class="dropdown-toggle" data-toggle="dropdown" href="{{route('user_list')}}"><i class="fas fa-users"></i>Inventory Location Tracking</a>
 					<ul class="dropdown-menu">
-						<li><a href="{{route('user_list')}}"><i class="fas fa-user"></i>Add Record</a></li>
-						<li><a href="{{route('add_user')}}" ><i class="fas fa-user-plus"></i>List All</a></li>
+						<li><a href="{{route('addInventory')}}"><i class="fas fa-user"></i>Add Record</a></li>
+						<li><a href="{{route('inventory')}}" ><i class="fas fa-user-plus"></i>List All</a></li>
 					</ul>
 				</li>
 

@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\FileUploadController;
-
+use App\Http\Controllers\InventoryLocationTrackingController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -33,5 +33,9 @@ Route::middleware(['is_admin'])->group(function (){
 // File Upload
 	Route::get('/files/import', [FileUploadController::class, 'importFiles'])->name('import_files');
 	Route::post('/files/import/save', [FileUploadController::class, 'saveImportFiles'])->name('saveImportFiles');
-
+// Inventory Location
+	Route::get('/inventory', [InventoryLocationTrackingController::class, 'index'])->name('inventory');
+	Route::get('/inventory/add', [InventoryLocationTrackingController::class, 'create'])->name('addInventory');
+	Route::post('/inventory/upload', [InventoryLocationTrackingController::class, 'uploadImage'])->name('uploadImage');
+	Route::post('/inventory/upload/remove', [InventoryLocationTrackingController::class, 'removeImage'])->name('removeImage');
 });
