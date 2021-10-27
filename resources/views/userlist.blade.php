@@ -2,7 +2,7 @@
 
 @section('content')
 
-	<div class="col-lg-10">
+	<div class="col-lg-10 col-md-9">
 		<div class="wrap-content">
 			<div class="wc-title">
 				<h2>All Users</h2>
@@ -33,8 +33,8 @@
 							    		@if ($user->id == 1 || Session::get('id') == $user->id)
 							    			No actions
 							    		@else 
-								    		<a href="{{route('edit_user', ['id' => $user->id]) }}">Edit</a>
-								    		<a class="deleteIt" href="{{route('deleteuser', ['id' => $user->id]) }}">Delete</a>
+								    		<a href="{{route('edit_user', ['id' => $user->id]) }}" class="mr-3"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>
+								    		<a class="deleteIt" href="{{route('deleteuser', ['id' => $user->id]) }}"><i class="fas fa-trash-alt mr-2"></i>Delete</a>
 							    		@endif
 							    	</td>
 							    </tr>
