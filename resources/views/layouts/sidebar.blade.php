@@ -1,4 +1,6 @@
+
  <div class="col-lg-3 col-md-4">
+
 	<div class="wrap-aside">
 		<div class="wa-logo">
 			<img src="{{ asset('images/logo.png') }}" style="filter: invert(1);" alt="Logo">
