@@ -22,7 +22,7 @@ class CreateTableInventoryLocationTracking extends Migration
             $table->string('to', 255)->nullable();
             $table->date('expiration_date')->nullable();
             $table->string('pallet_number', 255)->nullable();
-            $table->string('images', 255)->nullable();
+            $table->text('images')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
