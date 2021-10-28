@@ -16,7 +16,7 @@
 	<!-- Jquery -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<!-- Bootstrap Js -->
-	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 	<!-- Table Js -->
 	<script type='text/javascript' src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 </head>
