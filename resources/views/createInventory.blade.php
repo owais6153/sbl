@@ -2,7 +2,7 @@
 
 @section('content')
 
-	<div class="col-lg-10 col-md-9">
+	<div class="col-lg-9 col-md-9">
 		<div class="wrap-content">
 			<div class="wc-title">
 				<h2>Add Inventory Location</h2>
@@ -37,8 +37,8 @@
 					    <input type="date" class="form-control" id="expiration_date" placeholder="Expiration Date" name="expiration_date">
 					  </div>
 					  <div class="form-group">
-					    <label for="images">Images</label>
-					    <button type="button" id="imageUploader"><i class="fas fa-plus"></i></button>
+					    <label for="images">Upload Images</label>
+					    <button type="button" id="imageUploader"><img src="{{ asset('images/upload_img.png') }}"></button>
 					    <input type="file" id="fileupload" class="form-control" style="visibility: hidden; opacity: 0;" id="images" name="images[]" multiple="">
 					    <div id="preview"></div>
 					  </div>

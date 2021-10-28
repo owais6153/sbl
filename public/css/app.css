@@ -269,7 +269,37 @@ section.home-user {
     background: #22292f;
 }
 .brand_logo_container {
-    display: flex;
+    display: flex;div#preview > div {
+    height: 180px;
+    width: 250px;
+    display: inline-block;
+    margin-right: 20px;
+    position: relative;
+}
+div#preview > div img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+div#preview > div i.far.fa-times-circle {
+    color: #f00;
+    font-size: 30px;
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    background: #fff;
+    border-radius: 100%;
+}
+button.btn.btn-primary {
+    background: #22292f;
+    width: 180px;
+    height: 54px;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    line-height: 24px;
+}
     align-items: center;
     justify-content: center;
     background: #22292f;
@@ -314,3 +344,40 @@ ul.nav.navbar-nav i {
     top: 16px;
 }
 
+div#preview > div {
+    height: 180px;
+    width: 250px;
+    display: inline-block;
+    margin-right: 20px;
+    position: relative;
+}
+div#preview > div img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+div#preview > div i.far.fa-times-circle {
+    color: #f00;
+    font-size: 30px;
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    background: #fff;
+    border-radius: 100%;
+}
+button.btn.btn-primary {
+    background: #22292f;
+    width: 180px;
+    height: 54px;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    line-height: 24px;
+}
+button#imageUploader {
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    outline: none;
+}
