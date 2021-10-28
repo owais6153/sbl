@@ -26,6 +26,10 @@
 	<main>
 		<div class="db-sec">
 			<div class="container-fluid">
+				<button id="btn-toggle" class="btn-toggle" type="button">
+			 		<span class="toggle-icon"><img src="{{ asset('images/toggle-icon.png') }}"></span>
+			 		<span class="cross-icon"><img src="{{ asset('images/cross-icon.png') }}"></span>
+			 	</button>
 				<div class="row db-sec-wrap">
 					@include('layouts/sidebar')
 					@yield('content')
@@ -35,6 +39,17 @@
 
 	</main>
 @yield('script')
+
+<script type="text/javascript">
+	$(document).ready(function(){
+
+
+		$('#btn-toggle').on('click',function() {
+			$('.db-sec-wrap').toggleClass('show_sidebar');
+		});
+
+	});
+</script>
 
 </body>
 </html>
