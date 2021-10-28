@@ -12,8 +12,9 @@
 			    	@endforeach
 			    @endif
 			</div>
+			<div class="alert"></div>
 			<div class="wc-content">
-				<form action="{{route('addusers')}}" method="POST" enctype="multipart/form-data">
+				<form action="{{route('addusers')}}" method="POST" enctype="multipart/form-data" id="saveInventory">
 					   @csrf
 					   <div id="fileFields"></div>
 					  <div class="form-group">
@@ -37,9 +38,13 @@
 					    <input type="date" class="form-control" id="expiration_date" placeholder="Expiration Date" name="expiration_date">
 					  </div>
 					  <div class="form-group">
+					    <label for="pallet_number">Pallet number</label>
+					    <input type="text" class="form-control" id="pallet_number" placeholder="Pallet Number" name="pallet_number">
+					  </div>
+					  <div class="form-group">
 					    <label for="images">Images</label>
 					    <button type="button" id="imageUploader"><i class="fas fa-plus"></i></button>
-					    <input type="file" id="fileupload" class="form-control" style="visibility: hidden; opacity: 0;" id="images" name="images[]" multiple="">
+					    <input type="file" id="fileupload" class="form-control" style="visibility: hidden; opacity: 0;" id="images" name="upimages[]" multiple="">
 					    <div id="preview"></div>
 					  </div>
 
@@ -82,15 +87,18 @@
    			       for(var index = 0; index < response.files.length; index++) {
 			         var src = "{{ asset('uploads/') }}" + "/" + response.files[index];
 
-			         $('#preview').append('<div><i class="far fa-times-circle" onclick="removeImages(this)" data-id="uImg'+index+'" imgsrc="'+src+'"></i><img src="'+src+'" width="200px;" height="200px"></div>');
+			         $('#preview').append('<div><i class="far fa-times-circle" onclick="removeImages(this)" data-id="uImg'+index+'" imgsrc="'+response.files[index]+'"></i><img src="'+src+'" width="200px;" height="200px"></div>');
 			         
 
-			         $('#fileFields').append('<input id="uImg'+index+'" type="hidden" name="files[]" value="'+response.files[index]+'" >');
+			         $('#fileFields').append('<input id="uImg'+index+'" type="hidden" name="images[]" value="'+response.files[index]+'" >');
 			       }
 		       }
 		       else{
 			       	alert(response.error);
 		       }
+
+		     },
+		     error: function (){
 
 		     }
 		});
@@ -103,14 +111,13 @@
 	            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 	         },
 		     url: "{{route('removeImage')}}", 
-		     type: 'post',
+		     type: 'POST',
 		     data: {'removepath': path},
 		     dataType: 'json',
-		     contentType: 'json',
 		     success: function (response) {
 		        if (response.status == 'success') {
-		       		$(elem).remove();
-		       		$('#' +$(elem).attr('imgsrc')).remove();
+		       		$(elem).parent('div').remove();
+		       		$('#' +$(elem).attr('data-id')).remove();
 		        }
 		        else{
 			       	alert(response.error);
@@ -118,5 +125,39 @@
 		     }
 		});
 	}
+
+	$('#saveInventory').submit( function (e){
+		e.preventDefault();
+		var formData = new FormData(this);
+		$.ajax({
+	         headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+             },
+		     url: "{{route('saveInventory')}}", 
+		     type: 'post',
+		     data: formData,
+		     dataType: 'json',
+		     		     contentType: false,
+		     processData: false,
+		     success: function (response) {
+		       if (response.status == 'success') {
+		       		$('.alert').text(response.success);
+		       		$('.alert').addClass('alert-success');
+		       		$('#saveInventory').trigger("reset");
+			       	$('#preview').html('');			         
+			        $('#fileFields').html('');
+		       }
+		       else{
+			       	alert(response.error);
+		       }
+
+		     },
+		     error: function (){
+
+		     }
+		});
+	})
+
+
 </script>
 @endsection
