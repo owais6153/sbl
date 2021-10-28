@@ -17,9 +17,13 @@
 					<thead>
 					    <tr>
 					      <th scope="col">#</th>
-					      <th scope="col">Name</th>
-					      <th scope="col">Email</th>
-					      <th scope="col">Actions</th>
+					      <th scope="col">Barcode</th>
+					      <th scope="col">Quantity</th>
+					      <th scope="col">From Location</th>
+					      <th scope="col">To Location</th>
+					      <th scope="col">Expiration Date</th>
+					      <th scope="col">Pallet Numbers</th>
+					      <th scope="col">Images</th>
 					    </tr>
 					</thead>
 					<tbody>
@@ -29,9 +33,17 @@
 							    	<td>{{ ($index + 1)}}</td>
 							    	<td>{{$inventory->barcode}}</td>
 							    	<td>{{$inventory->quantity}}</td>
+							    	<td>{{$inventory->from}}</td>
+							    	<td>{{$inventory->to}}</td>
+							    	<td>{{$inventory->expiration_date}}</td>
+							    	<td>{{$inventory->pallet_number}}</td>
 							    	<td>
-							    		<a href="{{route('edit_user', ['id' => $inventory->id]) }}" class="mr-3"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>
-							    		<a class="deleteIt" href="{{route('deleteuser', ['id' => $inventory->id]) }}"><i class="fas fa-trash-alt mr-2"></i>Delete</a>							    
+							    		@php
+							    			$images = (!empty($inventory->images)) ? explode(',', $inventory->images) : array();
+							    		@endphp
+							    		@foreach ($images as $image)
+							    			<a target="_blank" href="{{asset('uploads/' . $image)}}">View Image</a><br>
+							    		@endforeach
 							    	</td>
 							    </tr>
 							@endforeach

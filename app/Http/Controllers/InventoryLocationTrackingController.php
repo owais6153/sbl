@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\InventoryLocationTracking as InventoryModel;
 use Validator;
 use File;
+use Session;
 
 class InventoryLocationTrackingController extends Controller
 {
@@ -20,9 +21,7 @@ class InventoryLocationTrackingController extends Controller
     }
     public function uploadImage(Request $request)
     {
-        $validation = Validator::make($request->all(),[
-            'files' => 'required',
-        ]);
+
         if($request->TotalFiles > 0)
         {
                 
@@ -63,6 +62,39 @@ class InventoryLocationTrackingController extends Controller
     }
     public function removeImage(Request $request)
     {
-        return response()->json(['success'=>$request->removepath]);
+        $path = $request->removepath;
+   
+        unlink(public_path('uploads/' .$path));
+        return response()->json(['success'=>'s', 'status' => 'success', 'path' => public_path('uploads/' .$path)]);
+    }
+    public function saveInventory(Request $request)
+    {
+        $validation = Validator::make($request->all(),[
+            'barcode' => 'required',
+            'quantity' => 'required',
+            'from' => 'required',
+        ]);
+
+        if ($validation->fails())
+        {
+            foreach($validation->messages()->getMessages() as $field_name => $messages)
+            {
+                 return response()->json(["error" => $messages, 'status' => 'error']);
+            }
+        }
+
+        $Inventory = new InventoryModel();
+        $Inventory->user_id = Session::get('id');
+        $Inventory->barcode = $request->barcode;
+        $Inventory->quantity = $request->quantity;
+        $Inventory->from = $request->from;
+        $Inventory->to = $request->to;
+        $Inventory->expiration_date = $request->expiration_date;
+        $Inventory->pallet_number = $request->pallet_number;
+        if (isset($request->images) && !empty($request->images)) {
+            $Inventory->images = implode(',', $request->images);
+        }
+        $Inventory->save();
+        return response()->json(['success'=>'Inventory Inserted', 'status' => 'success']);
     }
 }
