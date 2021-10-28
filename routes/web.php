@@ -40,4 +40,8 @@ Route::middleware(['is_admin'])->group(function (){
 	Route::post('/inventory/upload', [InventoryLocationTrackingController::class, 'uploadImage'])->name('uploadImage');
 	Route::post('/inventory/upload/remove', [InventoryLocationTrackingController::class, 'removeImage'])->name('removeImage');
 	Route::get('/onhand', [InventoryLocationTrackingController::class, 'inventoryOnhand'])->name('inventoryOnhand');
+	Route::get('/onhand/get', [InventoryLocationTrackingController::class, 'getOnHandList'])->name('getOnHandList');
+	Route::get('/onrecive', [InventoryLocationTrackingController::class, 'inventoryOnRecive'])->name('inventoryOnRecive');
+	Route::get('/onrecive/get', [InventoryLocationTrackingController::class, 'getOnReciveList'])->name('getOnReciveList');
+
 });

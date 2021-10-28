@@ -8,6 +8,7 @@ use App\Models\OnHand;
 use Validator;
 use File;
 use Session;
+use DataTables;
 
 class InventoryLocationTrackingController extends Controller
 {
@@ -98,15 +99,36 @@ class InventoryLocationTrackingController extends Controller
         $Inventory->save();
         return response()->json(['success'=>'Inventory Inserted', 'status' => 'success']);
     }
-    public function inventoryOnhand($value='')
+    public function inventoryOnhand()
     {
 
         return view('inventorylistOnhand'); 
     }
-    public getOnHandList(){
+    public function getOnHandList(){
 
         $model = OnHand::query();
-        return view('userlist', compact('users'));
+
+        return DataTables::eloquent($model)
+        ->filter(function ($query) {
+            if (request()->has('name')) {
+                $query->where('name', 'like', "%" . request('name') . "%");
+            }
+
+            if (request()->has('email')) {
+                $query->where('email', 'like', "%" . request('email') . "%");
+            }
+        }, true)
+        ->toJson();
+    }
+
+    public function inventoryOnRecive()
+    {
+
+        return view('inventorylistOnrecieve'); 
+    }
+    public function getOnReciveList(){
+
+        $model = OnHand::query();
 
         return DataTables::eloquent($model)
         ->filter(function ($query) {

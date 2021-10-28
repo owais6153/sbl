@@ -62,6 +62,10 @@
 			}
 		})
 
-
+		$(document).ready( function () {
+			if ( $('#wc-table').length > 0) {
+			    $('#wc-table').DataTable();
+			}
+		} );
 	</script>
 @endsection
