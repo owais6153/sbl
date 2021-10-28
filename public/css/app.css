@@ -300,10 +300,10 @@ button.btn.btn-primary {
     border: none;
     line-height: 24px;
 }
-    align-items: center;
+   /* align-items: center;
     justify-content: center;
     background: #22292f;
-    box-shadow: 0px 1px 0px 20px rgb(241 241 241 / 67%);
+    box-shadow: 0px 1px 0px 20px rgb(241 241 241 / 67%);*/
 }
 .brand_logo_container img {
     width: 100%;
@@ -380,9 +380,185 @@ button#imageUploader {
     box-shadow: none;
     border: none;
     outline: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
 }
 .brand_logo_container img {
     width: 100%;
     height: 100%;
     object-fit: contain;
+}
+.dataTables_wrapper .dataTables_length select {
+    height: 44px;
+    margin: 0 10px;
+    width: 90px;
+    text-align: center;
+    border-radius: 0;
+    border: 1px solid #dfdede;
+}
+.dataTables_wrapper .dataTables_length label {
+    font-size: 18px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+.dataTables_wrapper .dataTables_filter label {
+    font-size: 18px;
+    font-weight: 600;
+}
+.dataTables_wrapper .dataTables_filter input[type="search"] {
+    height: 44px;
+    margin-left: 10px;
+    border: 1px solid #dfdede;
+    border-radius: 0;
+    padding: 0 18px;
+}
+table.dataTable th, table.dataTable td {
+    padding: 16px 30px !important;
+}
+table.dataTable.display tbody td a {
+    background: #22292f;
+    color: #fff !important;
+    font-size: 14px;
+    padding: 10px 16px;
+    border-radius: 7px;
+    text-decoration: none;
+}
+table.dataTable thead .sorting {
+    font-weight: 500;
+}
+.dataTables_wrapper .dataTables_info {
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: capitalize;
+    letter-spacing: -0.5px;
+}
+.db-sec-wrap .col-lg-3.col-md-4 {
+    max-width: 20%;
+    flex: 20%;
+}
+.db-sec-wrap .col-lg-9 {
+    max-width: 80%;
+    flex: 80%;
+}
+.custom_form .col-half {
+    width: 49%;
+    display: inline-block;
+    padding-right: 20px;
+}
+.custom_form .form-group label {
+    font-size: 19px;
+    font-weight: 700;
+    color: #262626;
+}
+.custom_form .form-group .form-control:not([type="file"]) {
+    height: 48px;
+    border: 1px solid #bfbfbf;
+    border-radius: 0;
+    padding: 0 16px;
+    color: #727171;
+    box-shadow: none;
+    outline: none;
+}
+button#imageUploader img {
+    margin-left: 20px;
+}
+.btn-form img {
+    display: none;
+}
+input#file_upload.data_file {
+    border: none;
+    box-shadow: none;
+    outline: none;
+    width: 153px;
+    height: 85px;
+    font-size: 0;
+    background-size: cover;
+    background: no-repeat;
+    cursor: pointer;
+    border: none;
+    display: block;
+}
+input#file_upload::-webkit-file-upload-button {
+  visibility: hidden;
+}
+input#file_upload {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    outline: none;
+    display: none;
+}
+span.attach-file {
+    font-size: 0;
+    display: none;
+}
+span.attach-file.equipped {
+    font-size: 18px;
+    display: block;
+    margin-top: 10px;
+}
+/* The container */
+.custom_form .form-group.input-radio label.label {
+  position: relative;
+  padding-left: 32px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  margin-right: 20px;
+  font-weight: 500;
+}
+/* Hide the browser's default radio button */
+.custom_form .form-group.input-radio label.label input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 0;
+  height: 0;
+}
+/* Create a custom radio button */
+.custom_form .form-group.input-radio label.label .checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 22px;
+  width: 22px;
+  background-color: #eee;
+  border-radius: 50%;
+}
+/* On mouse-over, add a grey background color */
+.custom_form .form-group.input-radio label.label:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+/* When the radio button is checked, add a blue background */
+.custom_form .form-group.input-radio label.label input:checked ~ .checkmark {
+  background-color: #2196F3;
+}
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.custom_form .form-group.input-radio label.label .checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+/* Show the indicator (dot/circle) when checked */
+.custom_form .form-group.input-radio label.label input:checked ~ .checkmark:after {
+  display: block;
+}
+/* Style the indicator (dot/circle) */
+.custom_form .form-group.input-radio label.label .checkmark:after {
+    top: 9px;
+    left: 9px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+}
+.custom_form .form-group.input-radio label {
+    margin-bottom: 25px;
 }

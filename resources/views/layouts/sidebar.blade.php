@@ -30,7 +30,7 @@
 			        <li class="dropdown">
 			        <a class="dropdown-toggle" data-toggle="dropdown" href="{{route('user_list')}}"><i class="fas fa-users"></i>Inventory Aging Report</a>
 					<ul class="dropdown-menu">
-						<li><a href="{{route('user_list')}}"><i class="fas fa-user"></i>List All on Hands</a></li>
+						<li><a href="{{route('inventoryOnhand')}}"><i class="fas fa-user"></i>List All on Hands</a></li>
 						<li><a href="{{route('add_user')}}" ><i class="fas fa-user-plus"></i>List All on Receive</a></li>
 						<li><a href="{{route('import_files')}}" ><i class="fas fa-user-plus"></i>Import (browse, radio on hands/receive)</a></li>
 					</ul>
@@ -39,7 +39,7 @@
 				<li class="dropdown">
 				<a class="dropdown-toggle" data-toggle="dropdown" href="{{route('user_list')}}"><i class="fas fa-users"></i>Inventory Location Tracking</a>
 					<ul class="dropdown-menu">
-						<li><a href="{{route('addInventory')}}"><i class="fas fa-user"></i>Add Record</a></li>
+						<li><a href="{{route('addInventory')}}"><i class="fas fa-user"></i>Scan Inventory</a></li>
 						<li><a href="{{route('inventory')}}" ><i class="fas fa-user-plus"></i>List All</a></li>
 					</ul>
 				</li>

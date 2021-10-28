@@ -14,41 +14,44 @@
 			</div>
 			<div class="alert"></div>
 			<div class="wc-content">
-				<form action="{{route('addusers')}}" method="POST" enctype="multipart/form-data" id="saveInventory">
+				<form class="custom_form" action="{{route('addusers')}}" method="POST" enctype="multipart/form-data" id="saveInventory">
 					   @csrf
 					   <div id="fileFields"></div>
-					  <div class="form-group">
+					  <div class="form-group col-half">
 					    <label for="barcode">Barcode</label>
 					    <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Enter Barcode">
 					  </div>
-					  <div class="form-group">
+					  <div class="form-group col-half">
 					    <label for="quantity">Quantity</label>
 					    <input type="number" class="form-control" id="quantity" placeholder="Enter Quantity" name="quantity">
 					  </div>
-					  <div class="form-group">
+					  <div class="form-group col-half">
 					    <label for="from">From Location</label>
 					    <input type="text" class="form-control" id="from" placeholder="From Location" name="from">
 					  </div>
-					  <div class="form-group">
+					  <div class="form-group col-half">
 					    <label for="to">To Location</label>
-					    <input type="text" class="form-control" id="to" placeholder="From Location" name="to">
+					    <input type="text" class="form-control" id="to" placeholder="To Location" name="to">
 					  </div>
-					  <div class="form-group">
+					  <div class="form-group col-half">
 					    <label for="expiration_date">Expiration Date</label>
 					    <input type="date" class="form-control" id="expiration_date" placeholder="Expiration Date" name="expiration_date">
 					  </div>
-					  <div class="form-group">
+					  <div class="form-group col-half">
 					    <label for="pallet_number">Pallet number</label>
 					    <input type="text" class="form-control" id="pallet_number" placeholder="Pallet Number" name="pallet_number">
 					  </div>
-					  <div class="form-group">
+					  <div class="form-group col-full">
 					    
-					    <button type="button" id="imageUploader">Images <img src="{{asset('images/upload_img.png')}}"></button>
+					    <button type="button" id="imageUploader">Upload Images <img src="{{asset('images/upload_img.png')}}"></button>
 					    <input type="file" id="fileupload" class="form-control" style="visibility: hidden; opacity: 0;" id="images" name="upimages[]" multiple="">
 					    <div id="preview"></div>
 					  </div>
 
-					  <button type="submit" class="btn btn-primary">Submit</button>
+					  <div class="btn-form">
+					  	<button type="submit" class="btn btn-primary">Submit</button>
+					  	<img src="{{asset('images/preloader.gif')}}">
+					  </div>
 				</form>
 			</div>
 		</div>
@@ -64,6 +67,8 @@
 	});
 	$('#fileupload').change(function(){
 	
+
+		$('.btn-form img').css("display","inline-block");
 
 		var formData = new FormData();
 		let TotalFiles = $('#fileupload')[0].files.length; //Total files
@@ -83,6 +88,7 @@
 		     contentType: false,
 		     processData: false,
 		     success: function (response) {
+		     	$('.btn-form img').css("display","none");
 		       if (response.status == 'success') {
    			       for(var index = 0; index < response.files.length; index++) {
 			         var src = "{{ asset('uploads/') }}" + "/" + response.files[index];
@@ -99,12 +105,14 @@
 
 		     },
 		     error: function (){
-
+		     	$('.btn-form img').css("display","inline-block");
+		     	alert("Something Went Wrong...");
 		     }
 		});
 	})
 
 	function removeImages(elem){
+		$('.btn-form img').css("display","inline-block");
 		var path = $(elem).attr('imgsrc');
 		$.ajax({
 	         headers: {
@@ -115,6 +123,7 @@
 		     data: {'removepath': path},
 		     dataType: 'json',
 		     success: function (response) {
+		     	$('.btn-form img').css("display","none");
 		        if (response.status == 'success') {
 		       		$(elem).parent('div').remove();
 		       		$('#' +$(elem).attr('data-id')).remove();
@@ -122,11 +131,16 @@
 		        else{
 			       	alert(response.error);
 		        }
+		     },
+		     error: function (){
+		     	$('.btn-form img').css("display","inline-block");
+		     	alert("Something Went Wrong...");
 		     }
 		});
 	}
 
 	$('#saveInventory').submit( function (e){
+		$('.btn-form img').css("display","inline-block");
 		e.preventDefault();
 		var formData = new FormData(this);
 		$.ajax({
@@ -140,6 +154,7 @@
 		     		     contentType: false,
 		     processData: false,
 		     success: function (response) {
+		     	$('.btn-form img').css("display","none");
 		       if (response.status == 'success') {
 		       		$('.alert').text(response.success);
 		       		$('.alert').addClass('alert-success');
@@ -153,7 +168,8 @@
 
 		     },
 		     error: function (){
-
+		     	$('.btn-form img').css("display","none");
+		     	alert("Something Went Wrong...");
 		     }
 		});
 	})

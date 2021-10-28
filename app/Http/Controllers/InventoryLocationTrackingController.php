@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\InventoryLocationTracking as InventoryModel;
+use App\Models\OnHand;
 use Validator;
 use File;
 use Session;
@@ -96,5 +97,27 @@ class InventoryLocationTrackingController extends Controller
         }
         $Inventory->save();
         return response()->json(['success'=>'Inventory Inserted', 'status' => 'success']);
+    }
+    public function inventoryOnhand($value='')
+    {
+
+        return view('inventorylistOnhand'); 
+    }
+    public getOnHandList(){
+
+        $model = OnHand::query();
+        return view('userlist', compact('users'));
+
+        return DataTables::eloquent($model)
+        ->filter(function ($query) {
+            if (request()->has('name')) {
+                $query->where('name', 'like', "%" . request('name') . "%");
+            }
+
+            if (request()->has('email')) {
+                $query->where('email', 'like', "%" . request('email') . "%");
+            }
+        }, true)
+        ->toJson();
     }
 }

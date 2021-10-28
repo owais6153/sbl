@@ -1,5 +1,11 @@
 @extends('layouts.app')
-
+@section('headermeta')
+<style type="text/css">
+	input#file_upload.data_file {
+    background: url('{{asset("images/upload_img.png")}}');
+}
+</style>
+@endsection
 @section('content')
 
 	<div class="col-lg-9 col-md-9">
@@ -19,19 +25,18 @@
 				    </div>
 				@endif
 			<div class="wc-content">
-				<form action="{{route('saveImportFiles')}}" method="POST" enctype="multipart/form-data">
+				<form class="custom_form" action="{{route('saveImportFiles')}}" method="POST" enctype="multipart/form-data">
 					   @csrf
-					  <div class="form-group">
+					  <div class="form-group input-radio">
 					    <label for="type">File Type</label><br>
-					    <label for="on_hand">On Hand
-						    <input type="radio"  id="on_hand" name="type" value="on_hand"></label>
-					    <label for="on_reciving">On Reciving
-						    <input type="radio"  id="on_reciving" name="type" value="on_reciving">		   
+					    <label class="label" for="on_hand"><input type="radio"  id="on_hand" name="type" value="on_hand">On Hand<span class="checkmark"></span></label>
+					    <label class="label" for="on_reciving"><input type="radio"  id="on_reciving" name="type" value="on_reciving">	On Reciving	   <span class="checkmark"></span>
 						</label>
 					  </div>
 					  <div class="form-group">
-					    <label for="email">Upload Files</label>
-					    <input type="file" class="form-control" id="file_upload" name="file_upload">
+					    <label for="email">Upload File</label>
+					    <input type="file" class="form-control data_file" id="file_upload" name="file_upload">
+					    <span class="attach-file"></span>
 					  </div>
 
 					  <button type="submit" class="btn btn-primary">Submit</button>
@@ -39,5 +44,38 @@
 			</div>
 		</div>
 	</div>
+
+@endsection
+
+
+@section('script')
+
+<script type="text/javascript">
+	
+	$('#file_upload').on("change",function(){
+	    if($(this).val() != ''){
+	    }
+	    else{
+	    }
+	});
+
+
+	$('#file_upload').on("change",function(){
+	    if($(this).val() != ''){
+
+	        
+	        let strpVal = $(this).val();
+	        strpVal = strpVal.replace(/\\/g, '/').replace(/.*\//, '');
+	        $('span.attach-file').text(strpVal);
+	        $('span.attach-file').addClass("equipped");
+	    }
+	    else{
+	       $('span.attach-file').text('Attach File'); 
+	       $('span.attach-file').removeClass("equipped");
+	    }
+	});
+
+</script>
+
 
 @endsection
