@@ -42,8 +42,8 @@
 					    <input type="text" class="form-control" id="pallet_number" placeholder="Pallet Number" name="pallet_number">
 					  </div>
 					  <div class="form-group">
-					    <label for="images">Images</label>
-					    <button type="button" id="imageUploader"><i class="fas fa-plus"></i></button>
+					    
+					    <button type="button" id="imageUploader">Images <img src="{{asset('images/upload_img.png')}}"></button>
 					    <input type="file" id="fileupload" class="form-control" style="visibility: hidden; opacity: 0;" id="images" name="upimages[]" multiple="">
 					    <div id="preview"></div>
 					  </div>
@@ -87,7 +87,7 @@
    			       for(var index = 0; index < response.files.length; index++) {
 			         var src = "{{ asset('uploads/') }}" + "/" + response.files[index];
 
-			         $('#preview').append('<div><i class="far fa-times-circle" onclick="removeImages(this)" data-id="uImg'+index+'" imgsrc="'+response.files[index]+'"></i><img src="'+src+'" width="200px;" height="200px"></div>');
+			         $('#preview').append('<div><i class="far fa-times-circle" onclick="removeImages(this)" data-id="uImg'+index+'" imgsrc="'+response.files[index]+'"></i><img src="'+src+'" ></div>');
 			         
 
 			         $('#fileFields').append('<input id="uImg'+index+'" type="hidden" name="images[]" value="'+response.files[index]+'" >');

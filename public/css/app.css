@@ -41,7 +41,7 @@ html {
     border: 2px solid white;
 }
 .form_container {
-    margin-top: 100px;
+    margin-top: 10px;
 }
 .login_btn {
     width: 100%;
@@ -269,9 +269,9 @@ section.home-user {
     background: #22292f;
 }
 .brand_logo_container {
-    display: flex;div#preview > div {
+    display: flex !important;
     height: 180px;
-    width: 250px;
+    width: 180px;
     display: inline-block;
     margin-right: 20px;
     position: relative;
@@ -345,8 +345,8 @@ ul.nav.navbar-nav i {
 }
 
 div#preview > div {
-    height: 180px;
-    width: 250px;
+    height: 100px;
+    width: 100px;
     display: inline-block;
     margin-right: 20px;
     position: relative;
@@ -380,4 +380,9 @@ button#imageUploader {
     box-shadow: none;
     border: none;
     outline: none;
+}
+.brand_logo_container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }

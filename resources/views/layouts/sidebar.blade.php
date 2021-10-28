@@ -3,7 +3,7 @@
 
 	<div class="wrap-aside">
 		<div class="wa-logo">
-			<img src="{{ asset('images/logo.png') }}" style="filter: invert(1);" alt="Logo">
+			<img src="{{ asset('images/logo.png') }}" style="filter: invert(1); max-width:200px; height: unset;" alt="Logo">
 		</div>
 		<div class="wa-menu">
 			<nav class="navbar navbar-inverse">
