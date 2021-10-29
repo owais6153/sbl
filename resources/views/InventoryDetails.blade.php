@@ -13,7 +13,7 @@
 				@endif
 			</div>
 			<div class="wc-content">
-				<table id="wc-table" class="display">
+				<table id="wc-table" class="table table-bordered table-striped display">
 					<thead>
 					    <tr>
 					      <th scope="col">#</th>
@@ -27,33 +27,7 @@
 					      <th scope="col">Images</th>
 					    </tr>
 					</thead>
-					<tbody>
-					  	@empty(!$inventories)
-					  		@foreach ($inventories as $index => $inventory)
-							    <tr>
-							    	<td>{{ ($index + 1)}}</td>
-							    	<td>{{$inventory->barcode}}</td>
-							    	<td>{{$inventory->from}}</td>
-							    	<td>{{$inventory->to}}</td>
-							    	<td>{{$inventory->quantity}}</td>
-							    	<td>{{$inventory->email}}</td>
-							    	<td>{{$inventory->expiration_date}}</td>
-							    	<td>{{$inventory->pallet_number}}</td>
-							    	<td>
-							    		@php
-							    		 $images = (!empty($inventory->images)) ? explode(',', $inventory->images) : array() ;
-							    		@endphp
-							    		@foreach ($images as $image)
-							    			<a target="_blank" href="{{asset('uploads/' . $image)}}">View Image</a>
-							    		@endforeach
-							    	</td>
-							    </tr>
-							@endforeach
-					    @else
-					    	<td colspan="4">No user found</td>	
-					    @endif
-					    
-					</tbody>
+
 				</table>
 			</div>
 		</div>
@@ -71,11 +45,34 @@
 				window.location.href = $(this).attr('href');
 			}
 		})
-		$(document).ready( function () {
-			if ( $('#wc-table').length > 0) {
-			    $('#wc-table').DataTable();
-			}
-		} );
+		  $('#wc-table').DataTable({
+		         processing: true,
+		         serverSide: true,
+		         ajax: {
+		          url: "{{ route('getInventoryDetails', ['id' => request('id')]) }}",
+		          type: 'GET',
+		         },
+
+		         columns: [
+		                  { data: 'id', name: 'id', 'visible': false},
+		                  { data: 'barcode', name: 'barcode' },
+		                  { data: 'from', name: 'from' },
+		                  { data: 'to', name: 'to' },
+		                  { data: 'quantity', name: 'quantity' },
+		                  { data: 'email', name: 'users.email' },
+		                  { data: 'expiration_date', name: 'expiration_date' },
+		                  { data: 'pallet_number', name: 'pallet_number' },
+		                  { data: 'images_links', 
+		                      name: 'images_links', 
+		                      orderable: true, 
+		                      searchable: true
+		                  }
+		               ],
+		        order: [[0, 'desc']]
+		  });
+		  
+
+
 
 	</script>
 @endsection

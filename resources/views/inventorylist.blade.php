@@ -25,7 +25,7 @@
 					</thead>
 					<tbody>
 					  	@empty(!$inventories)
-					  		@foreach ($inventories as $index => $inventory)
+					  		@foreach ($inventories['data'] as $index => $inventory)
 							    <tr>
 							    	<td>{{ ($index + 1)}}</td>
 							    	<td>{{$inventory['barcode']}}</td>
@@ -36,7 +36,7 @@
 							    	</td>
 							    	<td>{{$inventory['total']}}</td>
 							    	<td>
-							    		<a href="{{route('getInventoryDetails', ['id' => $inventory['barcode']] ) }}">Click for all moves</a><br>
+							    		<a href="{{route('getInventoryDetailsView', ['id' => $inventory['barcode']] ) }}">Click for all moves</a><br>
 							    	</td>
 							    </tr>
 							@endforeach
@@ -46,6 +46,7 @@
 					    
 					</tbody>
 				</table>
+				{{$inventories['links']}}
 			</div>
 		</div>
 	</div>
@@ -64,7 +65,7 @@
 		})
 		$(document).ready( function () {
 			if ( $('#wc-table').length > 0) {
-			    $('#wc-table').DataTable();
+			    $('#wc-table').DataTable({  "paging":   false,"info":     false});
 			}
 		} );
 

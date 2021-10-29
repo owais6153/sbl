@@ -9,12 +9,13 @@ use App\Models\InventoryLocation;
 use Validator;
 use File;
 use Session;
+use DataTables;
 
 class InventoryLocationTrackingController extends Controller
 {
     public function index()
     {
-        $barcodes = InventoryModel::select('barcode')->groupBy('barcode')->get();
+        $barcodes = InventoryModel::select('barcode')->groupBy('barcode')->paginate(10);
         $inventories = array();
         foreach ($barcodes as $barcode){
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->get();
@@ -46,22 +47,41 @@ class InventoryLocationTrackingController extends Controller
                 }
                 $eachBarcodeData['total'] = $total_inventory;
             }
-            $inventories[] = $eachBarcodeData;
+            $inventories['data'][] = $eachBarcodeData;
+
         }     
-        // echo "<pre>";
-        // print_r($inventories);
-        // echo "</pre>"; 
+        $inventories['links'] = $barcodes->links();
+
         return view('inventorylist', compact('inventories'));        
 
 
 
     }
-
+    public function getInventoryDetailsView(Request $request){
+        return view('InventoryDetails');
+    }
     public function getInventoryDetails(Request $request){
 
-        $inventories = InventoryModel::select('users.email', 'inventory_location_tracking.*')->where('barcode', '=', $request->id)->join('users', 'users.id', '=', 'inventory_location_tracking.user_id')->get();
+        // $inventories = InventoryModel::select('users.email', 'inventory_location_tracking.*')->where('barcode', '=', $request->id)->join('users', 'users.id', '=', 'inventory_location_tracking.user_id')->get();
 
-        return view('InventoryDetails', compact('inventories'));
+        // return view('InventoryDetails', compact('inventories'));
+
+        $model = InventoryModel::query();
+        return DataTables::eloquent($model,)
+        ->filter(function ($query) {
+            $query->select('users.email', 'inventory_location_tracking.*')->where('barcode', '=', request('id'))->join('users', 'users.id', '=', 'inventory_location_tracking.user_id');
+        }, true)
+        ->addColumn('images_links', function($row){
+            
+            $images = (!empty($row->images)) ? explode(',', $row->images) : array();
+            $actionBtn = '';
+            foreach($images as $image){
+                $actionBtn.= '<a target="_blank" href="'.asset('uploads/' . $image ).'" >View Image</a>';
+            }
+            return $actionBtn;
+        })
+        ->rawColumns(['images_links'])
+        ->toJson();
     }
     public function create()
     {

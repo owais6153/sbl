@@ -41,7 +41,8 @@ Route::middleware(['is_admin'])->group(function (){
 	Route::get('/files/onrecive/get', [FileUploadController::class, 'getOnReciveList'])->name('getOnReciveList');
 // Inventory Location
 	Route::get('/inventory', [InventoryLocationTrackingController::class, 'index'])->name('inventory');	
-	Route::get('/inventory/detail/{id}', [InventoryLocationTrackingController::class, 'getInventoryDetails'])->name('getInventoryDetails');
+	Route::get('/inventory/getdetail/{id}', [InventoryLocationTrackingController::class, 'getInventoryDetails'])->name('getInventoryDetails');
+	Route::get('/inventory/detail/{id}', [InventoryLocationTrackingController::class, 'getInventoryDetailsView'])->name('getInventoryDetailsView');
 	Route::post('/inventory/save', [InventoryLocationTrackingController::class, 'saveInventory'])->name('saveInventory');
 	Route::get('/inventory/add', [InventoryLocationTrackingController::class, 'create'])->name('addInventory');
 	Route::post('/inventory/upload', [InventoryLocationTrackingController::class, 'uploadImage'])->name('uploadImage');
