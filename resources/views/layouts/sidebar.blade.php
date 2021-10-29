@@ -19,7 +19,7 @@
 			      <ul class="nav navbar-nav">
 
 
-			        <li class="dropdown active">
+			        <li class="dropdown {{ (request()->is('users/*') || request()->is('users')) ? 'active' : '' }}">
 			          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fas fa-users"></i>Users</a>
 			          <ul class="dropdown-menu">
 			            <li><a href="{{route('user_list')}}"><i class="fas fa-user"></i>All Users</a></li>
@@ -28,7 +28,7 @@
 			        </li>
 
 
-			        <li class="dropdown">
+			        <li class="dropdown {{ (request()->is('files/*') || request()->is('files')) ? 'active' : '' }}">
 			        <a class="dropdown-toggle" data-toggle="dropdown" href="{{route('user_list')}}"><i class="fas fa-users"></i>Inventory Aging Report</a>
 					<ul class="dropdown-menu">
 						<li><a href="{{route('inventoryOnhand')}}"><i class="fas fa-user"></i>List All on Hands</a></li>
@@ -37,11 +37,10 @@
 					</ul>
 				</li>
 
-				<li class="dropdown">
+				<li class="dropdown {{ (request()->is('inventory/*') || request()->is('inventory')) ? 'active' : '' }}">
 				<a class="dropdown-toggle" data-toggle="dropdown" href="{{route('user_list')}}"><i class="fas fa-users"></i>Inventory Location Tracking</a>
 					<ul class="dropdown-menu">
-						<li><a href="{{route('addInventory')}}"><i class="fas fa-user"></i>Scan Inventory</a></li>
-						<li><a href="{{route('inventory')}}" ><i class="fas fa-user-plus"></i>List All</a></li>
+						<li><a href="{{route('addInventory')}}"><i class="fas fa-user"></i>Scan Inventory</a></li>						
 						<li><a href="{{route('inventory')}}" ><i class="fas fa-user-plus"></i>Location</a></li>
 					</ul>
 				</li>
