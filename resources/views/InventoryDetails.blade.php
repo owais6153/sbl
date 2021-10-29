@@ -18,9 +18,13 @@
 					    <tr>
 					      <th scope="col">#</th>
 					      <th scope="col">Barcode</th>
-					      <th scope="col">Locations (QTY)</th>
-					      <th scope="col">Total Inventory</th>
-					      <th scope="col">Moves</th>
+					      <th scope="col">From Location</th>
+					      <th scope="col">To Location</th>
+					      <th scope="col">Qty</th>
+					  	  <th scope="col">Email</th>
+					      <th scope="col">Expiration</th>
+					      <th scope="col">Pallet</th>
+					      <th scope="col">Images</th>
 					    </tr>
 					</thead>
 					<tbody>
@@ -28,15 +32,20 @@
 					  		@foreach ($inventories as $index => $inventory)
 							    <tr>
 							    	<td>{{ ($index + 1)}}</td>
-							    	<td>{{$inventory['barcode']}}</td>
+							    	<td>{{$inventory->barcode}}</td>
+							    	<td>{{$inventory->from}}</td>
+							    	<td>{{$inventory->to}}</td>
+							    	<td>{{$inventory->quantity}}</td>
+							    	<td>{{$inventory->email}}</td>
+							    	<td>{{$inventory->expiration_date}}</td>
+							    	<td>{{$inventory->pallet_number}}</td>
 							    	<td>
-							    		@foreach ($inventory['locations'] as $location)
-							    			{{$location['location_name']}} ({{$location['location_sum']}})
+							    		@php
+							    		 $images = (!empty($inventory->images)) ? explode(',', $inventory->images) : array() ;
+							    		@endphp
+							    		@foreach ($images as $image)
+							    			<a target="_blank" href="{{asset('uploads/' . $image)}}">View Image</a>
 							    		@endforeach
-							    	</td>
-							    	<td>{{$inventory['total']}}</td>
-							    	<td>
-							    		<a href="{{route('getInventoryDetails', ['id' => $inventory['barcode']] ) }}">Click for all moves</a><br>
 							    	</td>
 							    </tr>
 							@endforeach

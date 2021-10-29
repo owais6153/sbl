@@ -3,19 +3,65 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\InventoryLocationTracking as InventoryModel;
-use App\Models\OnHand;
+use App\Models\InventoryLocation;
 use Validator;
 use File;
 use Session;
-use DataTables;
 
 class InventoryLocationTrackingController extends Controller
 {
     public function index()
     {
-        $inventories = InventoryModel::all();
+        $barcodes = InventoryModel::select('barcode')->groupBy('barcode')->get();
+        $inventories = array();
+        foreach ($barcodes as $barcode){
+            $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->get();
+            $location = array();
+            foreach ($from_to_query as $k => $from_to_rec){
+                if(!in_array($from_to_rec->to,$location) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping') )
+                {
+                    $location[$barcode->barcode][] = $from_to_rec->to;
+                }
+                elseif(!in_array($from_to_rec->from,$location) && ($from_to_rec->from != 'Receiving' && $from_to_rec->from != 'Shipping') )
+                {
+                    $location[$barcode->barcode][] = $from_to_rec->from;
+                }
+                $location[$barcode->barcode] = array_unique($location[$barcode->barcode]);
+            }
+
+            $eachBarcodeData = array();
+            foreach ($location as $k => $v){
+                $total_inventory = 0;
+                foreach ($v as $k2 => $v2 ){
+                    $get_location_sum = DB::table('inventory_location')->where('location', '=', $v2)->sum('count');
+                    // echo $get_location_sum;
+                    $eachBarcodeData['barcode'] = $k;
+                    $eachBarcodeData['locations'][] = array(
+                        'location_name' => $v2,
+                        'location_sum'  => $get_location_sum,
+                    );
+                    $total_inventory = $total_inventory + $get_location_sum;
+                }
+                $eachBarcodeData['total'] = $total_inventory;
+            }
+            $inventories[] = $eachBarcodeData;
+        }     
+        // echo "<pre>";
+        // print_r($inventories);
+        // echo "</pre>"; 
         return view('inventorylist', compact('inventories'));        
+
+
+
+    }
+
+    public function getInventoryDetails(Request $request){
+
+        $inventories = InventoryModel::select('users.email', 'inventory_location_tracking.*')->where('barcode', '=', $request->id)->join('users', 'users.id', '=', 'inventory_location_tracking.user_id')->get();
+
+        return view('InventoryDetails', compact('inventories'));
     }
     public function create()
     {
@@ -97,49 +143,25 @@ class InventoryLocationTrackingController extends Controller
             $Inventory->images = implode(',', $request->images);
         }
         $Inventory->save();
+        
+        if ($request->from != 'Receiving') {
+            $FromLocation = new InventoryLocation();
+            $FromLocation->barcode = $request->barcode;
+            $FromLocation->count = $request->quantity * -1;
+            $FromLocation->location = $request->from;
+            $FromLocation->inventory_track_id = $Inventory->id;
+            $FromLocation->save();
+        }
+        if ($request->to != 'Shipping') {
+            $ToLocation = new InventoryLocation();
+            $ToLocation->barcode = $request->barcode;
+            $ToLocation->count = $request->quantity ;
+            $ToLocation->location = $request->to;
+            $ToLocation->inventory_track_id = $Inventory->id;
+            $ToLocation->save();
+        }
+
         return response()->json(['success'=>'Inventory Inserted', 'status' => 'success']);
     }
-    public function inventoryOnhand()
-    {
 
-        return view('inventorylistOnhand'); 
-    }
-    public function getOnHandList(){
-
-        $model = OnHand::query();
-
-        return DataTables::eloquent($model)
-        ->filter(function ($query) {
-            if (request()->has('name')) {
-                $query->where('name', 'like', "%" . request('name') . "%");
-            }
-
-            if (request()->has('email')) {
-                $query->where('email', 'like', "%" . request('email') . "%");
-            }
-        }, true)
-        ->toJson();
-    }
-
-    public function inventoryOnRecive()
-    {
-
-        return view('inventorylistOnrecieve'); 
-    }
-    public function getOnReciveList(){
-
-        $model = OnHand::query();
-
-        return DataTables::eloquent($model)
-        ->filter(function ($query) {
-            if (request()->has('name')) {
-                $query->where('name', 'like', "%" . request('name') . "%");
-            }
-
-            if (request()->has('email')) {
-                $query->where('email', 'like', "%" . request('email') . "%");
-            }
-        }, true)
-        ->toJson();
-    }
 }

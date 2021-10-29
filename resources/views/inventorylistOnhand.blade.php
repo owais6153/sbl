@@ -5,7 +5,7 @@
 	<div class="col-lg-9 col-md-9">
 		<div class="wrap-content">
 			<div class="wc-title">
-				<h2>All Inventories</h2>
+				<h2>All On Hand Inventories</h2>
 				@if (session('success'))
 				    <div class="alert alert-success mb-3">
 				        {{ session('success') }}

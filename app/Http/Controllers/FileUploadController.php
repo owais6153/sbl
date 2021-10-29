@@ -12,6 +12,7 @@ use App\Models\OnReciving;
 use File;
 use Illuminate\Support\Facades\Bus;
 use App\Jobs\ImportCSV;
+use DataTables;
 
 class FileUploadController extends Controller
 {
@@ -97,5 +98,48 @@ class FileUploadController extends Controller
         }
 
         return [];
+    }
+    public function inventoryOnhand()
+    {
+
+        return view('inventorylistOnhand'); 
+    }
+    public function getOnHandList(){
+
+        $model = OnHand::query();
+
+        return DataTables::eloquent($model)
+        ->filter(function ($query) {
+            if (request()->has('name')) {
+                $query->where('name', 'like', "%" . request('name') . "%");
+            }
+
+            if (request()->has('email')) {
+                $query->where('email', 'like', "%" . request('email') . "%");
+            }
+        }, true)
+        ->toJson();
+    }
+
+    public function inventoryOnRecive()
+    {
+
+        return view('inventorylistOnrecieve'); 
+    }
+    public function getOnReciveList(){
+
+        $model = OnReciving::query();
+
+        return DataTables::eloquent($model)
+        ->filter(function ($query) {
+            if (request()->has('name')) {
+                $query->where('name', 'like', "%" . request('name') . "%");
+            }
+
+            if (request()->has('email')) {
+                $query->where('email', 'like', "%" . request('email') . "%");
+            }
+        }, true)
+        ->toJson();
     }
 }

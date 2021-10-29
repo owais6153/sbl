@@ -33,15 +33,20 @@ Route::middleware(['is_admin'])->group(function (){
 // File Upload
 	Route::get('/files/import', [FileUploadController::class, 'importFiles'])->name('import_files');
 	Route::post('/files/import/save', [FileUploadController::class, 'saveImportFiles'])->name('saveImportFiles');
+	// On hand
+	Route::get('/onhand', [FileUploadController::class, 'inventoryOnhand'])->name('inventoryOnhand');
+	Route::get('/onhand/get', [FileUploadController::class, 'getOnHandList'])->name('getOnHandList');
+	// On Recieve
+	Route::get('/onrecive', [FileUploadController::class, 'inventoryOnRecive'])->name('inventoryOnRecive');
+	Route::get('/onrecive/get', [FileUploadController::class, 'getOnReciveList'])->name('getOnReciveList');
 // Inventory Location
-	Route::get('/inventory', [InventoryLocationTrackingController::class, 'index'])->name('inventory');
+	Route::get('/inventory', [InventoryLocationTrackingController::class, 'index'])->name('inventory');	
+	Route::get('/inventory/detail/{id}', [InventoryLocationTrackingController::class, 'getInventoryDetails'])->name('getInventoryDetails');
 	Route::post('/inventory/save', [InventoryLocationTrackingController::class, 'saveInventory'])->name('saveInventory');
 	Route::get('/inventory/add', [InventoryLocationTrackingController::class, 'create'])->name('addInventory');
 	Route::post('/inventory/upload', [InventoryLocationTrackingController::class, 'uploadImage'])->name('uploadImage');
 	Route::post('/inventory/upload/remove', [InventoryLocationTrackingController::class, 'removeImage'])->name('removeImage');
-	Route::get('/onhand', [InventoryLocationTrackingController::class, 'inventoryOnhand'])->name('inventoryOnhand');
-	Route::get('/onhand/get', [InventoryLocationTrackingController::class, 'getOnHandList'])->name('getOnHandList');
-	Route::get('/onrecive', [InventoryLocationTrackingController::class, 'inventoryOnRecive'])->name('inventoryOnRecive');
-	Route::get('/onrecive/get', [InventoryLocationTrackingController::class, 'getOnReciveList'])->name('getOnReciveList');
+
+
 
 });
