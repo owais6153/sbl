@@ -9,6 +9,7 @@ use Redirect;
 use Hash;
 use Validator;
 use Session;
+use DataTables;
 
 class HomeController extends Controller
 {
@@ -44,8 +45,31 @@ class HomeController extends Controller
       return redirect('/');
     }
     public function users(){
-        $users = User::all();
-        return view('userlist', compact('users'));
+        return view('userlist');
+    }
+    public function userDisplay()
+    {
+        $model = User::query();
+
+        return DataTables::eloquent($model)
+        ->filter(function ($query) {
+            if (request()->has('name')) {
+                $query->where('name', 'like', "%" . request('name') . "%");
+            }
+
+            if (request()->has('email')) {
+                $query->where('email', 'like', "%" . request('email') . "%");
+            }
+        }, true)
+        ->addColumn('action', function($row){
+            $actionBtn= '<a href="' . route('edit_user', ['id' => $row->id]) . '" class="mr-3"><i class="fas fa-pencil-alt mr-2"></i>Edit</a> <a class="deleteIt" href="' .route('deleteuser', ['id' => $row->id]). '"><i class="fas fa-trash-alt mr-2"></i>Delete</a>
+
+            ';
+            return $actionBtn;
+        })
+        ->rawColumns(['action'])
+
+        ->toJson();
     }
     public function add_user(){
         return view('adduser');

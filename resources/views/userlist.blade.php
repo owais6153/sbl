@@ -16,34 +16,12 @@
 				<table id="wc-table" class="display">
 					<thead>
 					    <tr>
-					      <th scope="col">#</th>
+					      <th scope="col">ID</th>
 					      <th scope="col">Name</th>
 					      <th scope="col">Email</th>
-					      <th scope="col">Actions</th>
+					      <th scope="col">Action</th>
 					    </tr>
 					</thead>
-					<tbody>
-					  	@empty(!$users)
-					  		@foreach ($users as $index => $user)
-							    <tr>
-							    	<td>{{ ($index + 1)}}</td>
-							    	<td>{{$user->name}}</td>
-							    	<td>{{$user->email}}</td>
-							    	<td>
-							    		@if ($user->id == 1 || Session::get('id') == $user->id)
-							    			No actions
-							    		@else 
-								    		<a href="{{route('edit_user', ['id' => $user->id]) }}" class="mr-3"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>
-								    		<a class="deleteIt" href="{{route('deleteuser', ['id' => $user->id]) }}"><i class="fas fa-trash-alt mr-2"></i>Delete</a>
-							    		@endif
-							    	</td>
-							    </tr>
-							@endforeach
-					    @else
-					    	<td colspan="4">No user found</td>	
-					    @endif
-					    
-					</tbody>
 				</table>
 			</div>
 		</div>
@@ -60,12 +38,36 @@
 			if (result) {
 				window.location.href = $(this).attr('href');
 			}
-		})
+		});
+
 
 		$(document).ready( function () {
-			if ( $('#wc-table').length > 0) {
-			    $('#wc-table').DataTable();
-			}
-		} );
+		   $.ajaxSetup({
+		      headers: {
+		          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		      }
+		  });
+		 
+		  $('#wc-table').DataTable({
+		         processing: true,
+		         serverSide: true,
+		         ajax: {
+		          url: "{{ route('userDisplay') }}",
+		          type: 'GET',
+		         },
+		         columns: [
+		                  { data: 'id', name: 'id', 'visible': false},
+		                  { data: 'name', name: 'name' },
+		                  { data: 'email', name: 'email' },
+		                  { data: 'action', 
+		                      name: 'action', 
+		                      orderable: true, 
+		                      searchable: true
+		                  }
+		               ],
+		        order: [[0, 'desc']]
+		  });
+		  
+		});
 	</script>
 @endsection

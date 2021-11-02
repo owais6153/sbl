@@ -35,7 +35,7 @@
 					  </div>
 					  <div class="form-group col-half">
 					    <label for="expiration_date">Expiration Date</label>
-					    <input type="date" class="form-control" id="expiration_date" placeholder="Expiration Date" name="expiration_date">
+					    <input type="text" class="form-control" id="expiration_date" placeholder="Expiration Date" name="expiration_date">
 					  </div>
 					  <div class="form-group col-half">
 					    <label for="pallet_number">Pallet number</label>
