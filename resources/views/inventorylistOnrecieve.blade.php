@@ -13,7 +13,7 @@
 				@endif
 			</div>
 			<div class="wc-content">
-				<table class="table table-bordered table-striped display" id="wc-table">
+				<table class="table table-bordered table-striped display inventory-table" id="wc-table">
 			       <thead>
 			          <tr>
 			             <th>ID</th>
