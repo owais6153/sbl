@@ -441,11 +441,7 @@ table.dataTable thead .sorting {
     max-width: 80%;
     flex: 80%;
 }
-.custom_form .col-half {
-    width: 49%;
-    display: inline-block;
-    padding-right: 20px;
-}
+
 .custom_form .form-group label {
     font-size: 19px;
     font-weight: 700;
