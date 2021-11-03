@@ -56,7 +56,9 @@
 		});
 
 		$( function() {
-		    $( "#expiration_date" ).datepicker();
+		    $( "#expiration_date" ).datepicker({
+		    	 dateFormat: "yy-mm-dd"
+		    });
 	  	} );
 
 	  	var height = $(window).height();

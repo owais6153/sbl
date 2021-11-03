@@ -26,8 +26,12 @@
 					    <input type="number" class="form-control" id="quantity" placeholder="Enter Quantity" name="quantity">
 					  </div>
 					  <div class="form-group col-half">
-					    <label for="from">From Location</label>
-					    <input type="text" class="form-control" id="from" placeholder="From Location" name="from">
+					    <label for="from">From Location</label>		
+					    <select class="form-control" id="from" placeholder="From Location" name="from">
+					    	<option value="">Select From</option>
+					    	<option value="Receiving">Receiving</option>
+					    	<optgroup id="options"></optgroup>
+					    </select>
 					  </div>
 					  <div class="form-group col-half">
 					    <label for="to">To Location</label>
@@ -35,7 +39,7 @@
 					  </div>
 					  <div class="form-group col-half">
 					    <label for="expiration_date">Expiration Date</label>
-					    <input type="text" class="form-control" id="expiration_date" placeholder="Expiration Date" name="expiration_date">
+					    <input type="date" class="form-control" id="expiration_date" placeholder="Expiration Date" name="expiration_date">
 					  </div>
 					  <div class="form-group col-half">
 					    <label for="pallet_number">Pallet number</label>
@@ -173,7 +177,62 @@
 		     }
 		});
 	})
+	$('#barcode').change(function(){
+		if ($(this).val() != '') {
+			let barcode = $(this).val() ;
+			$.ajax({
+		         headers: {
+	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+	             },
+			     url: "{{route('getlocationbybarcode')}}", 
+			     type: 'post',
+			     data: {'barcode': barcode},
+			     dataType: 'json',
+			     success: function (response) {
+			       if (response.status == 'success') {
+			       		let html = '';
+			       	   for(var index = 0; index < response.locations.length; index++) {
+			       	   	html+= '<option value="'+response.locations[index]+'">' + response.locations[index] + '</option>';
+				       }
+				       $('#options').html(html); 
+			       }
+			       else if (response.status == 'error'){
+				       	alert(response.error);
+			       }
 
+			     },
+			     error: function (){
+			     	alert("Something Went Wrong...");
+			     }
+			});
+		}
+	})
+	$('#from').change(function(){
+		if ($(this).val() != '' && $(this).val() != 'Receiving' && $('#barcode').val() != '') {
+			let from = $(this).val() ;
+			$.ajax({
+		         headers: {
+	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+	             },
+			     url: "{{route('getExiprationDateAndQuantity')}}", 
+			     type: 'post',
+			     data: {'from': from, 'barcode':  $('#barcode').val()},
+			     dataType: 'json',
+			     success: function (response) {
+			       if (response.status == 'success') {
+			       		console.log(response);
+			       }
+			       else if (response.status == 'error'){
+				       	alert(response.error);
+			       }
+
+			     },
+			     error: function (){
+			     	alert("Something Went Wrong...");
+			     }
+			});
+		}
+	})
 
 </script>
 @endsection

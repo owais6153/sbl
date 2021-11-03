@@ -169,8 +169,9 @@ class InventoryLocationTrackingController extends Controller
             $FromLocation->barcode = $request->barcode;
             $FromLocation->count = $request->quantity * -1;
             $FromLocation->location = $request->from;
-            $FromLocation->inventory_track_id = $Inventory->id;
-            $FromLocation->save();
+            $FromLocation->inventory_track_id = $Inventory->id;    
+            $FromLocation->expiration_date = $request->expiration_date;        
+            $FromLocation->save();            
         }
         if ($request->to != 'Shipping') {
             $ToLocation = new InventoryLocation();
@@ -178,10 +179,90 @@ class InventoryLocationTrackingController extends Controller
             $ToLocation->count = $request->quantity ;
             $ToLocation->location = $request->to;
             $ToLocation->inventory_track_id = $Inventory->id;
+            $ToLocation->expiration_date = $request->expiration_date;
             $ToLocation->save();
         }
 
         return response()->json(['success'=>'Inventory Inserted', 'status' => 'success']);
     }
+    public function getlocationbybarcode(Request $request)
+    {        
+        $validation = Validator::make($request->all(),[
+            'barcode' => 'required'
+        ]);
 
+        if ($validation->fails())
+        {
+            foreach($validation->messages()->getMessages() as $field_name => $messages)
+            {
+                 return response()->json(["error" => $messages, 'status' => 'error']);
+            }
+        }
+
+        $barcode = $request->barcode;        
+        $barcodes = InventoryModel::select('barcode')->where('barcode', '=', $request->barcode )->first();
+        if (empty($barcodes)) {
+             return response()->json(["error" => 'Barcode not found', 'status' => '404']);
+        }
+            
+        $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode)->get();
+        $locations = array();
+        foreach ($from_to_query as $k => $from_to_rec){
+            if(!in_array($from_to_rec->to,$locations) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping') )
+            {
+                $locations[] = $from_to_rec->to;
+            }
+            elseif(!in_array($from_to_rec->from,$locations) && ($from_to_rec->from != 'Receiving' && $from_to_rec->from != 'Shipping') )
+            {
+                $locations[] = $from_to_rec->from;
+            }
+            $locations = array_unique($locations);
+        }
+
+        foreach($locations as $i => $location){
+            $get_location_sum = DB::table('inventory_location')->where('location', '=', $location)->sum('count');
+            if ($get_location_sum == 0) {
+                unset($locations[$i]);
+            }
+        }
+
+
+       return response()->json(["locations" => $locations, 'status' => 'success']);
+
+    }
+    public function getExiprationDateAndQuantity(Request $request){
+        $validation = Validator::make($request->all(),[
+            'from' => 'required',
+            'barcode' => 'required'
+        ]);
+
+        if ($validation->fails())
+        {
+            foreach($validation->messages()->getMessages() as $field_name => $messages)
+            {
+                 return response()->json(["error" => $messages, 'status' => 'error']);
+            }
+        }
+        $from = $request->from; 
+        $barcode = $request->barcode;        
+        $barcodes = InventoryModel::select('barcode')->where('barcode', '=', $request->barcode )->first();
+        if (empty($barcodes)) {
+          return response()->json(["error" => 'Barcode not found', 'status' => '404']);
+        }
+        $from_to_query = InventoryModel::select('id', 'to', 'barcode')->where('barcode', '=', $barcode)->where('to', '=', $from)->get();
+
+        $data = array();
+        foreach ($from_to_query as $k => $from_to_rec){            
+            $get_location_sum = DB::select("select SUM(`count`) as `quantity`, expiration_date from `inventory_location` where `location` = '".$from."' and `barcode` = '".$barcode."' group by `expiration_date`");
+
+            
+                $data[][$from_to_rec->to]['count'] = $get_location_sum;
+
+        }
+        echo '<pre>';
+        print_r($get_location_sum);
+        echo '</pre>';
+
+
+    }
 }

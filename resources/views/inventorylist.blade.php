@@ -25,6 +25,7 @@
 					</thead>
 					<tbody>
 					  	@empty(!$inventories)
+					  	@isset($inventories['data'])
 					  		@foreach ($inventories['data'] as $index => $inventory)
 							    <tr>
 							    	<td>{{ ($index + 1)}}</td>
@@ -40,6 +41,7 @@
 							    	</td>
 							    </tr>
 							@endforeach
+							@endif
 					    @else
 					    	<td colspan="4">No user found</td>	
 					    @endif
