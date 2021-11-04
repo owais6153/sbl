@@ -13,7 +13,7 @@
 		    	@endforeach
 		    @endif
 			<div class="wc-content">
-				<form action="{{route('addusers')}}" method="POST">
+				<form action="{{route('addusers')}}" method="POST" autocomplete="off">
 					   @csrf
 					  <div class="form-group">
 					    <label for="username">Name</label>

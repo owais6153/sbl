@@ -14,7 +14,7 @@
 				@endif
 			</div>
 			<div class="wc-content">
-				<form action="{{route('edituser')}}" method="POST">
+				<form action="{{route('edituser')}}" method="POST" autocomplete="off">
 					@csrf
 				<div class="form-group">
 				    <label for="username">Name</label>

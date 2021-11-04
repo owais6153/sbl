@@ -99,14 +99,9 @@ class InventoryLocationTrackingController extends Controller
             }
             return $actionBtn;
         })
-        ->addColumn('date', function($row){
-            $created_at = $row->created_at;
-            $created_at = date('m/d/Y', strtotime($created_at));       
-            return $created_at;
-        })
         ->addColumn('time', function($row){
             $created_at = $row->created_at;
-            $created_at = date('H:i:s a', strtotime($created_at));       
+            $created_at = date('m/d/Y h:i A', strtotime($created_at));       
             return $created_at;
         })
         ->rawColumns(['images_links'])

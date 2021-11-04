@@ -22,7 +22,7 @@
 			</div>
 			<div class="alert"></div>
 			<div class="wc-content">
-				<form class="custom_form" action="{{route('addusers')}}" method="POST" enctype="multipart/form-data" id="saveInventory">
+				<form class="custom_form" action="{{route('addusers')}}" method="POST" enctype="multipart/form-data" id="saveInventory" autocomplete="off">
 					   @csrf
 					   <div id="fileFields"></div>
 					  <div class="form-group col-half">
@@ -62,7 +62,7 @@
 					  </div>
 
 					  <div class="btn-form">
-					  	<button type="submit" class="btn btn-primary">Submit</button>
+					  	<button type="button" id="submitForm" class="btn btn-primary">Submit</button>
 					  	<img src="{{asset('images/preloader.gif')}}">
 					  </div>
 				</form>
@@ -153,9 +153,12 @@
 	}
 
 	$('#saveInventory').submit( function (e){
-		$('.btn-form img').css("display","inline-block");
 		e.preventDefault();
-		var formData = new FormData(this);
+	})
+	$('#submitForm').click( function (e){
+		$('.btn-form img').css("display","inline-block");
+		var forms= document.getElementById('saveInventory');
+		var formData = new FormData(forms);
 		$.ajax({
 	         headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -164,7 +167,7 @@
 		     type: 'post',
 		     data: formData,
 		     dataType: 'json',
-		     		     contentType: false,
+		     contentType: false,
 		     processData: false,
 		     success: function (response) {
 		     	$('.btn-form img').css("display","none");
