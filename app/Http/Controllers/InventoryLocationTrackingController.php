@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\InventoryLocationTracking as InventoryModel;
@@ -13,9 +13,28 @@ use DataTables;
 
 class InventoryLocationTrackingController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $barcodes = InventoryModel::select('barcode')->groupBy('barcode')->paginate(10);
+        $InventoryModel = new InventoryModel();
+        $tablename = $InventoryModel->getTable();
+        $columns = Schema::getColumnListing($tablename);
+        $query = InventoryModel::query()->select('barcode');
+        $search = $request->search;
+        if ($request->search != '') {
+            foreach ($columns as $column) {
+                if ($column != 'id' && $column != 'user_id' && $column != 'images' && $column != 'created_at' && $column != 'updated_at') {
+                    $query->orWhere($column, 'LIKE', '%' . $search . '%');
+                }
+            }
+        }
+
+
+        $barcodes = $query->groupBy('barcode')->paginate(10);
+        if (empty($barcodes)) {
+            return response()->json(["error" => 'Barcode not found', 'status' => '404']);
+        }
+
+        
         $inventories = array();
         foreach ($barcodes as $barcode){
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->get();
@@ -274,5 +293,63 @@ class InventoryLocationTrackingController extends Controller
 
        return response()->json(["data" => $data, 'status' => 'success']);
 
+    }
+    public function listsearch (Request $request){
+        $InventoryModel = new InventoryModel();
+        $tablename = $InventoryModel->getTable();
+        $columns = Schema::getColumnListing($tablename);
+        $query = InventoryModel::query()->select('barcode');
+        $search = $request->search;
+        if ($request->search != '') {
+            foreach ($columns as $column) {
+                if ($column != 'id' && $column != 'user_id' && $column != 'images' && $column != 'created_at' && $column != 'updated_at') {
+                    $query->orWhere($column, 'LIKE', '%' . $search . '%');
+                }
+            }
+        }
+
+
+        $barcodes = $query->groupBy('barcode')->paginate(10);
+        if (empty($barcodes)) {
+            return response()->json(["error" => 'Barcode not found', 'status' => '404']);
+        }
+        $inventories = array();
+        foreach ($barcodes as $barcode){
+            $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->get();
+            $location = array();
+            foreach ($from_to_query as $k => $from_to_rec){
+                if(!in_array($from_to_rec->to,$location) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping') )
+                {
+                    $location[$barcode->barcode][] = $from_to_rec->to;
+                }
+                elseif(!in_array($from_to_rec->from,$location) && ($from_to_rec->from != 'Receiving' && $from_to_rec->from != 'Shipping') )
+                {
+                    $location[$barcode->barcode][] = $from_to_rec->from;
+                }
+                $location[$barcode->barcode] = array_unique($location[$barcode->barcode]);
+            }
+
+            $eachBarcodeData = array();
+            foreach ($location as $k => $v){
+                $total_inventory = 0;
+                foreach ($v as $k2 => $v2 ){
+                    $get_location_sum = DB::table('inventory_location')->where('location', '=', $v2)->where('barcode', '=', $barcode->barcode)->sum('count');
+                    // echo $get_location_sum;
+                    $eachBarcodeData['barcode'] = $k;
+                    $eachBarcodeData['locations'][] = array(
+                        'location_name' => $v2,
+                        'location_sum'  => $get_location_sum,
+                    );
+                    $total_inventory = $total_inventory + $get_location_sum;
+                }
+                $eachBarcodeData['total'] = $total_inventory;
+            }
+            $inventories['data'][] = $eachBarcodeData;
+
+        }     
+        $barcodes->withPath(route('inventory'));
+        $inventories['links'] = $barcodes->links();
+        $html = view('response.inventorylist', compact('inventories', 'search'))->render();
+        return response()->json(['html'=> $html, 'status' => 'success']);
     }
 }

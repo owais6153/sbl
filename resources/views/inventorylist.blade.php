@@ -12,11 +12,13 @@
 				    </div>
 				@endif
 			</div>
-			<div class="wc-content">
+			<img src="{{asset('images/preloader.gif')}}" id="loader" style="display: none;">
+			<div class="wc-content">			    
+				<div class="custom_data_filter"><label>Search:<input type="search" value="{{ Request::get('search') }}" class="" placeholder="">					  	</label></div>
+
 				<table id="wc-table" class="display">
 					<thead>
 					    <tr>
-					      <th scope="col">#</th>
 					      <th scope="col">Barcode</th>
 					      <th scope="col">Locations (QTY)</th>
 					      <th scope="col">Total Inventory</th>
@@ -28,7 +30,6 @@
 					  	@isset($inventories['data'])
 					  		@foreach ($inventories['data'] as $index => $inventory)
 							    <tr>
-							    	<td>{{ ($index + 1)}}</td>
 							    	<td>{{$inventory['barcode']}}</td>
 							    	<td>
 							    		@foreach ($inventory['locations'] as $location)
@@ -67,9 +68,37 @@
 		})
 		$(document).ready( function () {
 			if ( $('#wc-table').length > 0) {
-			    $('#wc-table').DataTable({  "paging":   false,"info":     false});
+			    $('#wc-table').DataTable({  "paging":   false,"info":     false, searching: false});
 			}
 		} );
+
+		$(document).on('keyup', '.custom_data_filter input' , function(){
+			$('#loader').show();
+			$.ajax({
+		         headers: {
+	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+	             },
+			     url: "{{route('listsearch')}}", 
+			     type: 'post',
+			     data: {'search': $(this).val()},
+			     dataType: 'json',
+			     success: function (response) {
+			     $('#loader').hide();
+			     if (response.status == 'success') {
+			     	$('.wc-content').html(response.html);
+			     	  $('#wc-table').DataTable({  "paging":   false,"info":     false, searching: false});
+			     }
+			     if (response.status == '404') {
+			     	alert(response.error);
+			     }
+
+			     },
+			     error: function (){
+			     	$('#loader').hide();
+			     	alert("Something Went Wrong...");
+			     }
+			});
+		});
 
 	</script>
 @endsection
