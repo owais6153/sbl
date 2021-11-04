@@ -25,6 +25,8 @@
 					      <th scope="col">Expiration</th>
 					      <th scope="col">Pallet</th>
 					      <th scope="col">Images</th>
+					      <th scope="col">Date created</th>
+					      <th scope="col">Time created</th>
 					    </tr>
 					</thead>
 
@@ -64,6 +66,16 @@
 		                  { data: 'pallet_number', name: 'pallet_number' },
 		                  { data: 'images_links', 
 		                      name: 'images_links', 
+		                      orderable: true, 
+		                      searchable: true
+		                  },
+		                  { data: 'date', 
+		                      name: 'date', 
+		                      orderable: true, 
+		                      searchable: true
+		                  },
+		                  { data: 'time', 
+		                      name: 'time', 
 		                      orderable: true, 
 		                      searchable: true
 		                  }

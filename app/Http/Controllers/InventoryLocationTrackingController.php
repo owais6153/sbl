@@ -36,7 +36,7 @@ class InventoryLocationTrackingController extends Controller
             foreach ($location as $k => $v){
                 $total_inventory = 0;
                 foreach ($v as $k2 => $v2 ){
-                    $get_location_sum = DB::table('inventory_location')->where('location', '=', $v2)->sum('count');
+                    $get_location_sum = DB::table('inventory_location')->where('location', '=', $v2)->where('barcode', '=', $barcode->barcode)->sum('count');
                     // echo $get_location_sum;
                     $eachBarcodeData['barcode'] = $k;
                     $eachBarcodeData['locations'][] = array(
@@ -80,12 +80,22 @@ class InventoryLocationTrackingController extends Controller
             }
             return $actionBtn;
         })
+        ->addColumn('date', function($row){
+            $created_at = $row->created_at;
+            $created_at = date('m/d/Y', strtotime($created_at));       
+            return $created_at;
+        })
+        ->addColumn('time', function($row){
+            $created_at = $row->created_at;
+            $created_at = date('H:i:s a', strtotime($created_at));       
+            return $created_at;
+        })
         ->rawColumns(['images_links'])
         ->toJson();
     }
     public function create()
     {
-        return view('createInventory');        
+        return view('scanInventory');        
     }
     public function uploadImage(Request $request)
     {
@@ -249,20 +259,20 @@ class InventoryLocationTrackingController extends Controller
         if (empty($barcodes)) {
           return response()->json(["error" => 'Barcode not found', 'status' => '404']);
         }
-        $from_to_query = InventoryModel::select('id', 'to', 'barcode')->where('barcode', '=', $barcode)->where('to', '=', $from)->get();
+
 
         $data = array();
-        foreach ($from_to_query as $k => $from_to_rec){            
-            $get_location_sum = DB::select("select SUM(`count`) as `quantity`, expiration_date from `inventory_location` where `location` = '".$from."' and `barcode` = '".$barcode."' group by `expiration_date`");
+         
+        $getLocationDetails = DB::select("select SUM(`count`) as `quantity`, expiration_date from `inventory_location` where `location` = '".$from."' and `barcode` = '".$barcode."' group by `expiration_date`");
 
-            
-                $data[][$from_to_rec->to]['count'] = $get_location_sum;
-
+        if (!empty($getLocationDetails)) {
+            foreach($getLocationDetails as $key => $locationDeatail){
+                $data[$key]['count'] = $locationDeatail->quantity;
+                $data[$key]['expiration'] = $locationDeatail->expiration_date;
+            }
         }
-        echo '<pre>';
-        print_r($get_location_sum);
-        echo '</pre>';
 
+       return response()->json(["data" => $data, 'status' => 'success']);
 
     }
 }

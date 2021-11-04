@@ -1,5 +1,13 @@
 @extends('layouts.app')
 
+@section('headermeta')
+	<style type="text/css">
+		div#available_expiration_wrapper {
+		    padding-top: 20px;
+		}
+	</style>
+@endsection
+
 @section('content')
 
 	<div class="col-lg-9 col-md-9">
@@ -23,14 +31,14 @@
 					  </div>
 					  <div class="form-group col-half">
 					    <label for="quantity">Quantity</label>
-					    <input type="number" class="form-control" id="quantity" placeholder="Enter Quantity" name="quantity">
+					    <input type="number" class="form-control" min="1" id="quantity" placeholder="Enter Quantity" name="quantity">
 					  </div>
 					  <div class="form-group col-half">
 					    <label for="from">From Location</label>		
 					    <select class="form-control" id="from" placeholder="From Location" name="from">
 					    	<option value="">Select From</option>
 					    	<option value="Receiving">Receiving</option>
-					    	<optgroup id="options"></optgroup>
+					    	<optgroup id="options" label="Locations"></optgroup>
 					    </select>
 					  </div>
 					  <div class="form-group col-half">
@@ -39,7 +47,8 @@
 					  </div>
 					  <div class="form-group col-half">
 					    <label for="expiration_date">Expiration Date</label>
-					    <input type="date" class="form-control" id="expiration_date" placeholder="Expiration Date" name="expiration_date">
+					    <input type="text" class="form-control" id="expiration_date" placeholder="Expiration Date" name="expiration_date">
+					    <div id="available_expiration_date"></div>
 					  </div>
 					  <div class="form-group col-half">
 					    <label for="pallet_number">Pallet number</label>
@@ -178,6 +187,11 @@
 		});
 	})
 	$('#barcode').change(function(){
+		$('#options').html('');
+		$('#available_expiration_date').html('');
+		$('#expiration_date').removeAttr('disabled');
+		$('#expiration_date').val('');
+		$('#quantity').attr('max', '');
 		if ($(this).val() != '') {
 			let barcode = $(this).val() ;
 			$.ajax({
@@ -208,6 +222,11 @@
 		}
 	})
 	$('#from').change(function(){
+
+		$('#available_expiration_date').html('');
+		$('#expiration_date').removeAttr('disabled');
+		$('#expiration_date').val('');
+		$('#quantity').attr('max', '');
 		if ($(this).val() != '' && $(this).val() != 'Receiving' && $('#barcode').val() != '') {
 			let from = $(this).val() ;
 			$.ajax({
@@ -220,7 +239,14 @@
 			     dataType: 'json',
 			     success: function (response) {
 			       if (response.status == 'success') {
-			       		console.log(response);
+			       	let html = '<table id="available_expiration" class="table table-bordered table-striped"><thead><tr><th colspan="5" class="text-center">Available Expiration Date.</th></tr><tr><th>Barcode</th><th>Location</th><th>Quantity</th><th>Expiration Date</th><th>Action</th></tr></thead><tbody>';
+			       	  for(var index = 0; index < response.data.length; index++) {
+			       	   	html+= `<tr><td>`+$('#barcode').val()+`</td><td>`+from+`</td><td>`+response.data[index][`count`]+`</td><td>`+response.data[index][`expiration`]+`</td><td><a href="javascript:void(0)" class="btn btn-primary" onclick="setExiprationDateAndQuantity('`+response.data[index][`expiration`]+`', '`+response.data[index][`count`]+`')">Select this</a></td></tr>`;
+				       }
+				       html+= '</tbody></table>';
+				        $('#available_expiration_date').html(html); 
+						$('#expiration_date').attr('disabled', 'disabled');
+						$('#available_expiration_date table').DataTable({  "info":     false});
 			       }
 			       else if (response.status == 'error'){
 				       	alert(response.error);
@@ -233,6 +259,18 @@
 			});
 		}
 	})
+	function setExiprationDateAndQuantity(date, quantity) {
+		if (date == '') {
+			$('#expiration_date').removeAttr('disabled');
+
+			$('#expiration_date').val('');
+			alert('Note: Expiration date is empty in this record.');
+		}
+		else{
+			$('#expiration_date').val(date);
+			$('#quantity').attr('max', quantity);
+		}
+	}
 
 </script>
 @endsection

@@ -62,10 +62,13 @@ class HomeController extends Controller
             }
         }, true)
         ->addColumn('action', function($row){
-            $actionBtn= '<a href="' . route('edit_user', ['id' => $row->id]) . '" class="mr-3"><i class="fas fa-pencil-alt mr-2"></i>Edit</a> <a class="deleteIt" href="' .route('deleteuser', ['id' => $row->id]). '"><i class="fas fa-trash-alt mr-2"></i>Delete</a>
 
-            ';
-            return $actionBtn;
+            if($row->id != Session::get('id') && $row->id != 1){
+                $actionBtn= '<a href="' . route('edit_user', ['id' => $row->id]) . '" class="mr-3"><i class="fas fa-pencil-alt mr-2"></i>Edit</a> <a class="deleteIt" href="' .route('deleteuser', ['id' => $row->id]). '"><i class="fas fa-trash-alt mr-2"></i>Delete</a>
+
+                ';
+                return $actionBtn;
+            }
         })
         ->rawColumns(['action'])
 
