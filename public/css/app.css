@@ -895,4 +895,18 @@ button#btn-toggle span {
     width: 75%;
   }
 }
+.custom_data_filter input[type=search] {
+  margin-left: 10px;
+  display: inline-block;
+  height: 36px;
+  font-size: 14px;
+  border: 1px solid #dfdede;
+  border-radius: 0;
+  padding: 0 18px;
+}
+
+.custom_data_filter label {
+  font-size: 18px;
+  font-weight: 600;
+}
 
