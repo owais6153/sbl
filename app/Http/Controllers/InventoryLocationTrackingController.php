@@ -174,6 +174,7 @@ class InventoryLocationTrackingController extends Controller
                  return response()->json(["error" => $messages, 'status' => 'error']);
             }
         }
+         $request->expiration_date = ( $request->expiration_date == 'null') ? null :  $request->expiration_date;
 
         $Inventory = new InventoryModel();
         $Inventory->user_id = Session::get('id');

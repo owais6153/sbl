@@ -13,7 +13,7 @@
 	<div class="col-lg-9 col-md-9">
 		<div class="wrap-content">
 			<div class="wc-title">
-				<h2>Add Inventory Location</h2>
+				<h2>Add Inventory Location </h2>
 				 @if (Session::get('danger')) 
 			    	@foreach (Session::get('danger')[0] as $error)
 			    		<div class="alert alert-danger">{{$error}}</div>
@@ -27,7 +27,7 @@
 					   <div id="fileFields"></div>
 					  <div class="form-group col-half">
 					    <label for="barcode">Barcode</label>
-					    <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Enter Barcode">
+					    <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Enter Barcode"> <img src="{{asset('images/preloader.gif')}}" id="barcode_loader" style="display: none;">
 					  </div>
 					  <div class="form-group col-half">
 					    <label for="quantity">Quantity</label>
@@ -36,10 +36,11 @@
 					  <div class="form-group col-half">
 					    <label for="from">From Location</label>		
 					    <select class="form-control" id="from" placeholder="From Location" name="from">
-					    	<option value="">Select From</option>
+					    	
 					    	<option value="Receiving">Receiving</option>
 					    	<optgroup id="options" label="Locations"></optgroup>
 					    </select>
+					    <img src="{{asset('images/preloader.gif')}}" id="from_loader" style="display: none;">
 					  </div>
 					  <div class="form-group col-half">
 					    <label for="to">To Location</label>
@@ -48,13 +49,14 @@
 					  <div class="form-group col-half">
 					    <label for="expiration_date">Expiration Date</label>
 					    <input type="text" class="form-control" id="expiration_date" placeholder="Expiration Date" name="expiration_date">
-					    <div id="available_expiration_date"></div>
+					    <select  class="form-control" name="expiration_date" id="expiration_date_select" style="display: none;"></select>
+					    <img src="{{asset('images/preloader.gif')}}" id="barcode_loader" style="display: none;">
 					  </div>
 					  <div class="form-group col-half">
 					    <label for="pallet_number">Pallet number</label>
 					    <input type="text" class="form-control" id="pallet_number" placeholder="Pallet Number" name="pallet_number">
 					  </div>
-					  <div class="form-group col-full">
+					  <div class="form-group uploader col-full">
 					    
 					    <button type="button" id="imageUploader">Upload Images <img src="{{asset('images/upload_img.png')}}"></button>
 					    <input type="file" id="fileupload" class="form-control" style="visibility: hidden; opacity: 0;" id="images" name="upimages[]" multiple="">
@@ -191,10 +193,15 @@
 	})
 	$('#barcode').change(function(){
 		$('#options').html('');
-		$('#available_expiration_date').html('');
+		$('#barcode_loader').show();
+		$('#from_loader').show();
+		$('#expiration_date_select').html('');
 		$('#expiration_date').removeAttr('disabled');
 		$('#expiration_date').val('');
 		$('#quantity').attr('max', '');
+		$('#expiration_date').val('');
+		$('#expiration_date').show();
+		$('#expiration_date_select').hide();
 		if ($(this).val() != '') {
 			let barcode = $(this).val() ;
 			$.ajax({
@@ -206,19 +213,31 @@
 			     data: {'barcode': barcode},
 			     dataType: 'json',
 			     success: function (response) {
+
+					$('#barcode_loader').hide();
+					$('#from_loader').hide();
 			       if (response.status == 'success') {
 			       		let html = '';
 			       	   for(var index = 0; index < response.locations.length; index++) {
 			       	   	html+= '<option value="'+response.locations[index]+'">' + response.locations[index] + '</option>';
 				       }
 				       $('#options').html(html); 
+				        $('#from').select2();
 			       }
 			       else if (response.status == 'error'){
 				       	alert(response.error);
 			       }
+			       else{
+			       	$('#from').select2();
+			       	$('#barcode_loader').hide();
+					$('#from_loader').hide();
+			       }
 
 			     },
 			     error: function (){
+
+					$('#barcode_loader').hide();
+					$('#from_loader').hide();
 			     	alert("Something Went Wrong...");
 			     }
 			});
@@ -226,11 +245,15 @@
 	})
 	$('#from').change(function(){
 
-		$('#available_expiration_date').html('');
+		$('#expiration_date_select').html('');
+
 		$('#expiration_date').removeAttr('disabled');
 		$('#expiration_date').val('');
+		$('#expiration_date').show();
+		$('#expiration_date_select').hide(); 
 		$('#quantity').attr('max', '');
 		if ($(this).val() != '' && $(this).val() != 'Receiving' && $('#barcode').val() != '') {
+		    $('#from_loader').show();
 			let from = $(this).val() ;
 			$.ajax({
 		         headers: {
@@ -241,29 +264,36 @@
 			     data: {'from': from, 'barcode':  $('#barcode').val()},
 			     dataType: 'json',
 			     success: function (response) {
+			       $('#from_loader').hide();
 			       if (response.status == 'success') {
-			       	let html = '<table id="available_expiration" class="table table-bordered table-striped"><thead><tr><th colspan="5" class="text-center">Available Expiration Date.</th></tr><tr><th>Barcode</th><th>Location</th><th>Quantity</th><th>Expiration Date</th><th>Action</th></tr></thead><tbody>';
+			       	let html = '';
 			       	  for(var index = 0; index < response.data.length; index++) {
-			       	   	html+= `<tr><td>`+$('#barcode').val()+`</td><td>`+from+`</td><td>`+response.data[index][`count`]+`</td><td>`+response.data[index][`expiration`]+`</td><td><a href="javascript:void(0)" class="btn btn-primary" onclick="setExiprationDateAndQuantity('`+response.data[index][`expiration`]+`', '`+response.data[index][`count`]+`')">Select this</a></td></tr>`;
+			       	  	let date = (response.data[index][`expiration`] == null) ? 'None' : response.data[index][`expiration`];
+			       	   	html+= '<option value="'+response.data[index][`expiration`]+'" data-count="'+response.data[index][`count`]+'">' + date + '</option>';
 				       }
-				       html+= '</tbody></table>';
-				        $('#available_expiration_date').html(html); 
-						$('#expiration_date').attr('disabled', 'disabled');
-						$('#available_expiration_date table').DataTable({  "info":     false});
+					    $('#expiration_date').hide();
+				        $('#expiration_date_select').html(html); 
+				        $('#expiration_date_select').show(); 
 			       }
 			       else if (response.status == 'error'){
 				       	alert(response.error);
 			       }
 
+			       else{
+			       	$('#from').select2();
+			       	$('#barcode_loader').hide();
+					$('#from_loader').hide();
+			       }expiration_date_select
 			     },
 			     error: function (){
+			        $('#from_loader').hide();
 			     	alert("Something Went Wrong...");
 			     }
 			});
 		}
 	})
 	function setExiprationDateAndQuantity(date, quantity) {
-		if (date == '') {
+		if (date == '' || date == 'null') {
 			$('#expiration_date').removeAttr('disabled');
 
 			$('#expiration_date').val('');
@@ -274,6 +304,8 @@
 			$('#quantity').attr('max', quantity);
 		}
 	}
-
+$(document).ready(function() {
+    $('#from').select2();
+});
 </script>
 @endsection

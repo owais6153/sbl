@@ -901,3 +901,26 @@ button#btn-toggle span {
     font-size: 18px;
     font-weight: 600;
 }
+.form-group {
+    position: relative;
+}
+
+.form-group:not(.uploader) img {
+    position: absolute;
+    bottom: 7px;
+    right: 10px;
+}
+span.select2-selection.select2-selection--single {
+    height: 48px;
+    border-radius: 0px;
+        border: 1px solid #bfbfbf;
+}
+
+span#select2-from-container {
+    height: 48px;
+    line-height: 44px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 48px;
+}
