@@ -51,7 +51,7 @@ Route::middleware(['is_admin'])->group(function (){
 	Route::post('/inventory/getlocationbybarcode', [InventoryLocationTrackingController::class, 'getlocationbybarcode'])->name('getlocationbybarcode');
 	Route::post('/inventory/getExiprationDateAndQuantity', [InventoryLocationTrackingController::class, 'getExiprationDateAndQuantity'])->name('getExiprationDateAndQuantity');
 	Route::post('/inventory/listsearch', [InventoryLocationTrackingController::class, 'listsearch'])->name('listsearch');
-
-
+	Route::get('/inventory/deletemove/{id}', [InventoryLocationTrackingController::class, 'deletemove'])->name('deletemove');
+	
 
 });

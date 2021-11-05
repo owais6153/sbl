@@ -6,26 +6,32 @@
 		<div class="wrap-content">
 			<div class="wc-title">
 				<h2>All Inventories</h2>
-				@if (session('success'))
-				    <div class="alert alert-success mb-3">
-				        {{ session('success') }}
-				    </div>
-				@endif
 			</div>
+			@if (session('success'))
+			    <div class="alert alert-success mb-3">
+			        {{ session('success') }}
+			    </div>
+			@endif
+			@if (session('danger'))
+			    <div class="alert alert-danger mb-3">
+			        {{ session('danger') }}
+			    </div>
+			@endif
 			<div class="wc-content">
 				<table id="wc-table" class="table table-bordered table-striped display">
 					<thead>
 					    <tr>
 					      <th scope="col">#</th>
 					      <th scope="col">Barcode</th>
-					      <th scope="col">From Location</th>
-					      <th scope="col">To Location</th>
+					      <th scope="col">From</th>
+					      <th scope="col">To</th>
 					      <th scope="col">Qty</th>
 					  	  <th scope="col">Email</th>
 					      <th scope="col">Expiration</th>
 					      <th scope="col">Pallet</th>
 					      <th scope="col">Images</th>
 					      <th scope="col">Time created</th>
+					      <th scope="col">Action</th>
 					    </tr>
 					</thead>
 
@@ -70,6 +76,11 @@
 		                  },
 		                  { data: 'time', 
 		                      name: 'time', 
+		                      orderable: true, 
+		                      searchable: true
+		                  },
+		                  { data: 'actions', 
+		                      name: 'actions', 
 		                      orderable: true, 
 		                      searchable: true
 		                  }

@@ -10,6 +10,7 @@ use Validator;
 use File;
 use Session;
 use DataTables;
+use Redirect;
 
 class InventoryLocationTrackingController extends Controller
 {
@@ -104,7 +105,11 @@ class InventoryLocationTrackingController extends Controller
             $created_at = date('m/d/Y h:i A', strtotime($created_at));       
             return $created_at;
         })
-        ->rawColumns(['images_links'])
+        ->addColumn('actions', function($row){
+            $html = '<a href="'.route('deletemove', ['id' => $row->id]).'" class="deleteIt"><i class="fas fa-trash-alt mr-2"></i>Delete</a>';
+            return $html;
+        })
+        ->rawColumns(['images_links', 'actions'])
         ->toJson();
     }
     public function create()
@@ -347,5 +352,16 @@ class InventoryLocationTrackingController extends Controller
         $inventories['links'] = $barcodes->links();
         $html = view('response.inventorylist', compact('inventories', 'search'))->render();
         return response()->json(['html'=> $html, 'status' => 'success']);
+    }
+    public function deletemove(Request $request)
+    {
+        $moves = InventoryModel::where('id', $request->id)->delete();
+        $trackmoves = InventoryLocation::where('inventory_track_id', $request->id)->delete();
+        if ($moves && $trackmoves) {
+            return Redirect::back()->with('success', "Move deleted successfuly.");
+        } else {
+            return Redirect::back()->with('danger', "Move not found");
+        }
+
     }
 }
