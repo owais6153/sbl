@@ -114,8 +114,11 @@ class InventoryLocationTrackingController extends Controller
         // })
         ->addColumn('time', function($row){
             $created_at = $row->created_at;
-            $created_at = date('m/d/Y h:i A', strtotime($created_at));       
-            return $created_at;
+            $created_at = date('m/d/Y h:i A', strtotime($created_at));      
+            $datetime = new \DateTime($created_at);
+            $la_time = new \DateTimeZone('America/New_York');
+            $datetime->setTimezone($la_time);
+            return  $datetime->format('m/d/Y h:i A'); 
         })
         ->addColumn('actions', function($row){
             if (request('trash') != 1) {
