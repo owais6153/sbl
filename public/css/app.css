@@ -822,9 +822,20 @@ button#btn-toggle span {
     transition: all 0.5s ease-in-out !important;
   }
 
-  .wc-content table.inventory-table {
-    display: block;
+  .wc-content table.inventory-table,
+  .wc-content table.responsive_scroll {
+    display: block; 
     overflow: scroll;
+  }
+  table.responsive_scroll.dataTable th, table.responsive_scroll.dataTable td {
+    padding: 10px !important;
+  }
+  table.responsive_scroll.dataTable.display tbody td a {
+    font-size: 11px;
+    padding: 8px 4px;
+  }
+  table.responsive_scroll.dataTable.display tbody td a i {
+    display: none;
   }
 
   table.dataTable thead .sorting {

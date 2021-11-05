@@ -18,7 +18,7 @@
 			    </div>
 			@endif
 			<div class="wc-content">
-				<table id="wc-table" class="table table-bordered table-striped display">
+				<table id="wc-table" class="table table-bordered table-striped display responsive_scroll">
 					<thead>
 					    <tr>
 					      <th scope="col">#</th>
