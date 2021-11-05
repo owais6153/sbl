@@ -49,7 +49,7 @@
 					  <div class="form-group col-half">
 					    <label for="expiration_date">Expiration Date</label>
 					    <input type="text" class="form-control" id="expiration_date" placeholder="Expiration Date" name="expiration_date">
-					    <select  class="form-control" name="expiration_date" id="expiration_date_select" style="display: none;"></select>
+					    <select  class="form-control" onchange="setExiprationDateAndQuantity(this)" name="expiration_date" id="expiration_date_select" style="display: none;"></select>
 					    <img src="{{asset('images/preloader.gif')}}" id="barcode_loader" style="display: none;">
 					  </div>
 					  <div class="form-group col-half">
@@ -266,7 +266,7 @@
 			     success: function (response) {
 			       $('#from_loader').hide();
 			       if (response.status == 'success') {
-			       	let html = '';
+			       	let html = '<option value="">Select expiration date</option>';
 			       	  for(var index = 0; index < response.data.length; index++) {
 			       	  	let date = (response.data[index][`expiration`] == null) ? 'None' : response.data[index][`expiration`];
 			       	   	html+= '<option value="'+response.data[index][`expiration`]+'" data-count="'+response.data[index][`count`]+'">' + date + '</option>';
@@ -283,7 +283,7 @@
 			       	$('#from').select2();
 			       	$('#barcode_loader').hide();
 					$('#from_loader').hide();
-			       }expiration_date_select
+			       }
 			     },
 			     error: function (){
 			        $('#from_loader').hide();
@@ -292,17 +292,8 @@
 			});
 		}
 	})
-	function setExiprationDateAndQuantity(date, quantity) {
-		if (date == '' || date == 'null') {
-			$('#expiration_date').removeAttr('disabled');
-
-			$('#expiration_date').val('');
-			alert('Note: Expiration date is empty in this record.');
-		}
-		else{
-			$('#expiration_date').val(date);
-			$('#quantity').attr('max', quantity);
-		}
+	function setExiprationDateAndQuantity(elem) {
+		$('#quantity').attr('max', $(elem).find('option:selected').attr('data-count'));
 	}
 $(document).ready(function() {
     $('#from').select2();
