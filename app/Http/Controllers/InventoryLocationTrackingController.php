@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\InventoryLocationTracking as InventoryModel;
 use App\Models\InventoryLocation;
+use App\Models\User;
 use Validator;
 use File;
 use Session;
@@ -85,11 +86,17 @@ class InventoryLocationTrackingController extends Controller
         // $inventories = InventoryModel::select('users.email', 'inventory_location_tracking.*')->where('barcode', '=', $request->id)->join('users', 'users.id', '=', 'inventory_location_tracking.user_id')->get();
 
         // return view('InventoryDetails', compact('inventories'));
-
+        // $model = InventoryModel::onlyTrashed()->get();
+        // echo count($model);
+        // exit();
         $model = InventoryModel::query();
         return DataTables::eloquent($model,)
         ->filter(function ($query) {
-            $query->select('users.email', 'inventory_location_tracking.*')->where('barcode', '=', request('id'))->join('users', 'users.id', '=', 'inventory_location_tracking.user_id');
+            $query->select('inventory_location_tracking.*', 'users.email')->where('barcode', '=', request('barcode'))->join('users', 'users.id', '=', 'inventory_location_tracking.user_id');
+            if (request('trash') == 1) {
+                $query->onlyTrashed();
+            }
+            return $query;
         }, true)
         ->addColumn('images_links', function($row){
             
@@ -100,14 +107,21 @@ class InventoryLocationTrackingController extends Controller
             }
             return $actionBtn;
         })
+        // ->addColumn('email', function($row){
+            
+        //     $email = User::select('email')->where( 'id', '=', $row->user_id)->first();
+        //     return $email->email;
+        // })
         ->addColumn('time', function($row){
             $created_at = $row->created_at;
             $created_at = date('m/d/Y h:i A', strtotime($created_at));       
             return $created_at;
         })
         ->addColumn('actions', function($row){
-            $html = '<a href="'.route('deletemove', ['id' => $row->id]).'" class="deleteIt"><i class="fas fa-trash-alt mr-2"></i>Delete</a>';
-            return $html;
+            if (request('trash') != 1) {
+                $html = '<a href="'.route('deletemove', ['id' => $row->id]).'" class="deleteIt"><i class="fas fa-trash-alt mr-2"></i>Delete</a>';        
+                   return $html;        
+            }
         })
         ->rawColumns(['images_links', 'actions'])
         ->toJson();
@@ -170,8 +184,9 @@ class InventoryLocationTrackingController extends Controller
             'barcode' => 'required',
             'quantity' => 'required',
             'from' => 'required',
+            'to' => 'required',
         ]);
-
+        
         if ($validation->fails())
         {
             foreach($validation->messages()->getMessages() as $field_name => $messages)

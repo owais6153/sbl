@@ -217,20 +217,23 @@
 					$('#barcode_loader').hide();
 					$('#from_loader').hide();
 			       if (response.status == 'success') {
-			       		let html = '';
-			       	   for(var index = 0; index < response.locations.length; index++) {
-			       	   	html+= '<option value="'+response.locations[index]+'">' + response.locations[index] + '</option>';
-				       }
+			       	   let html = '';
+			       	   if (response.locations.length == undefined && response.locations[1] != '') {
+			       	   		html+='<option value="'+response.locations[1]+'">' + response.locations[1] + '</option>';
+			       	   }
+			       	   else{
+				       	   for(var index = 0; index < response.locations.length; index++) {
+				       	   		html+= '<option value="'+response.locations[index]+'">' + response.locations[index] + '</option>';
+					       }			       	   	
+			       	   }
 				       $('#options').html(html); 
-				        $('#from').select2();
-			       }
-			       else if (response.status == 'error'){
-				       	alert(response.error);
+				       $('#from').select2();
 			       }
 			       else{
 			       	$('#from').select2();
 			       	$('#barcode_loader').hide();
 					$('#from_loader').hide();
+					alert(response.error);
 			       }
 
 			     },
@@ -267,22 +270,28 @@
 			       $('#from_loader').hide();
 			       if (response.status == 'success') {
 			       	let html = '<option value="">Select expiration date</option>';
-			       	  for(var index = 0; index < response.data.length; index++) {
+			       	 if (response.data.length == undefined && response.data[1] != '') {
+			       	  	let date = (response.data[1][`expiration`] == null) ? 'None' : response.data[1][`expiration`];
+			       	   	html+= '<option value="'+response.data[1][`expiration`]+'" data-count="'+response.data[1][`count`]+'">' + date + '</option>';
+			       	 }
+			       	 else{
+			       	   for(var index = 0; index < response.data.length; index++) {
 			       	  	let date = (response.data[index][`expiration`] == null) ? 'None' : response.data[index][`expiration`];
 			       	   	html+= '<option value="'+response.data[index][`expiration`]+'" data-count="'+response.data[index][`count`]+'">' + date + '</option>';
 				       }
+			       	 }
+
+
 					    $('#expiration_date').hide();
 				        $('#expiration_date_select').html(html); 
 				        $('#expiration_date_select').show(); 
 			       }
-			       else if (response.status == 'error'){
-				       	alert(response.error);
-			       }
 
 			       else{
-			       	$('#from').select2();
-			       	$('#barcode_loader').hide();
-					$('#from_loader').hide();
+			       		$('#from').select2();
+			       		$('#barcode_loader').hide();
+						$('#from_loader').hide();
+						alert(response.error);
 			       }
 			     },
 			     error: function (){

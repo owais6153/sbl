@@ -38,7 +38,7 @@
 							    	</td>
 							    	<td>{{$inventory['total']}}</td>
 							    	<td>
-							    		<a href="{{route('getInventoryDetailsView', ['id' => $inventory['barcode']] ) }}">Click for all moves</a><br>
+							    		<a href="{{route('getInventoryDetailsView', ['barcode' => $inventory['barcode']] ) }}">Click for all moves</a><br>
 							    	</td>
 							    </tr>
 							@endforeach
@@ -91,7 +91,9 @@
 			     if (response.status == '404') {
 			     	alert(response.error);
 			     }
-
+			     if (response.status == 'error') {
+			     	alert(response.error);
+			     }
 			     },
 			     error: function (){
 			     	$('#loader').hide();
