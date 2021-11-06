@@ -26,7 +26,7 @@
 			            <li><a href="{{route('add_user')}}"><i class="fas fa-user-plus"></i>Add User</a></li>
 			          </ul>
 			        </li>
-
+			        <li class="{{ ( request()->is('items') ) ? 'active' : '' }}"><a href="{{route('listitems')}}"><i class="fas fa-box-open"></i>Items</a></li>
 
 			        <li class="dropdown {{ (request()->is('files/*') || request()->is('files')) ? 'active' : '' }}">
 			        <a class="dropdown-toggle" data-toggle="dropdown" href="{{route('user_list')}}"><i class="fas fa-users"></i>Inventory Aging Report</a>

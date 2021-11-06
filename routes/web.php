@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\InventoryLocationTrackingController;
+use App\Http\Controllers\ItemsController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -46,6 +47,10 @@ Route::middleware(['is_admin'])->group(function (){
 	Route::get('/inventory/detail/{barcode}', [InventoryLocationTrackingController::class, 'getInventoryDetailsView'])->name('getInventoryDetailsView');
 	Route::get('/inventory/add', [InventoryLocationTrackingController::class, 'create'])->name('addInventory');
 	Route::get('/inventory/deletemove/{id}', [InventoryLocationTrackingController::class, 'deletemove'])->name('deletemove');
+// Items
+	Route::get('/items', [ItemsController::class, 'index'])->name('listitems');	
+	Route::get('/items/getItems', [ItemsController::class, 'getItems'])->name('getItems');
+
 });
 
 
