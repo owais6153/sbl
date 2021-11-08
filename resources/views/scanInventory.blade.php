@@ -33,10 +33,11 @@
 					    <label for="quantity">Quantity</label>
 					    <input type="number" class="form-control" min="1" id="quantity" placeholder="Enter Quantity" name="quantity">
 					  </div>
+					  <input type="hidden" name="from_id" id="from_id" value="">
 					  <div class="form-group col-half">
 					    <label for="from">From Location</label>		
 					    <select class="form-control" id="from" placeholder="From Location" name="from">
-					    	
+					        <option value="">Select From Location</option>
 					    	<option value="Receiving">Receiving</option>
 					    	<optgroup id="options" label="Locations"></optgroup>
 					    </select>
@@ -194,6 +195,7 @@
 	$('#barcode').change(function(){
 		$('#options').html('');
 		$('#barcode_loader').show();
+		$('#from_id').val();
 		$('#from_loader').show();
 		$('#expiration_date_select').html('');
 		$('#expiration_date').removeAttr('disabled');
@@ -249,7 +251,7 @@
 	$('#from').change(function(){
 
 		$('#expiration_date_select').html('');
-
+		$('#from_id').val();
 		$('#expiration_date').removeAttr('disabled');
 		$('#expiration_date').val('');
 		$('#expiration_date').show();
@@ -272,12 +274,14 @@
 			       	let html = '<option value="">Select expiration date</option>';
 			       	 if (response.data.length == undefined && response.data[1] != '') {
 			       	  	let date = (response.data[1][`expiration`] == null) ? 'None' : response.data[1][`expiration`];
-			       	   	html+= '<option value="'+response.data[1][`expiration`]+'" data-count="'+response.data[1][`count`]+'">' + date + '</option>';
+			       	   	html+= '<option value="'+response.data[1][`expiration`]+'" data-count="'+response.data[1][`count`]+'" data-fromid="'+response.data[1][`from_id`]+'">' + date + '</option>';
+
 			       	 }
 			       	 else{
 			       	   for(var index = 0; index < response.data.length; index++) {
 			       	  	let date = (response.data[index][`expiration`] == null) ? 'None' : response.data[index][`expiration`];
-			       	   	html+= '<option value="'+response.data[index][`expiration`]+'" data-count="'+response.data[index][`count`]+'">' + date + '</option>';
+			       	   	html+= '<option value="'+response.data[index][`expiration`]+'" data-count="'+response.data[index][`count`]+'" data-fromid="'+response.data[index][`from_id`]+'">' + date + '</option>';
+
 				       }
 			       	 }
 
@@ -303,9 +307,24 @@
 	})
 	function setExiprationDateAndQuantity(elem) {
 		$('#quantity').attr('max', $(elem).find('option:selected').attr('data-count'));
+		$('#from_id').val($(elem).find('option:selected').attr('data-fromid'));
 	}
-$(document).ready(function() {
-    $('#from').select2();
-});
+	$(document).ready(function() {
+	    $('#from').select2();
+	    $(document).on('focus', '.select2-selection.select2-selection--single', function (e) {
+		  $(this).closest(".select2-container").siblings('select:enabled').select2('open');
+		})
+		let lastHoverItem = '';
+		$(document).on('keydown', 'input.select2-search__field', function(e){
+
+		    if (e.keyCode == 9) {
+		    	$('#from').val(lastHoverItem).trigger("change");
+		    }
+		    else{
+		    	let temp = $('span.select2-selection.select2-selection--single').attr('aria-activedescendant').split("-");
+		    	lastHoverItem = temp.at(-1);
+		    }
+		})
+	});
 </script>
 @endsection

@@ -15,7 +15,7 @@ class UpdaateInventoryLocationTable extends Migration
     {
         Schema::table('inventory_location', function (Blueprint $table) {
 
-            $table->date('expiration_date')->nullable();
+            $table->date('expiration_date')->nullable()->after('inventory_track_id');
 
 
         });
@@ -29,7 +29,7 @@ class UpdaateInventoryLocationTable extends Migration
     public function down()
     {
         Schema::table('inventory_location', function (Blueprint $table) {
-             $table->dropColumn('expiration_date')->after('inventory_track_id');
+             $table->dropColumn('expiration_date');
 
         });
     }

@@ -57,7 +57,7 @@ class InventoryLocationTrackingController extends Controller
             foreach ($location as $k => $v){
                 $total_inventory = 0;
                 foreach ($v as $k2 => $v2 ){
-                    $get_location_sum = DB::table('inventory_location')->where('location', '=', $v2)->where('barcode', '=', $barcode->barcode)->sum('count');
+                    $get_location_sum = DB::table('inventory_location')->where('location', '=', $v2)->where('barcode', '=', $barcode->barcode)->where('deleted_at', '=', null)->sum('count');
                     // echo $get_location_sum;
                     $eachBarcodeData['barcode'] = $k;
                     $eachBarcodeData['locations'][] = array(
@@ -122,8 +122,13 @@ class InventoryLocationTrackingController extends Controller
         })
         ->addColumn('actions', function($row){
             if (request('trash') != 1) {
-                $html = '<a href="'.route('deletemove', ['id' => $row->id]).'" class="deleteIt"><i class="fas fa-trash-alt mr-2"></i>Delete</a>';        
+                $id = $row->id;
+                $trackingDetails = InventoryLocation::select('barcode','id', 'from_id')->where('inventory_track_id', '=', $row->id)->where('location', '=', $row->to)->first();
+                $checkIfItemMoveToDiffrentLocation = InventoryLocation::where('from_id', '=', $trackingDetails['id'])->count();
+                if ($checkIfItemMoveToDiffrentLocation < 1) {
+                    $html = '<a href="'.route('deletemove', ['id' => $id]).'" class="deleteIt"><i class="fas    fa-trash-alt mr-2"></i>Delete</a>';        
                    return $html;        
+                }
             }
         })
         ->rawColumns(['images_links', 'actions'])
@@ -197,8 +202,11 @@ class InventoryLocationTrackingController extends Controller
                  return response()->json(["error" => $messages, 'status' => 'error']);
             }
         }
-         $request->expiration_date = ( $request->expiration_date == 'null') ? null :  $request->expiration_date;
+        $request->expiration_date = ( $request->expiration_date == 'null') ? null :  $request->expiration_date;
 
+        if ($request->from != 'Receiving' && empty($request->from_id)) {
+            return response()->json(["error" => 'From Id required', 'status' => 'error']);
+        }
         $Inventory = new InventoryModel();
         $Inventory->user_id = Session::get('id');
         $Inventory->barcode = $request->barcode;
@@ -218,7 +226,8 @@ class InventoryLocationTrackingController extends Controller
             $FromLocation->count = $request->quantity * -1;
             $FromLocation->location = $request->from;
             $FromLocation->inventory_track_id = $Inventory->id;    
-            $FromLocation->expiration_date = $request->expiration_date;        
+            $FromLocation->expiration_date = $request->expiration_date;  
+            $FromLocation->from_id = $request->from_id;      
             $FromLocation->save();            
         }
         if ($request->to != 'Shipping') {
@@ -227,7 +236,8 @@ class InventoryLocationTrackingController extends Controller
             $ToLocation->count = $request->quantity ;
             $ToLocation->location = $request->to;
             $ToLocation->inventory_track_id = $Inventory->id;
-            $ToLocation->expiration_date = $request->expiration_date;
+            $ToLocation->expiration_date = $request->expiration_date; 
+            $ToLocation->from_id = $request->from_id;   
             $ToLocation->save();
         }
 
@@ -268,7 +278,7 @@ class InventoryLocationTrackingController extends Controller
         }
 
         foreach($locations as $i => $location){
-            $get_location_sum = DB::table('inventory_location')->where('location', '=', $location)->sum('count');
+            $get_location_sum = DB::table('inventory_location')->where('location', '=', $location)->where('deleted_at', '=', null)->sum('count');
             if ($get_location_sum == 0) {
                 unset($locations[$i]);
             }
@@ -300,13 +310,20 @@ class InventoryLocationTrackingController extends Controller
 
 
         $data = array();
-         
-        $getLocationDetails = DB::select("select SUM(`count`) as `quantity`, expiration_date from `inventory_location` where `location` = '".$from."' and `barcode` = '".$barcode."' group by `expiration_date`");
+        // $getLocationDetails = DB::select("select , SUM(`count`) as `quantity`, expiration_date from `inventory_location` where `location` = '".$from."' and `barcode` = '".$barcode."' group by `expiration_date`");
+        $getLocationDetails =  DB::table('inventory_location')
+             ->select(DB::raw('SUM(`count`) as `quantity`, id as `from_id`, expiration_date'))
+             ->where('location', '=', $from)
+             ->where('barcode', '=', $barcode)
+             ->where('deleted_at', '=', null)
+             ->groupBy('expiration_date')
+             ->get();
 
         if (!empty($getLocationDetails)) {
             foreach($getLocationDetails as $key => $locationDeatail){
                 $data[$key]['count'] = $locationDeatail->quantity;
                 $data[$key]['expiration'] = $locationDeatail->expiration_date;
+                $data[$key]['from_id'] = $locationDeatail->from_id;
             }
         }
 
@@ -352,7 +369,7 @@ class InventoryLocationTrackingController extends Controller
             foreach ($location as $k => $v){
                 $total_inventory = 0;
                 foreach ($v as $k2 => $v2 ){
-                    $get_location_sum = DB::table('inventory_location')->where('location', '=', $v2)->where('barcode', '=', $barcode->barcode)->sum('count');
+                    $get_location_sum = DB::table('inventory_location')->where('location', '=', $v2)->where('barcode', '=', $barcode->barcode)->where('deleted_at', '=', null)->sum('count');
                     // echo $get_location_sum;
                     $eachBarcodeData['barcode'] = $k;
                     $eachBarcodeData['locations'][] = array(

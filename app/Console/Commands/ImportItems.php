@@ -100,7 +100,7 @@ class ImportItems extends Command
             }
         }
 
-        $this->info('ImportItems Cummand Run successfully!');                    
+        $this->info('Items Imported successfully!');                    
         curl_close($curl);
     }
 }
