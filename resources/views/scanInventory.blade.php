@@ -231,7 +231,7 @@
 				       $('#options').html(html); 
 				       $('#from').select2();
 			       }
-			       else{
+			       else if (response.status == 'error') {
 			       	$('#from').select2();
 			       	$('#barcode_loader').hide();
 					$('#from_loader').hide();
