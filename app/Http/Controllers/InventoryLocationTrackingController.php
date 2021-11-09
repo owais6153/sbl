@@ -101,7 +101,7 @@ class InventoryLocationTrackingController extends Controller
                          ->get();
                     if (!empty($LocationDetails)) {
                         foreach($LocationDetails as $key => $LocationDetail){
-                            $eachBarcodeData['locationsData'][$count]['item'] = $items['item_number'];
+                            $eachBarcodeData['locationsData'][$count]['item'] = (isset($items['item_number'])) ? $items['item_number'] : 'Not Found';
                             $eachBarcodeData['locationsData'][$count]['name'] = $from;
                             $eachBarcodeData['locationsData'][$count]['count'] = $LocationDetail->quantity;
                             $eachBarcodeData['locationsData'][$count]['expiration'] =$LocationDetail->expiration_date;
@@ -205,7 +205,7 @@ class InventoryLocationTrackingController extends Controller
                          ->get();
                     if (!empty($LocationDetails)) {
                         foreach($LocationDetails as $key => $LocationDetail){
-                            $eachBarcodeData['locationsData'][$count]['item'] = $items['item_number'];
+                            $eachBarcodeData['locationsData'][$count]['item'] = (isset($items['item_number'])) ? $items['item_number'] : 'Not Found';
                             $eachBarcodeData['locationsData'][$count]['name'] = $from;
                             $eachBarcodeData['locationsData'][$count]['count'] = $LocationDetail->quantity;
                             $eachBarcodeData['locationsData'][$count]['expiration'] =$LocationDetail->expiration_date;
