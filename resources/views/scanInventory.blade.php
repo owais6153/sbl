@@ -28,6 +28,7 @@
 					  <div class="form-group col-half">
 					    <label for="barcode">Barcode</label>
 					    <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Enter Barcode"> <img src="{{asset('images/preloader.gif')}}" id="barcode_loader" style="display: none;">
+					    <div id="items"></div>
 					  </div>
 					  <div class="form-group col-half">
 					    <label for="quantity">Quantity</label>
@@ -204,6 +205,7 @@
 		$('#expiration_date').val('');
 		$('#expiration_date').show();
 		$('#expiration_date_select').hide();
+		$('#items').html('');
 		if ($(this).val() != '') {
 			let barcode = $(this).val() ;
 			$.ajax({
@@ -236,6 +238,13 @@
 			       	$('#barcode_loader').hide();
 					$('#from_loader').hide();
 					alert(response.error);
+			       }
+			       if(response.items.length > 0){
+			       	let item = '';
+			       	for(var index = 0; index < response.items.length; index++) {
+				       	item += '<span>'+response.items[index][`item_number`]+'</span>';
+					}	
+					$('#items').append($(item));
 			       }
 
 			     },

@@ -952,3 +952,8 @@ table.display table thead {
   border-bottom: solid 1px #bcbcbc;
 }
 
+#items span {
+  font-size: 12px;
+  color: #15b5ff;
+}
+
