@@ -822,20 +822,9 @@ button#btn-toggle span {
     transition: all 0.5s ease-in-out !important;
   }
 
-  .wc-content table.inventory-table,
-  .wc-content table.responsive_scroll {
-    display: block; 
+  .wc-content table.inventory-table {
+    display: block;
     overflow: scroll;
-  }
-  table.responsive_scroll.dataTable th, table.responsive_scroll.dataTable td {
-    padding: 10px !important;
-  }
-  table.responsive_scroll.dataTable.display tbody td a {
-    font-size: 11px;
-    padding: 8px 4px;
-  }
-  table.responsive_scroll.dataTable.display tbody td a i {
-    display: none;
   }
 
   table.dataTable thead .sorting {
@@ -944,5 +933,22 @@ span#select2-from-container {
 
 .select2-container--default .select2-selection--single .select2-selection__arrow {
   height: 48px;
+}
+
+table.dataTable tbody tr thead tr {
+  background: #eff2f4;
+  color: #22292f;
+}
+
+table.dataTable tbody tr thead tr th {
+  border-bottom: 0px;
+}
+
+table.display table {
+  border: solid 1px #bcbcbc;
+}
+
+table.display table thead {
+  border-bottom: solid 1px #bcbcbc;
 }
 

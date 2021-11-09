@@ -8,6 +8,7 @@
 					      <th scope="col">Locations (QTY)</th>
 					      <th scope="col">Total Inventory</th>
 					      <th scope="col">Moves</th>
+					      <th scope="col"></th>
 					    </tr>
 					</thead>
 					<tbody>
@@ -23,7 +24,38 @@
 							    	</td>
 							    	<td>{{$inventory['total']}}</td>
 							    	<td>
-							    		<a href="{{route('getInventoryDetailsView', ['id' => $inventory['barcode']] ) }}">Click for all moves</a><br>
+							    		
+							    		<a href="{{route('getInventoryDetailsView', ['barcode' => $inventory['barcode']] ) }}">Click for all moves</a><br>
+							    	</td>
+							    	<td>
+							    		<a href="javascript:void(0)" onclick="$(`#b{{ $inventory['barcode'] }}i-{{$index}}`).fadeToggle();"><i class="fas fa-plus-circle"></i>
+								    	</a>
+							    	</td>
+							    </tr>
+							  	<tr>
+							    	<td colspan="5" style="padding: 5px !important; display: none;" id="b{{ $inventory['barcode'] }}i-{{$index}}">
+							    		<table class="display">
+							    			<thead class="bg-dark text-light">
+							    				<tr>
+							    					<th>Item Name</th>
+							    					<th>Barcode</th>
+							    					<th>Location</th>
+							    					<th>Quantity</th>
+							    					<th>Expiration</th>
+							    				</tr>
+							    			</thead>
+							    			<tbody>
+							    				@foreach ($inventory['locationsData'] as $locationsData)
+								    				<tr>
+												    	<td>{{$locationsData['item']}}</td>
+												    	<td>{{$inventory['barcode']}}</td>
+												    	<td>{{$locationsData['name']}}</td>
+												    	<td>{{$locationsData['count']}}</td>
+												    	<td>{{$locationsData['expiration']}}</td>
+								    				</tr>
+							    				@endforeach
+							    			</tbody>
+							    		</table>
 							    	</td>
 							    </tr>
 							@endforeach
