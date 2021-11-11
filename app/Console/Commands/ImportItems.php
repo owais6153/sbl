@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\Items;
 use App\Models\ItemsCron;
+use Log;
 class ImportItems extends Command
 {
     /**
@@ -76,13 +77,13 @@ class ImportItems extends Command
                  \Log::info("API is returning error in ImportItems Command");
             }
             else{
-                $cron_data = new ItemsCron();
-                $cron_data->remaining = $res->remaining;
-                $cron_data->totalRecords = $res->totalRecords;
-                $cron_data->item_offset = $offset;
-                $cron_data->item_limit = $limit;
-                $cron_data->save();
                 if (!empty($res->data)) {
+                    $cron_data = new ItemsCron();
+                    $cron_data->remaining = $res->remaining;
+                    $cron_data->totalRecords = $res->totalRecords;
+                    $cron_data->item_offset = $offset;
+                    $cron_data->item_limit = $limit;
+                    $cron_data->save();
                     foreach ($res->data as $item){
                         if (isset($item->productIdentifiers[0])) {
                             if ($item->productIdentifiers[0]->identifierType == 'UPC') {
@@ -100,7 +101,8 @@ class ImportItems extends Command
             }
         }
 
-        $this->info('Items Imported successfully!');                    
+        $this->info('Items Imported successfully!');   
+         \Log::info("Items Imported. ");                 
         curl_close($curl);
     }
 }
