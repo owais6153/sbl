@@ -19,6 +19,7 @@
 				<table id="wc-table" class="display">
 					<thead>
 					    <tr>
+					      <th scope="col">Item Name</th>
 					      <th scope="col">Barcode</th>
 					      <th scope="col">Locations (QTY)</th>
 					      <th scope="col">Total Inventory</th>
@@ -31,6 +32,7 @@
 					  	@isset($inventories['data'])
 					  		@foreach ($inventories['data'] as $index => $inventory)
 							    <tr>
+							    	<td>{{$inventory['item']}}</td>
 							    	<td>{{$inventory['barcode']}}</td>
 							    	<td>
 							    		@foreach ($inventory['locations'] as $location)
@@ -39,15 +41,15 @@
 							    	</td>
 							    	<td>{{$inventory['total']}}</td>
 							    	<td>
-							    		<a href="{{route('getInventoryDetailsView', ['barcode' => $inventory['barcode']] ) }}">Click for all moves</a><br>
+							    		<a href="{{route('getInventoryDetailsView', ['barcode' => $inventory['barcode']] ) }}">All moves</a><br>
 							    	</td>
 							    	<td>
-							    		<a href="javascript:void(0)" onclick="$(`#b{{ $inventory['barcode'] }}i-{{$index}}`).fadeToggle();"><i class="fas fa-plus-circle"></i>
+							    		<a href="javascript:void(0)" onclick="$(`#b{{ $inventory['barcode'] }}i-{{$index}}`).fadeToggle(); $(this).find('.fas').toggleClass('fa-plus-circle'); $(this).find('.fas').toggleClass('fa-minus-circle');"><i class="fas fa-plus-circle"></i>
 								    	</a>
 							    	</td>
 							    </tr>
 							    <tr>
-							    	<td colspan="5" style="padding: 5px !important; display: none;" id="b{{ $inventory['barcode'] }}i-{{$index}}">
+							    	<td colspan="6" style="padding: 5px !important; display: none;" id="b{{ $inventory['barcode'] }}i-{{$index}}">
 							    		<table class="display">
 							    			<thead class="bg-dark text-light">
 							    				<tr>
@@ -61,7 +63,7 @@
 							    			<tbody>
 							    				@foreach ($inventory['locationsData'] as $locationsData)
 								    				<tr>
-												    	<td>{{$locationsData['item']}}</td>
+												    	<td>{{$inventory['item']}}</td>
 												    	<td>{{$inventory['barcode']}}</td>
 												    	<td>{{$locationsData['name']}}</td>
 												    	<td>{{$locationsData['count']}}</td>

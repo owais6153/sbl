@@ -200,6 +200,7 @@
 		$('#from_loader').show();
 		$('#expiration_date_select').html('');
 		$('#expiration_date').removeAttr('disabled');
+		$('#expiration_date').removeAttr('required');
 		$('#expiration_date').val('');
 		$('#quantity').attr('max', '');
 		$('#expiration_date').val('');
@@ -262,6 +263,7 @@
 		$('#expiration_date_select').html('');
 		$('#from_id').val();
 		$('#expiration_date').removeAttr('disabled');
+		$('#expiration_date').removeAttr('required');
 		$('#expiration_date').val('');
 		$('#expiration_date').show();
 		$('#expiration_date_select').hide(); 
@@ -289,15 +291,20 @@
 			       	 else{
 			       	   for(var index = 0; index < response.data.length; index++) {
 			       	  	let date = (response.data[index][`expiration`] == null) ? 'None' : response.data[index][`expiration`];
-			       	   	html+= '<option value="'+response.data[index][`expiration`]+'" data-count="'+response.data[index][`count`]+'" data-fromid="'+response.data[index][`from_id`]+'">' + date + '</option>';
+			       	  	let attri = (response.data.length == 1) ? 'selected' : '';
+			       	   	html+= '<option '+attri+' value="'+response.data[index][`expiration`]+'" data-count="'+response.data[index][`count`]+'" data-fromid="'+response.data[index][`from_id`]+'">' + date + '</option>';
 
 				       }
+
+				        $('#expiration_date_select').attr('required', 'required');
 			       	 }
 
 
 					    $('#expiration_date').hide();
 				        $('#expiration_date_select').html(html); 
 				        $('#expiration_date_select').show(); 
+
+
 			       }
 
 			       else{
@@ -326,8 +333,13 @@
 		let lastHoverItem = '';
 		$(document).on('keydown', 'input.select2-search__field', function(e){
 
-		    if (e.keyCode == 9) {
+		    if(e.shiftKey && e.keyCode == 9) { 
 		    	$('#from').val(lastHoverItem).trigger("change");
+		    	$('#quantity').focus();
+			}
+		    else if (e.keyCode == 9) {
+		    	$('#from').val(lastHoverItem).trigger("change");
+		    	$('#to').focus();
 		    }
 		    else{
 		    	let temp = $('span.select2-selection.select2-selection--single').attr('aria-activedescendant').split("-");

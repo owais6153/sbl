@@ -43,7 +43,7 @@ class InventoryLocationTrackingController extends Controller
         $items; 
         foreach ($barcodes as $barcode){
             $count = 0;
-            $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->limit(3)->get();
+            $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->get();
             $location = array();
             $items =  Items::select('item_number')->where('productIdentifier', '=', $barcode->barcode)->first(); 
             foreach ($from_to_query as $k => $from_to_rec){
@@ -65,10 +65,14 @@ class InventoryLocationTrackingController extends Controller
                     $get_location_sum = DB::table('inventory_location')->where('location', '=', $v2)->where('barcode', '=', $barcode->barcode)->where('deleted_at', '=', null)->sum('count');
                     // echo $get_location_sum;
                     $eachBarcodeData['barcode'] = $k;
-                    $eachBarcodeData['locations'][] = array(
-                        'location_name' => $v2,
-                        'location_sum'  => $get_location_sum,
-                    );
+                    $eachBarcodeData['item'] = (isset($items['item_number'])) ? $items['item_number'] : 'Not Found';
+                    if ($k2 < 2) {
+                        $eachBarcodeData['locations'][] = array(
+                            'location_name' => $v2,
+                            'location_sum'  => $get_location_sum,
+                        );
+                    }
+
                     $total_inventory = $total_inventory + $get_location_sum;
                 }
                 $eachBarcodeData['total'] = $total_inventory;
@@ -101,7 +105,6 @@ class InventoryLocationTrackingController extends Controller
                          ->get();
                     if (!empty($LocationDetails)) {
                         foreach($LocationDetails as $key => $LocationDetail){
-                            $eachBarcodeData['locationsData'][$count]['item'] = (isset($items['item_number'])) ? $items['item_number'] : 'Not Found';
                             $eachBarcodeData['locationsData'][$count]['name'] = $from;
                             $eachBarcodeData['locationsData'][$count]['count'] = $LocationDetail->quantity;
                             $eachBarcodeData['locationsData'][$count]['expiration'] =$LocationDetail->expiration_date;
@@ -150,7 +153,7 @@ class InventoryLocationTrackingController extends Controller
         $inventories = array();
         foreach ($barcodes as $barcode){
             $count = 0;
-            $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->limit(3)->get();
+            $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->get();
             $location = array();
             $items =  Items::select('item_number')->where('productIdentifier', '=', $barcode->barcode)->first();
             foreach ($from_to_query as $k => $from_to_rec){
@@ -171,11 +174,14 @@ class InventoryLocationTrackingController extends Controller
                 foreach ($v as $k2 => $v2 ){
                     $get_location_sum = DB::table('inventory_location')->where('location', '=', $v2)->where('barcode', '=', $barcode->barcode)->where('deleted_at', '=', null)->sum('count');
                     // echo $get_location_sum;
+                     $eachBarcodeData['item'] = (isset($items['item_number'])) ? $items['item_number'] : 'Not Found';
                     $eachBarcodeData['barcode'] = $k;
-                    $eachBarcodeData['locations'][] = array(
-                        'location_name' => $v2,
-                        'location_sum'  => $get_location_sum,
-                    );
+                    if ($k2 < 2) {
+                        $eachBarcodeData['locations'][] = array(
+                            'location_name' => $v2,
+                            'location_sum'  => $get_location_sum,
+                        );
+                    }
                     $total_inventory = $total_inventory + $get_location_sum;
                 }
                 $eachBarcodeData['total'] = $total_inventory;
@@ -205,7 +211,6 @@ class InventoryLocationTrackingController extends Controller
                          ->get();
                     if (!empty($LocationDetails)) {
                         foreach($LocationDetails as $key => $LocationDetail){
-                            $eachBarcodeData['locationsData'][$count]['item'] = (isset($items['item_number'])) ? $items['item_number'] : 'Not Found';
                             $eachBarcodeData['locationsData'][$count]['name'] = $from;
                             $eachBarcodeData['locationsData'][$count]['count'] = $LocationDetail->quantity;
                             $eachBarcodeData['locationsData'][$count]['expiration'] =$LocationDetail->expiration_date;
