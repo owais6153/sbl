@@ -268,7 +268,7 @@ class InventoryLocationTrackingController extends Controller
             $datetime = new \DateTime($created_at);
             $la_time = new \DateTimeZone('America/New_York');
             $datetime->setTimezone($la_time);
-            return  $datetime->format('m/d/Y h:i A'); 
+            return  $datetime->format('m/d/Y g:i:s A'); 
         })
         ->addColumn('actions', function($row){
             if (request('trash') != 1) {
@@ -276,7 +276,7 @@ class InventoryLocationTrackingController extends Controller
                 $trackingDetails = InventoryLocation::select('barcode','id', 'from_id')->where('inventory_track_id', '=', $row->id)->where('location', '=', $row->to)->first();
                 $checkIfItemMoveToDiffrentLocation = InventoryLocation::where('from_id', '=', $trackingDetails['id'])->count();
                 if ($checkIfItemMoveToDiffrentLocation < 1) {
-                    $html = '<a href="'.route('deletemove', ['id' => $id]).'" class="deleteIt"><i class="fas    fa-trash-alt mr-2"></i>Delete</a>';        
+                    $html = '<a href="'.route('deletemove', ['id' => $id]).'" class="deleteIt">Delete</a>';        
                    return $html;        
                 }
             }

@@ -181,6 +181,7 @@
 		       		$('#saveInventory').trigger("reset");
 			       	$('#preview').html('');			         
 			        $('#fileFields').html('');
+			        $('#items').html('');
 		       }
 		       else{
 			       	alert(response.error);
@@ -294,6 +295,7 @@
 			       	  	let attri = (response.data.length == 1) ? 'selected' : '';
 			       	   	html+= '<option '+attri+' value="'+response.data[index][`expiration`]+'" data-count="'+response.data[index][`count`]+'" data-fromid="'+response.data[index][`from_id`]+'">' + date + '</option>';
 
+
 				       }
 
 				        $('#expiration_date_select').attr('required', 'required');
@@ -303,6 +305,10 @@
 					    $('#expiration_date').hide();
 				        $('#expiration_date_select').html(html); 
 				        $('#expiration_date_select').show(); 
+				       	if(response.data.length == 1){
+			       	   		$('#quantity').attr('max', $('#expiration_date_select').find('option:selected').attr('data-count'));
+							$('#from_id').val($('#expiration_date_select').find('option:selected').attr('data-fromid'));
+			       	   	}
 
 
 			       }
