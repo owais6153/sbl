@@ -76,5 +76,11 @@
 			$(item).attr('href', $(item).attr('href') + '&search=' + $('.custom_data_filter input').val())
 		})
 	}
+	var fieldInput = $('.custom_data_filter input');
+	var fldLength= fieldInput.val().length;
+	fieldInput.focus();
+	fieldInput[0].setSelectionRange(fldLength, fldLength);
+
+
 </script>
 @endif
