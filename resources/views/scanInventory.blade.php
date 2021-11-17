@@ -160,39 +160,66 @@
 		e.preventDefault();
 	})
 	$('#submitForm').click( function (e){
-		$('.btn-form img').css("display","inline-block");
-		var forms= document.getElementById('saveInventory');
-		var formData = new FormData(forms);
-		$.ajax({
-	         headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-             },
-		     url: "{{route('saveInventory')}}", 
-		     type: 'post',
-		     data: formData,
-		     dataType: 'json',
-		     contentType: false,
-		     processData: false,
-		     success: function (response) {
-		     	$('.btn-form img').css("display","none");
-		       if (response.status == 'success') {
-		       		$('.alert').text(response.success);
-		       		$('.alert').addClass('alert-success');
-		       		$('#saveInventory').trigger("reset");
-			       	$('#preview').html('');			         
-			        $('#fileFields').html('');
-			        $('#items').html('');
-		       }
-		       else{
-			       	alert(response.error);
-		       }
-
-		     },
-		     error: function (){
-		     	$('.btn-form img').css("display","none");
-		     	alert("Something Went Wrong...");
-		     }
-		});
+		var max = $('#quantity').attr('max');
+		let flag = true;
+        if (typeof max !== 'undefined' && max !== false) {
+            if(parseInt(max) < parseInt($('#quantity').val())){
+                alert("You can not move more then " + max + " Items.");
+                flag = false;
+            }
+        }
+        
+        if($('#from').val() != 'Receiving'){
+            if($('select#expiration_date_select').val() == ''){
+                alert('Please select expiration date.');
+                flag = false;
+            }            
+        }
+        
+        if(flag == true){
+    		$('.btn-form img').css("display","inline-block");
+    		var forms= document.getElementById('saveInventory');
+    		var formData = new FormData(forms);
+    		$.ajax({
+    	         headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                 },
+    		     url: "{{route('saveInventory')}}", 
+    		     type: 'post',
+    		     data: formData,
+    		     dataType: 'json',
+    		     contentType: false,
+    		     processData: false,
+    		     success: function (response) {
+    		     	$('.btn-form img').css("display","none");
+    		       if (response.status == 'success') {
+    		       		$('.alert').text(response.success);
+    		       		$('.alert').addClass('alert-success');
+    		       		$('#saveInventory').trigger("reset");
+    			       	$('#preview').html('');			         
+    			        $('#fileFields').html('');
+    			        $('#items').html('');
+                		$('#options').html('');
+                		$('#expiration_date_select').html('');
+                		$('#expiration_date').removeAttr('disabled');
+                		$('#expiration_date').removeAttr('required');
+                		$('#expiration_date').val('');
+                		$('#expiration_date').show();
+                		$('#expiration_date_select').hide();
+                		$('#quantity').attr('max', '');
+                		$('#from').select2();
+    		       }
+    		       else{
+    			       	alert(response.error);
+    		       }
+    
+    		     },
+    		     error: function (){
+    		     	$('.btn-form img').css("display","none");
+    		     	alert("Something Went Wrong...");
+    		     }
+    		});
+	    }
 	})
 	$('#barcode').change(function(){
 		$('#options').html('');

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\Items;
 use App\Models\ItemsCron;
+use App\Models\ItemIdentifier;
 use Log;
 class ImportItems extends Command
 {
@@ -86,15 +87,17 @@ class ImportItems extends Command
                     $cron_data->save();
                     foreach ($res->data as $item){
                         if (isset($item->productIdentifiers[0])) {
-                            if ($item->productIdentifiers[0]->identifierType == 'UPC') {
-                                $countitems = Items::where('productIdentifier', '=', $item->productIdentifiers[0]->productIdentifier)->count();
-                                if ($countitems < 1) {
-                                    $items = new Items();
-                                    $items->item_number = $item->itemNumber;
-                                    $items->productIdentifier = $item->productIdentifiers[0]->productIdentifier;
-                                    $items->save();
-                                }                                
-                            }
+                            $items = new Items();
+                            $items->item_number = $item->itemNumber;
+                            $items->save();
+                            foreach ($item->productIdentifiers as $productIdentifier){
+                                if ($productIdentifier->identifierType == 'UPC') {
+                                    $ItemIdentifier = new ItemIdentifier();
+                                    $ItemIdentifier->item_id = $items->id;
+                                    $ItemIdentifier->productIdentifier = $productIdentifier->productIdentifier;
+                                    $ItemIdentifier->save();
+                                }
+                            }                                                       
                         }
                     }
                 }
@@ -102,7 +105,7 @@ class ImportItems extends Command
         }
 
         $this->info('Items Imported successfully!');   
-         \Log::info("Items Imported. ");                 
+         // \Log::info("Items Imported. ");                 
         curl_close($curl);
     }
 }

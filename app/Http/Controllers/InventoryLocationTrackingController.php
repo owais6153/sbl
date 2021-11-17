@@ -286,7 +286,7 @@ class InventoryLocationTrackingController extends Controller
             $datetime = new \DateTime($created_at);
             $la_time = new \DateTimeZone('America/New_York');
             $datetime->setTimezone($la_time);
-            return  $datetime->format('m/d/Y g:i:s A'); 
+            return  $datetime->format('m/d/Y g:i A'); 
         })
         ->addColumn('actions', function($row){
             if (request('trash') != 1) {
@@ -294,7 +294,7 @@ class InventoryLocationTrackingController extends Controller
                 $trackingDetails = InventoryLocation::select('barcode','id', 'from_id')->where('inventory_track_id', '=', $row->id)->where('location', '=', $row->to)->first();
                 $checkIfItemMoveToDiffrentLocation = InventoryLocation::where('from_id', '=', $trackingDetails['id'])->count();
                 if ($checkIfItemMoveToDiffrentLocation < 1) {
-                    $html = '<a href="'.route('deletemove', ['id' => $id]).'" class="deleteIt">Delete</a>';        
+                    $html = '<!--<a href="'.route('deletemove', ['id' => $id]).'" class="deleteIt">Delete</a>-->';        
                    return $html;        
                 }
             }
@@ -354,7 +354,7 @@ class InventoryLocationTrackingController extends Controller
         unlink(public_path('uploads/' .$path));
         return response()->json(['success'=>'s', 'status' => 'success', 'path' => public_path('uploads/' .$path)]);
     }
-    public function saveInventory(Request $request)
+        public function saveInventory(Request $request)
     {
         $validation = Validator::make($request->all(),[
             'barcode' => 'required',
@@ -375,6 +375,28 @@ class InventoryLocationTrackingController extends Controller
         if ($request->from != 'Receiving' && empty($request->from_id)) {
             return response()->json(["error" => 'From Id required', 'status' => 'error']);
         }
+        
+        if($request->from != 'Receiving'){
+            $LocationDetails = DB::table('inventory_location')
+                     ->select(DB::raw('SUM(`count`) as qty'))
+                     ->where('location', '=', $request->from)
+                     ->where('barcode', '=', $request->barcode)
+                     ->where('expiration_date', '=', $request->expiration_date)
+                     ->where('deleted_at', '=', null)
+                     ->groupBy('expiration_date')
+                     ->first();
+            if (!empty($LocationDetails)) {
+                if($LocationDetails->qty < $request->quantity){
+                    return response()->json(["error" => $request->from . "  doesn't have enough items.", 'status' => 'error']);
+                }
+            }
+            else{
+                return response()->json(["error" => $request->from . " not found in database.", 'status' => 'error']);
+            }
+        }
+                         
+                         
+                         
         $Inventory = new InventoryModel();
         $Inventory->user_id = Session::get('id');
         $Inventory->barcode = $request->barcode;
@@ -463,7 +485,7 @@ class InventoryLocationTrackingController extends Controller
             $locations = array_unique($locations);
         }
          
-       return response()->json(["locations" => $locations, "items" => $items, 'status' => 'success']);
+       return response()->json(["locations" =>array_values($locations), "items" => $items, 'status' => 'success']);
 
     }
     public function getExiprationDateAndQuantity(Request $request){
