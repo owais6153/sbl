@@ -258,7 +258,7 @@ class InventoryLocationTrackingController extends Controller
         // echo count($model);
         // exit();
         $model = InventoryModel::query();
-        return DataTables::eloquent($model,)
+        return DataTables::eloquent($model)
         ->filter(function ($query) {
             $query->select('inventory_location_tracking.*', 'users.email')->where('barcode', '=', request('barcode'))->join('users', 'users.id', '=', 'inventory_location_tracking.user_id');
             if (request('trash') == 1) {
@@ -443,17 +443,20 @@ class InventoryLocationTrackingController extends Controller
             {
                 $locations[$k] = $from_to_rec->from;
             }
-            $get_location_sum  = DB::table('inventory_location')
-             ->select(DB::raw('SUM(`count`) as qty'))
-             ->where('location', '=',  $locations[$k])
-             ->where('barcode', '=', $barcode)
-             ->where('deleted_at', '=', null)
-             ->groupBy('expiration_date')
-             ->first();
+            if (isset($locations[$k])) {
+                    $get_location_sum  = DB::table('inventory_location')
+                     ->select(DB::raw('SUM(`count`) as qty'))
+                     ->where('location', '=',  $locations[$k])
+                     ->where('barcode', '=', $barcode)
+                     ->where('deleted_at', '=', null)
+                     ->groupBy('expiration_date')
+                     ->first();
 
-             if ($get_location_sum->qty < 1) {
-                unset($locations[$k]);
-             }
+                     if ($get_location_sum->qty < 1) {
+                        unset($locations[$k]);
+                     }
+            }
+
 
 
 
