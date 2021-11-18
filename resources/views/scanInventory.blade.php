@@ -221,7 +221,12 @@
     		});
 	    }
 	})
-	$('#barcode').change(function(){
+		var xhrrunning = false;
+	var xhr;
+	$('#barcode').keyup(function(){
+	    if(xhrrunning){
+	        xhr.abort();
+	    }
 		$('#options').html('');
 		$('#barcode_loader').show();
 		$('#from_id').val();
@@ -235,9 +240,11 @@
 		$('#expiration_date').show();
 		$('#expiration_date_select').hide();
 		$('#items').html('');
+        $('#from').select2();
 		if ($(this).val() != '') {
 			let barcode = $(this).val() ;
-			$.ajax({
+			xhrrunning = true;
+			xhr = $.ajax({
 		         headers: {
 	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 	             },
@@ -246,7 +253,7 @@
 			     data: {'barcode': barcode},
 			     dataType: 'json',
 			     success: function (response) {
-
+                    xhrrunning = false;
 					$('#barcode_loader').hide();
 					$('#from_loader').hide();
 			       if (response.status == 'success') {
@@ -278,10 +285,10 @@
 
 			     },
 			     error: function (){
-
+                    xhrrunning = false;
 					$('#barcode_loader').hide();
 					$('#from_loader').hide();
-			     	alert("Something Went Wrong...");
+			     //	alert("Something Went Wrong...");
 			     }
 			});
 		}

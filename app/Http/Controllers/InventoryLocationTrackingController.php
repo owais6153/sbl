@@ -47,44 +47,44 @@ class InventoryLocationTrackingController extends Controller
             $location = array();
             $items =  Items::select('item_number')->where('productIdentifier', '=', $barcode->barcode)->first(); 
             foreach ($from_to_query as $k => $from_to_rec){
-                if(!in_array($from_to_rec->to,$location) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping') )
+                if(!in_array($from_to_rec->to,$location) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping' && $from_to_rec->to != 'Production') )
                 {
                     $location[$barcode->barcode][] = $from_to_rec->to;
                 }
-                elseif(!in_array($from_to_rec->from,$location) && ($from_to_rec->from != 'Receiving' && $from_to_rec->from != 'Shipping') )
+                elseif(!in_array($from_to_rec->from,$location) && ($from_to_rec->from != 'Receiving' && $from_to_rec->from != 'Shipping' && $from_to_rec->from != 'Production') )
                 {
                     $location[$barcode->barcode][] = $from_to_rec->from;
                 }
                 $location[$barcode->barcode] = array_unique($location[$barcode->barcode]);
             }
-
             $eachBarcodeData = array();
+            $eachBarcodeData['locations'] = array();
             foreach ($location as $k => $v){
                 $total_inventory = 0;
                 $acount = 0;
                 foreach ($v as $k2 => $v2 ){
                     $get_location_sum = DB::table('inventory_location')->where('location', '=', $v2)->where('barcode', '=', $barcode->barcode)->where('deleted_at', '=', null)->sum('count');
 
-                    if ($get_location_sum  > 0) {
+  
                     
                     // echo $get_location_sum;
                         $eachBarcodeData['barcode'] = $k;
                         $eachBarcodeData['item'] = (isset($items['item_number'])) ? $items['item_number'] : 'Not Found';
+                        if ($get_location_sum  > 0) {
                         if ($acount < 3) {
                             $eachBarcodeData['locations'][] = array(
                                 'location_name' => $v2,
                                 'location_sum'  => $get_location_sum,
                             );
+                            
                         }
-
                         else if($acount == 3){
                             $eachBarcodeData['more'] = true;
                         }
-
-                        $acount++;
+                        $acount++;    
                         $total_inventory = $total_inventory + $get_location_sum;
-
-                    }
+                        }
+                    
                 }
                 $eachBarcodeData['total'] = $total_inventory;
             }
@@ -95,11 +95,11 @@ class InventoryLocationTrackingController extends Controller
 
             $locationData = array();
             foreach ($getAllLocationData as $k => $getlocationData){
-                if(!in_array($getlocationData->to,$locationData) && ($getlocationData->to != 'Receiving' && $getlocationData->to != 'Shipping') )
+                if(!in_array($getlocationData->to,$locationData) && ($getlocationData->to != 'Receiving' && $getlocationData->to != 'Shipping' && $getlocationData->to != 'Production') )
                 {
                     $locationData[$barcode->barcode][] = $getlocationData->to;
                 }
-                elseif(!in_array($getlocationData->from,$locationData) && ($getlocationData->from != 'Receiving' && $getlocationData->from != 'Shipping') )
+                elseif(!in_array($getlocationData->from,$locationData) && ($getlocationData->from != 'Receiving' && $getlocationData->from != 'Shipping' && $getlocationData->from != 'Production') )
                 {
                     $locationData[$barcode->barcode][] = $getlocationData->from;
                 }
@@ -136,7 +136,7 @@ class InventoryLocationTrackingController extends Controller
         $inventories['links'] = $barcodes->links();
 
         // echo "<pre>";
-        // print_r($items);
+        // print_r($inventories);
         // exit();
 
         return view('inventorylist', compact('inventories'));        
@@ -171,11 +171,11 @@ class InventoryLocationTrackingController extends Controller
             $location = array();
             $items =  Items::select('item_number')->where('productIdentifier', '=', $barcode->barcode)->first();
             foreach ($from_to_query as $k => $from_to_rec){
-                if(!in_array($from_to_rec->to,$location) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping') )
+                if(!in_array($from_to_rec->to,$location) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping' && $from_to_rec->to != 'Production') )
                 {
                     $location[$barcode->barcode][] = $from_to_rec->to;
                 }
-                elseif(!in_array($from_to_rec->from,$location) && ($from_to_rec->from != 'Receiving' && $from_to_rec->from != 'Shipping') )
+                elseif(!in_array($from_to_rec->from,$location) && ($from_to_rec->from != 'Receiving' && $from_to_rec->from != 'Shipping' && $from_to_rec->from != 'Production') )
                 {
                     $location[$barcode->barcode][] = $from_to_rec->from;
                 }
@@ -183,6 +183,7 @@ class InventoryLocationTrackingController extends Controller
             }
 
             $eachBarcodeData = array();
+            $eachBarcodeData['locations'] = array();
             foreach ($location as $k => $v){
                 $total_inventory = 0;
                 $acount = 0;
@@ -191,6 +192,7 @@ class InventoryLocationTrackingController extends Controller
                     // echo $get_location_sum;
                      $eachBarcodeData['item'] = (isset($items['item_number'])) ? $items['item_number'] : 'Not Found';
                     $eachBarcodeData['barcode'] = $k;
+                     $eachBarcodeData['locations'] = array();
                     if ( $get_location_sum > 1) {
 
                         if ($acount < 3) {
@@ -199,11 +201,12 @@ class InventoryLocationTrackingController extends Controller
                                 'location_sum'  => $get_location_sum,
                             );
                         }
+                        
                         else if($acount == 3){
                             $eachBarcodeData['more'] = true;
                         }
-
-                        $acount++;
+                        
+                            $acount++;
                         $total_inventory = $total_inventory + $get_location_sum;
 
                     }
@@ -214,11 +217,11 @@ class InventoryLocationTrackingController extends Controller
 
             $locationData = array();
             foreach ($getAllLocationData as $k => $getlocationData){
-                if(!in_array($getlocationData->to,$locationData) && ($getlocationData->to != 'Receiving' && $getlocationData->to != 'Shipping') )
+                if(!in_array($getlocationData->to,$locationData) && ($getlocationData->to != 'Receiving' && $getlocationData->to != 'Shipping' && $getlocationData->to != 'Production') )
                 {
                     $locationData[$barcode->barcode][] = $getlocationData->to;
                 }
-                elseif(!in_array($getlocationData->from,$locationData) && ($getlocationData->from != 'Receiving' && $getlocationData->from != 'Shipping') )
+                elseif(!in_array($getlocationData->from,$locationData) && ($getlocationData->from != 'Receiving' && $getlocationData->from != 'Shipping' && $getlocationData->from != 'Production') )
                 {
                     $locationData[$barcode->barcode][] = $getlocationData->from;
                 }
@@ -290,21 +293,25 @@ class InventoryLocationTrackingController extends Controller
         // })
         ->addColumn('time', function($row){
             $created_at = $row->created_at;
-            $created_at = date('m/d/Y h:i A', strtotime($created_at));      
+            $created_at = date('m/d/Y h:i:s A', strtotime($created_at));      
             $datetime = new \DateTime($created_at);
             $la_time = new \DateTimeZone('America/New_York');
             $datetime->setTimezone($la_time);
-            return  $datetime->format('m/d/Y g:i A'); 
+            return  $datetime->format('m/d/Y g:i:s A'); 
         })
         ->addColumn('actions', function($row){
             if (request('trash') != 1) {
                 $id = $row->id;
-                $trackingDetails = InventoryLocation::select('barcode','id', 'from_id')->where('inventory_track_id', '=', $row->id)->where('location', '=', $row->to)->first();
-                $checkIfItemMoveToDiffrentLocation = InventoryLocation::where('from_id', '=', $trackingDetails['id'])->count();
-                if ($checkIfItemMoveToDiffrentLocation < 1) {
-                    $html = '<!--<a href="'.route('deletemove', ['id' => $id]).'" class="deleteIt">Delete</a>-->';        
-                   return $html;        
-                }
+                $trackingDetails = InventoryLocation::select('barcode','id', 'from_id')->where('inventory_track_id', '=', $row->id)
+                    // ->where('location', '=', $row->to)
+                    ->first();
+                // if(!empty($trackingDetail)){
+                    $checkIfItemMoveToDiffrentLocation = InventoryLocation::where('from_id', '=', $trackingDetails['id'])->count();
+                    if ($checkIfItemMoveToDiffrentLocation < 1) {
+                        $html = '<!--<a href="'.route('deletemove', ['id' => $id]).'" class="deleteIt">Delete</a>-->';        
+                       return $html;        
+                    }
+                // }
             }
         })
         ->rawColumns(['images_links', 'actions'])
@@ -428,7 +435,7 @@ class InventoryLocationTrackingController extends Controller
             $FromLocation->from_id = $request->from_id;      
             $FromLocation->save();            
         }
-        if ($request->to != 'Shipping') {
+        if ($request->to != 'Shipping' && $request->to != 'Production') {
             $ToLocation = new InventoryLocation();
             $ToLocation->barcode = $request->barcode;
             $ToLocation->count = $request->quantity ;
@@ -465,11 +472,11 @@ class InventoryLocationTrackingController extends Controller
         $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode)->get();
         $locations = array();
         foreach ($from_to_query as $k => $from_to_rec){
-            if(!in_array($from_to_rec->to,$locations) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping') )
+            if(!in_array($from_to_rec->to,$locations) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping' && $from_to_rec->to != 'Production') )
             {
                 $locations[$k] = $from_to_rec->to;
             }
-            elseif(!in_array($from_to_rec->from,$locations) && ($from_to_rec->from != 'Receiving' && $from_to_rec->from != 'Shipping') )
+            elseif(!in_array($from_to_rec->from,$locations) && ($from_to_rec->from != 'Receiving' && $from_to_rec->from != 'Shipping' && $from_to_rec->from != 'Production') )
             {
                 $locations[$k] = $from_to_rec->from;
             }

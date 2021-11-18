@@ -38,20 +38,23 @@
 							    		@foreach ($inventory['locations'] as $location)
 							    			{{$location['location_name']}} ({{$location['location_sum']}})
 							    		@endforeach
-							    		
 							    		@isset($inventory['more'])
-							    		    <b>[More...]</b>
+							    		    <b onclick="$(`#b{{ $inventory['barcode'] }}i-{{$index}}`).fadeToggle(); $(this).parents('tr').find('.fas').toggleClass('fa-plus-circle'); $(this).parents('tr').find('.fas').toggleClass('fa-minus-circle');">[More...]</b>
 							    		@endif
+							    		
 							    	</td>
 							    	<td>{{$inventory['total']}}</td>
 							    	<td>
 							    		<a href="{{route('getInventoryDetailsView', ['barcode' => $inventory['barcode']] ) }}">All moves</a><br>
 							    	</td>
 							    	<td>
+	        						    @isset($inventory['locationsData'])
 							    		<a href="javascript:void(0)" onclick="$(`#b{{ $inventory['barcode'] }}i-{{$index}}`).fadeToggle(); $(this).find('.fas').toggleClass('fa-plus-circle'); $(this).find('.fas').toggleClass('fa-minus-circle');"><i class="fas fa-plus-circle"></i>
 								    	</a>
+							    		@endif
 							    	</td>
 							    </tr>
+							    @isset($inventory['locationsData'])
 							    <tr>
 							    	<td colspan="6" style="padding: 5px !important; display: none;" id="b{{ $inventory['barcode'] }}i-{{$index}}">
 							    		<table class="display">
@@ -78,6 +81,7 @@
 							    		</table>
 							    	</td>
 							    </tr>
+							    @endif
 							@endforeach
 							@endif
 					    @else
@@ -111,10 +115,15 @@
 			    $('#wc-table table').DataTable({  "paging":   false,"info":     false, searching: false});
 			}
 		} );
-
+        var xhrRunning = false;
+        var xhr;
 		$(document).on('keyup', '.custom_data_filter input' , function(){
+		    if(xhrRunning){
+                xhr.abort();
+		    }
 			$('#loader').show();
-			$.ajax({
+		    xhrRunning = true;
+			xhr = $.ajax({
 		         headers: {
 	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 	             },
@@ -125,6 +134,7 @@
 			     success: function (response) {
 			     $('#loader').hide();
 			     if (response.status == 'success') {
+			        xhrRunning = false;
 			     	$('.wc-content').html(response.html);
 			     	  $('#wc-table').DataTable({  "paging":   false,"info":     false, searching: false});
 			     }
@@ -137,7 +147,8 @@
 			     },
 			     error: function (){
 			     	$('#loader').hide();
-			     	alert("Something Went Wrong...");
+			     	xhrRunning = false;
+			     //	alert("Something Went Wrong...");
 			     }
 			});
 		});

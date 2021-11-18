@@ -25,7 +25,7 @@
 							    		@endforeach
 							    		
 							    		@isset($inventory['more'])
-							    		    <b>[More...]</b>
+							    		    <b onclick="$(`#b{{ $inventory['barcode'] }}i-{{$index}}`).fadeToggle(); $(this).parents('tr').find('.fas').toggleClass('fa-plus-circle'); $(this).parents('tr').find('.fas').toggleClass('fa-minus-circle');">[More...]</b>
 							    		@endif
 							    	</td>
 							    	<td>{{$inventory['total']}}</td>
@@ -34,10 +34,13 @@
 							    		<a href="{{route('getInventoryDetailsView', ['barcode' => $inventory['barcode']] ) }}">All moves</a><br>
 							    	</td>
 							    	<td>
+							    	     @isset($inventory['locationsData'])
 							    		<a href="javascript:void(0)" onclick="$(`#b{{ $inventory['barcode'] }}i-{{$index}}`).fadeToggle();$(this).find('.fas').toggleClass('fa-plus-circle'); $(this).find('.fas').toggleClass('fa-minus-circle');"><i class="fas fa-plus-circle"></i>
 								    	</a>
+							    		@endif
 							    	</td>
 							    </tr>
+							     @isset($inventory['locationsData'])
 							  	<tr>
 							    	<td colspan="6" style="padding: 5px !important; display: none;" id="b{{ $inventory['barcode'] }}i-{{$index}}">
 							    		<table class="display">
@@ -64,6 +67,7 @@
 							    		</table>
 							    	</td>
 							    </tr>
+							    		@endif
 							@endforeach
 							@endif
 					    @else
