@@ -23,6 +23,10 @@
 							    		@foreach ($inventory['locations'] as $location)
 							    			{{$location['location_name']}} ({{$location['location_sum']}})
 							    		@endforeach
+							    		
+							    		@isset($inventory['more'])
+							    		    <b>[More...]</b>
+							    		@endif
 							    	</td>
 							    	<td>{{$inventory['total']}}</td>
 							    	<td>

@@ -75,9 +75,13 @@ class InventoryLocationTrackingController extends Controller
                                 'location_name' => $v2,
                                 'location_sum'  => $get_location_sum,
                             );
-                            $acount++;
                         }
 
+                        else if($acount == 3){
+                            $eachBarcodeData['more'] = true;
+                        }
+
+                        $acount++;
                         $total_inventory = $total_inventory + $get_location_sum;
 
                     }
@@ -194,8 +198,12 @@ class InventoryLocationTrackingController extends Controller
                                 'location_name' => $v2,
                                 'location_sum'  => $get_location_sum,
                             );
-                            $acount++;
                         }
+                        else if($acount == 3){
+                            $eachBarcodeData['more'] = true;
+                        }
+
+                        $acount++;
                         $total_inventory = $total_inventory + $get_location_sum;
 
                     }
@@ -524,10 +532,13 @@ class InventoryLocationTrackingController extends Controller
                 $data[$key]['count'] = $locationDeatail->quantity;
                 $data[$key]['expiration'] = $locationDeatail->expiration_date;
                 $data[$key]['from_id'] = $locationDeatail->from_id;
+                if ($locationDeatail->quantity < 1) {
+                    unset($data[$key]);
+                }
             }
         }
 
-       return response()->json(["data" => $data, 'status' => 'success']);
+       return response()->json(["data" => array_values( $data), 'status' => 'success']);
 
     }
 
