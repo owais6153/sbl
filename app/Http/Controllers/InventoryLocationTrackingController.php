@@ -47,11 +47,11 @@ class InventoryLocationTrackingController extends Controller
             $location = array();
             $items =  Items::select('item_number')->where('productIdentifier', '=', $barcode->barcode)->first(); 
             foreach ($from_to_query as $k => $from_to_rec){
-                if(!in_array($from_to_rec->to,$location) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping' && $from_to_rec->to != 'Production') )
+                if(!in_array($from_to_rec->to,$location) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping'  && $from_to_rec->to != 'Production' ) )
                 {
                     $location[$barcode->barcode][] = $from_to_rec->to;
                 }
-                elseif(!in_array($from_to_rec->from,$location) && ($from_to_rec->from != 'Receiving' && $from_to_rec->from != 'Shipping' && $from_to_rec->from != 'Production') )
+                elseif(!in_array($from_to_rec->from,$location) && ($from_to_rec->from != 'Receiving' && $from_to_rec->from != 'Shipping'  && $from_to_rec->from != 'Production') )
                 {
                     $location[$barcode->barcode][] = $from_to_rec->from;
                 }
@@ -70,6 +70,7 @@ class InventoryLocationTrackingController extends Controller
                     // echo $get_location_sum;
                         $eachBarcodeData['barcode'] = $k;
                         $eachBarcodeData['item'] = (isset($items['item_number'])) ? $items['item_number'] : 'Not Found';
+                        
                         if ($get_location_sum  > 0) {
                         if ($acount < 3) {
                             $eachBarcodeData['locations'][] = array(
@@ -112,7 +113,7 @@ class InventoryLocationTrackingController extends Controller
                          ->where('location', '=', $from)
                          ->where('barcode', '=', $barcode->barcode)
                          ->where('deleted_at', '=', null)
-                         ->groupBy('expiration_date')
+                        //  ->groupBy('expiration_date')
                          ->get();
                     if (!empty($LocationDetails)) {
                         foreach($LocationDetails as $key => $LocationDetail){
@@ -192,7 +193,6 @@ class InventoryLocationTrackingController extends Controller
                     // echo $get_location_sum;
                      $eachBarcodeData['item'] = (isset($items['item_number'])) ? $items['item_number'] : 'Not Found';
                     $eachBarcodeData['barcode'] = $k;
-                     $eachBarcodeData['locations'] = array();
                     if ( $get_location_sum > 1) {
 
                         if ($acount < 3) {
@@ -234,7 +234,7 @@ class InventoryLocationTrackingController extends Controller
                          ->where('location', '=', $from)
                          ->where('barcode', '=', $barcode->barcode)
                          ->where('deleted_at', '=', null)
-                         ->groupBy('expiration_date')
+                        //  ->groupBy('expiration_date')
                          ->get();
                     if (!empty($LocationDetails)) {
                         foreach($LocationDetails as $key => $LocationDetail){
@@ -261,13 +261,6 @@ class InventoryLocationTrackingController extends Controller
         return view('InventoryDetails');
     }
     public function getInventoryDetails(Request $request){
-
-        // $inventories = InventoryModel::select('users.email', 'inventory_location_tracking.*')->where('barcode', '=', $request->id)->join('users', 'users.id', '=', 'inventory_location_tracking.user_id')->get();
-
-        // return view('InventoryDetails', compact('inventories'));
-        // $model = InventoryModel::onlyTrashed()->get();
-        // echo count($model);
-        // exit();
         $model = InventoryModel::query();
         return DataTables::eloquent($model)
         ->filter(function ($query) {
@@ -286,11 +279,11 @@ class InventoryLocationTrackingController extends Controller
             }
             return $actionBtn;
         })
-        // ->addColumn('email', function($row){
+        ->addColumn('email', function($row){
             
-        //     $email = User::select('email')->where( 'id', '=', $row->user_id)->first();
-        //     return $email->email;
-        // })
+            $email = User::select('email')->where( 'id', '=', $row->user_id)->first();
+            return $email->email;
+        })
         ->addColumn('time', function($row){
             $created_at = $row->created_at;
             $created_at = date('m/d/Y h:i:s A', strtotime($created_at));      
@@ -298,21 +291,6 @@ class InventoryLocationTrackingController extends Controller
             $la_time = new \DateTimeZone('America/New_York');
             $datetime->setTimezone($la_time);
             return  $datetime->format('m/d/Y g:i:s A'); 
-        })
-        ->addColumn('actions', function($row){
-            if (request('trash') != 1) {
-                $id = $row->id;
-                $trackingDetails = InventoryLocation::select('barcode','id', 'from_id')->where('inventory_track_id', '=', $row->id)
-                    // ->where('location', '=', $row->to)
-                    ->first();
-                // if(!empty($trackingDetail)){
-                    $checkIfItemMoveToDiffrentLocation = InventoryLocation::where('from_id', '=', $trackingDetails['id'])->count();
-                    if ($checkIfItemMoveToDiffrentLocation < 1) {
-                        $html = '<!--<a href="'.route('deletemove', ['id' => $id]).'" class="deleteIt">Delete</a>-->';        
-                       return $html;        
-                    }
-                // }
-            }
         })
         ->rawColumns(['images_links', 'actions'])
         ->toJson();
@@ -369,7 +347,7 @@ class InventoryLocationTrackingController extends Controller
         unlink(public_path('uploads/' .$path));
         return response()->json(['success'=>'s', 'status' => 'success', 'path' => public_path('uploads/' .$path)]);
     }
-        public function saveInventory(Request $request)
+    public function saveInventory(Request $request)
     {
         $validation = Validator::make($request->all(),[
             'barcode' => 'required',
@@ -387,22 +365,28 @@ class InventoryLocationTrackingController extends Controller
         }
         $request->expiration_date = ( $request->expiration_date == 'null') ? null :  $request->expiration_date;
 
-        if ($request->from != 'Receiving' && empty($request->from_id)) {
+
+        $request->from = (ucfirst($request->from) == 'Receiving' || ucfirst($request->from) == 'Adjustment') ? ucfirst($request->from) : $request->from;
+        $request->to = (ucfirst($request->to) == 'Shipping' || ucfirst($request->to) == 'Production' || ucfirst($request->to) == 'Adjustment') ? ucfirst($request->to) : $request->to;
+        
+
+        if ($request->from != 'Receiving' && $request->from != 'Adjustment' && empty($request->from_id)) {
             return response()->json(["error" => 'From Id required', 'status' => 'error']);
         }
         
         if($request->from != 'Receiving'){
+            $checkFrom = ($request->from == 'Adjustment') ? $request->to : $request->from;
             $LocationDetails = DB::table('inventory_location')
                      ->select(DB::raw('SUM(`count`) as qty'))
-                     ->where('location', '=', $request->from)
+                     ->where('location', '=', $checkFrom)
                      ->where('barcode', '=', $request->barcode)
-                     ->where('expiration_date', '=', $request->expiration_date)
+                    //  ->where('expiration_date', '=', $request->expiration_date)
                      ->where('deleted_at', '=', null)
-                     ->groupBy('expiration_date')
+                    //  ->groupBy('expiration_date')
                      ->first();
             if (!empty($LocationDetails)) {
                 if($LocationDetails->qty < $request->quantity){
-                    return response()->json(["error" => $request->from . "  doesn't have enough items.", 'status' => 'error']);
+                    return response()->json(["error" => $request->from . " doesn't have enough items.", 'status' => 'error']);
                 }
             }
             else{
@@ -425,25 +409,45 @@ class InventoryLocationTrackingController extends Controller
         }
         $Inventory->save();
         
-        if ($request->from != 'Receiving') {
+        if ($request->from != 'Receiving' && $request->to != 'Adjustment') {
             $FromLocation = new InventoryLocation();
             $FromLocation->barcode = $request->barcode;
             $FromLocation->count = $request->quantity * -1;
-            $FromLocation->location = $request->from;
+            $FromLocation->location = ($request->from != 'Adjustment') ? $request->from : $request->to;
             $FromLocation->inventory_track_id = $Inventory->id;    
             $FromLocation->expiration_date = $request->expiration_date;  
             $FromLocation->from_id = $request->from_id;      
-            $FromLocation->save();            
+            $FromLocation->save();
+            if ($request->to == 'Shipping' || $request->to == 'Production'){
+                $newFromLocation = new InventoryLocation();
+                $newFromLocation->barcode = $request->barcode;
+                $newFromLocation->count = $request->quantity;
+                $newFromLocation->location = $request->to;
+                $newFromLocation->inventory_track_id = $Inventory->id;    
+                $newFromLocation->expiration_date = $request->expiration_date;  
+                $newFromLocation->from_id = $request->from_id;      
+                $newFromLocation->save();
+            }
         }
-        if ($request->to != 'Shipping' && $request->to != 'Production') {
+        if ($request->to != 'Shipping' && $request->to != 'Production' && $request->from != 'Adjustment') {
             $ToLocation = new InventoryLocation();
             $ToLocation->barcode = $request->barcode;
             $ToLocation->count = $request->quantity ;
-            $ToLocation->location = $request->to;
+            $ToLocation->location = ($request->to != 'Adjustment') ? $request->to : $request->from;
             $ToLocation->inventory_track_id = $Inventory->id;
             $ToLocation->expiration_date = $request->expiration_date; 
             $ToLocation->from_id = $request->from_id;   
             $ToLocation->save();
+            if($request->from == 'Receiving'){
+                $newToLocation = new InventoryLocation();
+                $newToLocation->barcode = $request->barcode;
+                $newToLocation->count = $request->quantity * -1;
+                $newToLocation->location = $request->from;
+                $newToLocation->inventory_track_id = $Inventory->id;
+                $newToLocation->expiration_date = $request->expiration_date; 
+                $newToLocation->from_id = $request->from_id;   
+                $newToLocation->save();
+            }
         }
 
         return response()->json(['success'=>'Inventory Inserted', 'status' => 'success']);
@@ -486,7 +490,7 @@ class InventoryLocationTrackingController extends Controller
                      ->where('location', '=',  $locations[$k])
                      ->where('barcode', '=', $barcode)
                      ->where('deleted_at', '=', null)
-                     ->groupBy('expiration_date')
+                    //  ->groupBy('expiration_date')
                      ->first();
 
                      if ($get_location_sum->qty < 1) {
@@ -500,7 +504,7 @@ class InventoryLocationTrackingController extends Controller
             $locations = array_unique($locations);
         }
          
-       return response()->json(["locations" =>array_values($locations), "items" => $items, 'status' => 'success']);
+       return response()->json(["locations" => array_values($locations), "items" => $items, 'status' => 'success']);
 
     }
     public function getExiprationDateAndQuantity(Request $request){
@@ -531,11 +535,12 @@ class InventoryLocationTrackingController extends Controller
              ->where('location', '=', $from)
              ->where('barcode', '=', $barcode)
              ->where('deleted_at', '=', null)
-             ->groupBy('expiration_date')
+            //  ->groupBy('expiration_date')
              ->get();
 
         if (!empty($getLocationDetails)) {
             foreach($getLocationDetails as $key => $locationDeatail){
+
                 $data[$key]['count'] = $locationDeatail->quantity;
                 $data[$key]['expiration'] = $locationDeatail->expiration_date;
                 $data[$key]['from_id'] = $locationDeatail->from_id;
@@ -543,9 +548,10 @@ class InventoryLocationTrackingController extends Controller
                     unset($data[$key]);
                 }
             }
+            
         }
 
-       return response()->json(["data" => array_values( $data), 'status' => 'success']);
+       return response()->json(["data" =>array_values( $data), 'status' => 'success']);
 
     }
 

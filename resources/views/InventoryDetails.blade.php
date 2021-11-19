@@ -5,7 +5,7 @@
 	<div class="col-lg-9 col-md-9">
 		<div class="wrap-content">
 			<div class="wc-title">
-				<h2>All Inventories</h2><br>
+				<h2>All Inventory Moves</h2><br>
 			</div>
 			@if (session('success'))
 			    <div class="alert alert-success mb-3">
@@ -18,17 +18,7 @@
 			    </div>
 			@endif
 			<div class="wc-content">
-				<form method="get" class="row mb-4">
-					<div class="col-md-2 pr-1">
-						<select id="trash" name="trash" class="form-control">
-							<option value="0">Active</option>
-							<option {{ (request('trash') == 1) ? 'selected' : '' }} value="1">Trashed</option>
-						</select>
-					</div>
-					<div class="col-md-1 pl-0">
-						<button class="btn btn-info btn-block">Filter</button>
-					</div>				
-				</form>
+
 				
 				<table id="wc-table" class="table table-bordered table-striped display responsive_scroll">
 					<thead>
@@ -43,7 +33,6 @@
 					      <th scope="col">Pallet</th>
 					      <th scope="col">Images</th>
 					      <th scope="col">Time created</th>
-					      <th scope="col">Action</th>
 					    </tr>
 					</thead>
 
@@ -91,11 +80,6 @@
 		                  },
 		                  { data: 'time', 
 		                      name: 'time', 
-		                      orderable: true, 
-		                      searchable: true
-		                  },
-		                  { data: 'actions', 
-		                      name: 'actions', 
 		                      orderable: true, 
 		                      searchable: true
 		                  }

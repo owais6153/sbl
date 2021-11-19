@@ -21,6 +21,9 @@
 			    @endif
 			</div>
 			<div class="alert"></div>
+			<audio id="beep">
+			    <source src="{{ asset('audio/beep.mp3') }}" ype="audio/mp3">
+			</audio>
 			<div class="wc-content">
 				<form class="custom_form" action="{{route('addusers')}}" method="POST" enctype="multipart/form-data" id="saveInventory" autocomplete="off">
 					   @csrf
@@ -40,9 +43,11 @@
 					    <select class="form-control" id="from" placeholder="From Location" name="from">
 					        <option value="">Select From Location</option>
 					    	<option value="Receiving">Receiving</option>
+					    	<option value="Adjustment">Adjustment</option>
 					    	<optgroup id="options" label="Locations"></optgroup>
 					    </select>
 					    <img src="{{asset('images/preloader.gif')}}" id="from_loader" style="display: none;">
+					    <span class="w-100" id="from_error" style="color: red; display:none;">Please select the valid from location.</span>
 					  </div>
 					  <div class="form-group col-half">
 					    <label for="to">To Location</label>
@@ -162,18 +167,39 @@
 	$('#submitForm').click( function (e){
 		var max = $('#quantity').attr('max');
 		let flag = true;
-        if (typeof max !== 'undefined' && max !== false) {
+		
+		if($('#from').val() == 'Adjustment' || $('input#to').val().toLowerCase() == 'adjustment'){
+            flag = confirm('Are you sure you want to do Adjustment?');
+        }
+        if (flag && typeof max !== 'undefined' && max !== false) {
             if(parseInt(max) < parseInt($('#quantity').val())){
                 alert("You can not move more then " + max + " Items.");
                 flag = false;
             }
         }
-        
-        if($('#from').val() != 'Receiving'){
+        if(flag && $('#from').val() != 'Receiving' && $('#from').val() != 'Adjustment'){
             if($('select#expiration_date_select').val() == ''){
                 alert('Please select expiration date.');
                 flag = false;
             }            
+        }
+        if(flag && $('#from').val() == $('input#to').val()){
+            alert("You can't put same values in both locations fields.");
+            flag = false;
+        }
+        if(flag && $('#from').val() == 'Receiving' && ($('input#to').val().toLowerCase() == 'shipping' || $('input#to').val().toLowerCase() == 'production')){
+            alert("You can't do shipping while receiving");
+            flag = false;
+        }
+        
+        if(flag && $('#from').val() == 'Receiving' && $('input#to').val().toLowerCase() == 'adjustment'){
+            alert("You can't do adjustment while receiving");
+            flag = false;
+        }
+        
+        if(flag && $('#from').val() == 'Adjustment' && ($('input#to').val().toLowerCase() == 'shipping' || $('input#to').val().toLowerCase() == 'production')){
+            alert("You can't do adjustment while shipping");
+            flag = false;
         }
         
         if(flag == true){
@@ -221,16 +247,14 @@
     		});
 	    }
 	})
-		var xhrrunning = false;
+	var xhrrunning = false;
 	var xhr;
 	$('#barcode').keyup(function(){
 	    if(xhrrunning){
 	        xhr.abort();
 	    }
 		$('#options').html('');
-		$('#barcode_loader').show();
 		$('#from_id').val();
-		$('#from_loader').show();
 		$('#expiration_date_select').html('');
 		$('#expiration_date').removeAttr('disabled');
 		$('#expiration_date').removeAttr('required');
@@ -242,6 +266,8 @@
 		$('#items').html('');
         $('#from').select2();
 		if ($(this).val() != '') {
+	    	$('#barcode_loader').show();
+    		$('#from_loader').show();
 			let barcode = $(this).val() ;
 			xhrrunning = true;
 			xhr = $.ajax({
@@ -293,74 +319,8 @@
 			});
 		}
 	})
-	$('#from').change(function(){
-
-		$('#expiration_date_select').html('');
-		$('#from_id').val();
-		$('#expiration_date').removeAttr('disabled');
-		$('#expiration_date').removeAttr('required');
-		$('#expiration_date').val('');
-		$('#expiration_date').show();
-		$('#expiration_date_select').hide(); 
-		$('#quantity').attr('max', '');
-		if ($(this).val() != '' && $(this).val() != 'Receiving' && $('#barcode').val() != '') {
-		    $('#from_loader').show();
-			let from = $(this).val() ;
-			$.ajax({
-		         headers: {
-	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-	             },
-			     url: "{{route('getExiprationDateAndQuantity')}}", 
-			     type: 'post',
-			     data: {'from': from, 'barcode':  $('#barcode').val()},
-			     dataType: 'json',
-			     success: function (response) {
-			       $('#from_loader').hide();
-			       if (response.status == 'success') {
-			       	let html = '<option value="">Select expiration date</option>';
-			       	 if (response.data.length == undefined && response.data[1] != '') {
-			       	  	let date = (response.data[1][`expiration`] == null) ? 'None' : response.data[1][`expiration`];
-			       	   	html+= '<option value="'+response.data[1][`expiration`]+'" data-count="'+response.data[1][`count`]+'" data-fromid="'+response.data[1][`from_id`]+'">' + date + '</option>';
-
-			       	 }
-			       	 else{
-			       	   for(var index = 0; index < response.data.length; index++) {
-			       	  	let date = (response.data[index][`expiration`] == null) ? 'None' : response.data[index][`expiration`];
-			       	  	let attri = (response.data.length == 1) ? 'selected' : '';
-			       	   	html+= '<option '+attri+' value="'+response.data[index][`expiration`]+'" data-count="'+response.data[index][`count`]+'" data-fromid="'+response.data[index][`from_id`]+'">' + date + '</option>';
 
 
-				       }
-
-				        $('#expiration_date_select').attr('required', 'required');
-			       	 }
-
-
-					    $('#expiration_date').hide();
-				        $('#expiration_date_select').html(html); 
-				        $('#expiration_date_select').show(); 
-				       	if(response.data.length == 1){
-			       	   		$('#quantity').attr('max', $('#expiration_date_select').find('option:selected').attr('data-count'));
-							$('#from_id').val($('#expiration_date_select').find('option:selected').attr('data-fromid'));
-			       	   	}
-
-
-			       }
-
-			       else{
-			       		$('#from').select2();
-			       		$('#barcode_loader').hide();
-						$('#from_loader').hide();
-						alert(response.error);
-			       }
-			     },
-			     error: function (){
-			        $('#from_loader').hide();
-			     	alert("Something Went Wrong...");
-			     }
-			});
-		}
-	})
 	function setExiprationDateAndQuantity(elem) {
 		$('#quantity').attr('max', $(elem).find('option:selected').attr('data-count'));
 		$('#from_id').val($(elem).find('option:selected').attr('data-fromid'));
@@ -375,17 +335,116 @@
 
 		    if(e.shiftKey && e.keyCode == 9) { 
 		    	$('#from').val(lastHoverItem).trigger("change");
-		    	$('#quantity').focus();
+		    	if($('#from').val() == ''){
+		    	    $('#beep').get(0).play();
+		    	    $('#from_error').fadeIn();
+    		    }
+    		    else if($('input.select2-search__field').val() !=  $('#from').val()){
+    		        $('#from').val('').trigger("change");
+		    	    $('#beep').get(0).play();
+		    	    $('#from_error').fadeIn();
+    		    }
+    		    else{
+    		        $('#quantity').focus();
+    		    }
 			}
 		    else if (e.keyCode == 9) {
 		    	$('#from').val(lastHoverItem).trigger("change");
-		    	$('#to').focus();
+		    	if($('#from').val() == ''){
+		    	    $('#beep').get(0).play();
+		    	    $('#from_error').fadeIn();
+    		    }
+    		    else if($('input.select2-search__field').val() !=  $('#from').val()){
+    		        $('#from').val('').trigger("change");
+		    	    $('#beep').get(0).play();
+		    	    $('#from_error').fadeIn();
+    		        
+    		    }
+    		    else{
+    		        $('#to').focus();
+    		    }
 		    }
 		    else{
-		    	let temp = $('span.select2-selection.select2-selection--single').attr('aria-activedescendant').split("-");
+		    	let temp;
+		    	temp = $('span.select2-selection.select2-selection--single').attr('aria-activedescendant').split("-");
 		    	lastHoverItem = temp.at(-1);
+		    	$('#from_error').fadeOut();
 		    }
 		})
+		$('#from').change(function(){
+		    if($('#from').val() == ''){
+		   	    $('#beep').get(0).play();
+		   	    $('#from_error').fadeIn();
+    		}
+    		else{
+		    	$('#from_error').fadeOut();
+    		}
+    		$('#expiration_date_select').html('');
+    		$('#from_id').val();
+    		$('#expiration_date').removeAttr('disabled');
+    		$('#expiration_date').removeAttr('required');
+    		$('#expiration_date').val('');
+    		$('#expiration_date').show();
+    		$('#expiration_date_select').hide(); 
+    		$('#quantity').attr('max', '');
+    		if ($(this).val() != '' && $(this).val() != 'Receiving' && $(this).val() != 'Adjustment' && $('#barcode').val() != '' ) {
+    		    $('#from_loader').show();
+    			let from = $(this).val() ;
+    			$.ajax({
+    		         headers: {
+    	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    	             },
+    			     url: "{{route('getExiprationDateAndQuantity')}}", 
+    			     type: 'post',
+    			     data: {'from': from, 'barcode':  $('#barcode').val()},
+    			     dataType: 'json',
+    			     success: function (response) {
+    			       $('#from_loader').hide();
+    			       if (response.status == 'success') {
+    			       	let html = '<option value="">Select expiration date</option>';
+    			       	 if (response.data.length == undefined && response.data[1] != '') {
+    			       	  	let date = (response.data[1][`expiration`] == null) ? 'None' : response.data[1][`expiration`];
+    			       	   	html+= '<option value="'+response.data[1][`expiration`]+'" data-count="'+response.data[1][`count`]+'" data-fromid="'+response.data[1][`from_id`]+'">' + date + '</option>';
+    
+    			       	 }
+    			       	 else{
+    			       	   for(var index = 0; index < response.data.length; index++) {
+    			       	  	let date = (response.data[index][`expiration`] == null) ? 'None' : response.data[index][`expiration`];
+    			       	  	let attri = (response.data.length == 1) ? 'selected' : '';
+    			       	   	html+= '<option '+attri+' value="'+response.data[index][`expiration`]+'" data-count="'+response.data[index][`count`]+'" data-fromid="'+response.data[index][`from_id`]+'">' + date + '</option>';
+    
+    
+    				       }
+    
+    				        $('#expiration_date_select').attr('required', 'required');
+    			       	 }
+    
+    
+    					    $('#expiration_date').hide();
+    				        $('#expiration_date_select').html(html); 
+    				        $('#expiration_date_select').show(); 
+    				       	if(response.data.length == 1){
+    			       	   		$('#quantity').attr('max', $('#expiration_date_select').find('option:selected').attr('data-count'));
+    							$('#from_id').val($('#expiration_date_select').find('option:selected').attr('data-fromid'));
+    			       	   	}
+    
+    
+    			       }
+    
+    			       else{
+    			       		$('#from').select2();
+    			       		$('#barcode_loader').hide();
+    						$('#from_loader').hide();
+    						alert(response.error);
+    			       }
+    			     },
+    			     error: function (){
+    			        $('#from_loader').hide();
+    			     	alert("Something Went Wrong...");
+    			     }
+    			});
+    		}
+    	})
 	});
 </script>
 @endsection
