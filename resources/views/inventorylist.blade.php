@@ -32,7 +32,14 @@
 					  	@isset($inventories['data'])
 					  		@foreach ($inventories['data'] as $index => $inventory)
 							    <tr>
-							    	<td>{{$inventory['item']}}</td>
+							    	<td>
+							    		@foreach ($inventory['item'] as $itemindex => $item)
+								    		{{$item}}
+								    		@if (isset($inventory['item'][$itemindex + 1]))
+								    			,<br>
+								    		@endif
+							    		@endforeach
+							    	</td>
 							    	<td>{{$inventory['barcode']}}</td>
 							    	<td>
 							    		@foreach ($inventory['locations'] as $location)
@@ -70,7 +77,14 @@
 							    			<tbody>
 							    				@foreach ($inventory['locationsData'] as $locationsData)
 								    				<tr>
-												    	<td>{{$inventory['item']}}</td>
+												    	<td>
+												    		@foreach ($inventory['item'] as $itemindex => $item)
+													    		{{$item}}
+													    		@if (isset($inventory['item'][$itemindex + 1]))
+													    			,<br>
+													    		@endif
+												    		@endforeach
+							    						</td>
 												    	<td>{{$inventory['barcode']}}</td>
 												    	<td>{{$locationsData['name']}}</td>
 												    	<td>{{$locationsData['count']}}</td>

@@ -44,8 +44,8 @@ class InventoryLocationTrackingController extends Controller
         foreach ($barcodes as $barcode){
             $count = 0;
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->get();
-            $location = array();
-            $items =  Items::select('item_number')->where('productIdentifier', '=', $barcode->barcode)->first(); 
+            $location = array();           
+            $items =  Items::select('item.item_number')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->get();
             foreach ($from_to_query as $k => $from_to_rec){
                 if(!in_array($from_to_rec->to,$location) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping'  && $from_to_rec->to != 'Production' ) )
                 {
@@ -69,8 +69,14 @@ class InventoryLocationTrackingController extends Controller
                     
                     // echo $get_location_sum;
                         $eachBarcodeData['barcode'] = $k;
-                        $eachBarcodeData['item'] = (isset($items['item_number'])) ? $items['item_number'] : 'Not Found';
+                        foreach($items as $item){
+                           $eachBarcodeData['item'][] = (isset($item->item_number)) ? $item->item_number : 'Not Found';                            
+                        }
+
                         
+                        if (!isset($eachBarcodeData['item'])) {
+                             $eachBarcodeData['item'][] = 'Not Found';
+                        }
                         if ($get_location_sum  > 0) {
                         if ($acount < 3) {
                             $eachBarcodeData['locations'][] = array(
@@ -170,7 +176,7 @@ class InventoryLocationTrackingController extends Controller
             $count = 0;
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->get();
             $location = array();
-            $items =  Items::select('item_number')->where('productIdentifier', '=', $barcode->barcode)->first();
+            $items =  Items::select('item.item_number')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->get();
             foreach ($from_to_query as $k => $from_to_rec){
                 if(!in_array($from_to_rec->to,$location) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping' && $from_to_rec->to != 'Production') )
                 {
@@ -190,8 +196,12 @@ class InventoryLocationTrackingController extends Controller
                 $acount = 0;
                 foreach ($v as $k2 => $v2 ){
                     $get_location_sum = DB::table('inventory_location')->where('location', '=', $v2)->where('barcode', '=', $barcode->barcode)->where('deleted_at', '=', null)->sum('count');
-                    // echo $get_location_sum;
-                     $eachBarcodeData['item'] = (isset($items['item_number'])) ? $items['item_number'] : 'Not Found';
+                        foreach($items as $item){
+                           $eachBarcodeData['item'][] = (isset($item->item_number)) ? $item->item_number : 'Not Found';                            
+                        }
+                        if (!isset($eachBarcodeData['item'])) {
+                             $eachBarcodeData['item'][] = 'Not Found';
+                        }
                     $eachBarcodeData['barcode'] = $k;
                     if ( $get_location_sum > 1) {
 
@@ -467,7 +477,8 @@ class InventoryLocationTrackingController extends Controller
         }
 
         $barcode = $request->barcode;        
-        $items =  Items::where('productIdentifier', '=', $barcode)->get(); 
+        $items =  Items::select('item.*', 'item_identifiers.*')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode)->get(); 
+
         $barcodes = InventoryModel::select('barcode')->where('barcode', '=', $request->barcode )->first();
         if (empty($barcodes)) {
              return response()->json(["error" => 'Barcode not found', 'items' => $items, 'status' => '404']);

@@ -45,7 +45,6 @@ class ImportItems extends Command
         $lastImport = ItemsCron::latest()->first();
         if (!empty($lastImport)) {
             $offset = 1000 + $lastImport->item_offset;
-            $limit =  $limit + $lastImport->item_limit;
         }
 
 
@@ -86,19 +85,21 @@ class ImportItems extends Command
                     $cron_data->item_limit = $limit;
                     $cron_data->save();
                     foreach ($res->data as $item){
-                        if (isset($item->productIdentifiers[0])) {
-                            $items = new Items();
-                            $items->item_number = $item->itemNumber;
-                            $items->save();
-                            foreach ($item->productIdentifiers as $productIdentifier){
-                                if ($productIdentifier->identifierType == 'UPC') {
+                        $items = new Items();
+                        $items->item_number = $item->itemNumber;
+                        $items->save();
+                        foreach ($item->productIdentifiers as $productIdentifier){
+                            if ($productIdentifier->identifierType == 'UPC') {
+                                $check = ItemIdentifier::where('productIdentifier', '=', $productIdentifier->productIdentifier)->where('item_id', '=', $items->id)->count();
+                                if($check < 1){
                                     $ItemIdentifier = new ItemIdentifier();
                                     $ItemIdentifier->item_id = $items->id;
                                     $ItemIdentifier->productIdentifier = $productIdentifier->productIdentifier;
                                     $ItemIdentifier->save();
                                 }
-                            }                                                       
-                        }
+                            }
+                        }                                                       
+                        
                     }
                 }
             }
