@@ -47,11 +47,11 @@ class InventoryLocationTrackingController extends Controller
             $location = array();           
             $items =  Items::select('item.item_number')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->get();
             foreach ($from_to_query as $k => $from_to_rec){
-                if(!in_array($from_to_rec->to,$location) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping'  && $from_to_rec->to != 'Production' ) )
+                if(!in_array($from_to_rec->to,$location) && (strtolower($from_to_rec->to) != 'receiving' && strtolower($from_to_rec->to) != 'shipping'  && strtolower($from_to_rec->to) != 'production' && strtolower($from_to_rec->to) != 'adjustment' ) )
                 {
                     $location[$barcode->barcode][] = $from_to_rec->to;
                 }
-                elseif(!in_array($from_to_rec->from,$location) && ($from_to_rec->from != 'Receiving' && $from_to_rec->from != 'Shipping'  && $from_to_rec->from != 'Production') )
+                elseif(!in_array($from_to_rec->from,$location) && (strtolower($from_to_rec->from) != 'receiving' && strtolower($from_to_rec->from) != 'shipping'  && strtolower($from_to_rec->from) != 'production' && strtolower($from_to_rec->from) != 'adjustment') )
                 {
                     $location[$barcode->barcode][] = $from_to_rec->from;
                 }
@@ -102,11 +102,11 @@ class InventoryLocationTrackingController extends Controller
 
             $locationData = array();
             foreach ($getAllLocationData as $k => $getlocationData){
-                if(!in_array($getlocationData->to,$locationData) && ($getlocationData->to != 'Receiving' && $getlocationData->to != 'Shipping' && $getlocationData->to != 'Production') )
+                if(!in_array($getlocationData->to,$locationData) && (strtolower($getlocationData->to) != 'receiving' && strtolower($getlocationData->to) != 'shipping' && strtolower($getlocationData->to) != 'production' && strtolower($getlocationData->to) != 'adjustment') )
                 {
                     $locationData[$barcode->barcode][] = $getlocationData->to;
                 }
-                elseif(!in_array($getlocationData->from,$locationData) && ($getlocationData->from != 'Receiving' && $getlocationData->from != 'Shipping' && $getlocationData->from != 'Production') )
+                elseif(!in_array($getlocationData->from,$locationData) && (strtolower($getlocationData->from) != 'receiving' && strtolower($getlocationData->from) != 'shipping' && strtolower($getlocationData->from) != 'production' && strtolower($getlocationData->from) != 'adjustment') )
                 {
                     $locationData[$barcode->barcode][] = $getlocationData->from;
                 }
@@ -178,11 +178,11 @@ class InventoryLocationTrackingController extends Controller
             $location = array();
             $items =  Items::select('item.item_number')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->get();
             foreach ($from_to_query as $k => $from_to_rec){
-                if(!in_array($from_to_rec->to,$location) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping' && $from_to_rec->to != 'Production') )
+                if(!in_array($from_to_rec->to,$location) && (strtolower($from_to_rec->to) != 'receiving' && strtolower($from_to_rec->to) != 'shipping'  && strtolower($from_to_rec->to) != 'production' && strtolower($from_to_rec->to) != 'adjustment') )
                 {
                     $location[$barcode->barcode][] = $from_to_rec->to;
                 }
-                elseif(!in_array($from_to_rec->from,$location) && ($from_to_rec->from != 'Receiving' && $from_to_rec->from != 'Shipping' && $from_to_rec->from != 'Production') )
+                elseif(!in_array($from_to_rec->from,$location) && (strtolower($from_to_rec->from) != 'receiving' && strtolower($from_to_rec->from) != 'shipping'  && strtolower($from_to_rec->from) != 'production' && strtolower($from_to_rec->from) != 'adjustment') )
                 {
                     $location[$barcode->barcode][] = $from_to_rec->from;
                 }
@@ -227,11 +227,11 @@ class InventoryLocationTrackingController extends Controller
 
             $locationData = array();
             foreach ($getAllLocationData as $k => $getlocationData){
-                if(!in_array($getlocationData->to,$locationData) && ($getlocationData->to != 'Receiving' && $getlocationData->to != 'Shipping' && $getlocationData->to != 'Production') )
+                if(!in_array($getlocationData->to,$locationData) && (strtolower($getlocationData->to) != 'receiving' && strtolower($getlocationData->to) != 'shipping' && strtolower($getlocationData->to) != 'production' && strtolower($getlocationData->to) != 'adjustment') )
                 {
                     $locationData[$barcode->barcode][] = $getlocationData->to;
                 }
-                elseif(!in_array($getlocationData->from,$locationData) && ($getlocationData->from != 'Receiving' && $getlocationData->from != 'Shipping' && $getlocationData->from != 'Production') )
+                elseif(!in_array($getlocationData->from,$locationData) && (strtolower($getlocationData->from) != 'receiving' && strtolower($getlocationData->from) != 'shipping' && strtolower($getlocationData->from) != 'production' && strtolower($getlocationData->from) != 'adjustment') )
                 {
                     $locationData[$barcode->barcode][] = $getlocationData->from;
                 }
@@ -376,16 +376,16 @@ class InventoryLocationTrackingController extends Controller
         $request->expiration_date = ( $request->expiration_date == 'null') ? null :  $request->expiration_date;
 
 
-        $request->from = (ucfirst($request->from) == 'Receiving' || ucfirst($request->from) == 'Adjustment') ? ucfirst($request->from) : $request->from;
-        $request->to = (ucfirst($request->to) == 'Shipping' || ucfirst($request->to) == 'Production' || ucfirst($request->to) == 'Adjustment') ? ucfirst($request->to) : $request->to;
+        $request->from = (strtolower($request->from) == 'receiving' || strtolower($request->from) == 'adjustment') ? strtolower($request->from) : $request->from;
+        $request->to = (strtolower($request->to) == 'shipping' || strtolower($request->to) == 'production' || strtolower($request->to) == 'adjustment') ? strtolower($request->to) : $request->to;
         
 
-        if ($request->from != 'Receiving' && $request->from != 'Adjustment' && empty($request->from_id)) {
+        if ($request->from != 'receiving' && $request->from != 'adjustment' && empty($request->from_id)) {
             return response()->json(["error" => 'From Id required', 'status' => 'error']);
         }
         
-        if($request->from != 'Receiving'){
-            $checkFrom = ($request->from == 'Adjustment') ? $request->to : $request->from;
+        if($request->from != 'receiving' && $request->from != 'adjustment'){
+            $checkFrom = ($request->from == 'adjustment') ? $request->to : $request->from;
             $LocationDetails = DB::table('inventory_location')
                      ->select(DB::raw('SUM(`count`) as qty'))
                      ->where('location', '=', $checkFrom)
@@ -405,7 +405,7 @@ class InventoryLocationTrackingController extends Controller
         }
                          
                          
-                         
+        // All moves   
         $Inventory = new InventoryModel();
         $Inventory->user_id = Session::get('id');
         $Inventory->barcode = $request->barcode;
@@ -419,16 +419,18 @@ class InventoryLocationTrackingController extends Controller
         }
         $Inventory->save();
         
-        if ($request->from != 'Receiving' && $request->to != 'Adjustment') {
+        if ($request->from != 'receiving' && $request->from != 'adjustment') {
+            // When Moving From Location (Not Receiving)
             $FromLocation = new InventoryLocation();
             $FromLocation->barcode = $request->barcode;
             $FromLocation->count = $request->quantity * -1;
-            $FromLocation->location = ($request->from != 'Adjustment') ? $request->from : $request->to;
+            $FromLocation->location = $request->from ;
             $FromLocation->inventory_track_id = $Inventory->id;    
             $FromLocation->expiration_date = $request->expiration_date;  
             $FromLocation->from_id = $request->from_id;      
             $FromLocation->save();
-            if ($request->to == 'Shipping' || $request->to == 'Production'){
+            if ($request->to == 'shipping' || $request->to == 'production' || $request->to == 'adjustment'){
+                // If Shipping
                 $newFromLocation = new InventoryLocation();
                 $newFromLocation->barcode = $request->barcode;
                 $newFromLocation->count = $request->quantity;
@@ -439,16 +441,18 @@ class InventoryLocationTrackingController extends Controller
                 $newFromLocation->save();
             }
         }
-        if ($request->to != 'Shipping' && $request->to != 'Production' && $request->from != 'Adjustment') {
+        if ($request->to != 'shipping' && $request->to != 'production' && $request->to != 'adjustment') {
+            // When Moving From Location (Not Shipping)
             $ToLocation = new InventoryLocation();
             $ToLocation->barcode = $request->barcode;
             $ToLocation->count = $request->quantity ;
-            $ToLocation->location = ($request->to != 'Adjustment') ? $request->to : $request->from;
+            $ToLocation->location = $request->to;
             $ToLocation->inventory_track_id = $Inventory->id;
             $ToLocation->expiration_date = $request->expiration_date; 
             $ToLocation->from_id = $request->from_id;   
             $ToLocation->save();
-            if($request->from == 'Receiving'){
+            if($request->from == 'receiving' || $request->from == 'adjustment'){
+                 // If Receiving
                 $newToLocation = new InventoryLocation();
                 $newToLocation->barcode = $request->barcode;
                 $newToLocation->count = $request->quantity * -1;
@@ -484,7 +488,7 @@ class InventoryLocationTrackingController extends Controller
              return response()->json(["error" => 'Barcode not found', 'items' => $items, 'status' => '404']);
         }
             
-        $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode)->get();
+        $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
         $locations = array();
         foreach ($from_to_query as $k => $from_to_rec){
             if(!in_array($from_to_rec->to,$locations) && ($from_to_rec->to != 'Receiving' && $from_to_rec->to != 'Shipping' && $from_to_rec->to != 'Production') )

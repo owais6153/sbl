@@ -90,7 +90,7 @@ class ImportItems extends Command
                         $items->save();
                         foreach ($item->productIdentifiers as $productIdentifier){
                             if ($productIdentifier->identifierType == 'UPC') {
-                                $check = ItemIdentifier::where('productIdentifier', '=', $productIdentifier->productIdentifier)->where('item_id', '=', $items->id)->count();
+                                $check = ItemIdentifier::where('productIdentifier', '=', $productIdentifier->productIdentifier)->count();
                                 if($check < 1){
                                     $ItemIdentifier = new ItemIdentifier();
                                     $ItemIdentifier->item_id = $items->id;
