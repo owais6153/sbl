@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\Items;
 use App\Models\ItemsCron;
 use App\Models\ItemIdentifier;
+use App\Models\SkippedItemIdentifiers;
 use Log;
 class ImportItems extends Command
 {
@@ -96,6 +97,17 @@ class ImportItems extends Command
                                     $ItemIdentifier->item_id = $items->id;
                                     $ItemIdentifier->productIdentifier = $productIdentifier->productIdentifier;
                                     $ItemIdentifier->save();
+                                }
+                                else{
+
+                                    $getIdentifier = ItemIdentifier::select('item_id', 'id', 'productIdentifier')->where('productIdentifier', '=', $productIdentifier->productIdentifier)->first();
+                                    $SkippedItemIdentifiers = new SkippedItemIdentifiers();
+                                    $SkippedItemIdentifiers->item_id = $getIdentifier->item_id;
+                                    $SkippedItemIdentifiers->identifier_id = $getIdentifier->id;
+                                    $SkippedItemIdentifiers->barcode = $getIdentifier->productIdentifier;
+                                    $SkippedItemIdentifiers->duplicate_item_id = $items->id;
+                                    $SkippedItemIdentifiers->save();
+
                                 }
                             }
                         }                                                       

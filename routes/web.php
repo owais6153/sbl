@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\InventoryLocationTrackingController;
 use App\Http\Controllers\ItemsController;
+use App\Http\Controllers\SkippedItemIdentifiersController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -50,6 +51,9 @@ Route::middleware(['is_admin'])->group(function (){
 // Items
 	Route::get('/items', [ItemsController::class, 'index'])->name('listitems');	
 	Route::get('/items/getItems', [ItemsController::class, 'getItems'])->name('getItems');
+// Skipped Items
+	Route::get('/skipped-items', [SkippedItemIdentifiersController::class, 'index'])->name('listSkippedItems');	
+	Route::get('/skipped-items/getItems', [SkippedItemIdentifiersController::class, 'getSkippedItems'])->name('getSkippedItems');
 
 });
 
