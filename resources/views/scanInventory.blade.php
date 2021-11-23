@@ -309,6 +309,10 @@
 					$('#items').append($(item));
 			       }
 
+			       if (response.action == 'append') {
+			       	 $('#barcode').val(response.barcode);
+			       }
+
 			     },
 			     error: function (){
                     xhrrunning = false;

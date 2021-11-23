@@ -43,9 +43,9 @@ class InventoryLocationTrackingController extends Controller
         $items; 
         foreach ($barcodes as $barcode){
             $count = 0;
-            $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->get();
+            $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
             $location = array();           
-            $items =  Items::select('item.item_number')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->get();
+            $items =  Items::select('item.item_number')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=', '0' . $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=',  substr($barcode->barcode, 1))->get();
             foreach ($from_to_query as $k => $from_to_rec){
                 if(!in_array($from_to_rec->to,$location) && (strtolower($from_to_rec->to) != 'receiving' && strtolower($from_to_rec->to) != 'shipping'  && strtolower($from_to_rec->to) != 'production' && strtolower($from_to_rec->to) != 'adjustment' ) )
                 {
@@ -98,7 +98,7 @@ class InventoryLocationTrackingController extends Controller
 
 
 
-            $getAllLocationData = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->where('deleted_at', '=', null)->get();
+            $getAllLocationData = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->where('deleted_at', '=', null)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
 
             $locationData = array();
             foreach ($getAllLocationData as $k => $getlocationData){
@@ -174,9 +174,9 @@ class InventoryLocationTrackingController extends Controller
         $inventories = array();
         foreach ($barcodes as $barcode){
             $count = 0;
-            $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->get();
+            $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
             $location = array();
-            $items =  Items::select('item.item_number')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->get();
+            $items =  Items::select('item.item_number')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=', '0' . $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=',  substr($barcode->barcode, 1))->get();
             foreach ($from_to_query as $k => $from_to_rec){
                 if(!in_array($from_to_rec->to,$location) && (strtolower($from_to_rec->to) != 'receiving' && strtolower($from_to_rec->to) != 'shipping'  && strtolower($from_to_rec->to) != 'production' && strtolower($from_to_rec->to) != 'adjustment') )
                 {
@@ -223,7 +223,7 @@ class InventoryLocationTrackingController extends Controller
                 }
                 $eachBarcodeData['total'] = $total_inventory;
             }
-            $getAllLocationData = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->where('deleted_at', '=', null)->get();
+            $getAllLocationData = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->where('deleted_at', '=', null)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
 
             $locationData = array();
             foreach ($getAllLocationData as $k => $getlocationData){
@@ -481,12 +481,41 @@ class InventoryLocationTrackingController extends Controller
         }
 
         $barcode = $request->barcode;        
-        $items =  Items::select('item.*', 'item_identifiers.*')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode)->get(); 
+        $items =  Items::select('item.*', 'item_identifiers.*')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode)->orWhere('item_identifiers.productIdentifier', '=', '0' . $barcode)->orWhere('item_identifiers.productIdentifier', '=',  substr($barcode, 1))->get();
 
-        $barcodes = InventoryModel::select('barcode')->where('barcode', '=', $request->barcode )->first();
+
+
+        $action = 'no';
+
+
+        $barcodes = InventoryModel::select('barcode')->where('barcode', '=', $barcode )->first();
         if (empty($barcodes)) {
-             return response()->json(["error" => 'Barcode not found', 'items' => $items, 'status' => '404']);
+
+            if (strlen($barcode) == 11) {
+                $barcodes = InventoryModel::select('barcode')->where('barcode', '=', '0' . $barcode )->first();
+                if (!empty($barcode)) {
+                    $action = 'append';
+                    $barcode = '0' . $barcode;
+                }
+            }
+            elseif (strlen($barcode) == 12) {
+                if ($barcode[0] == '0') {
+                    $barcodes = InventoryModel::select('barcode')->where('barcode', '=',  substr($barcode, 1) )->first();
+                    if (!empty($barcode)) {
+                        $action = 'append';
+                        $barcode = substr($barcode, 1);
+                    }                    
+                }
+            }
+    
+    
+            if (empty($barcodes)) {              
+                return response()->json(["error" => 'Barcode not found', 'items' => $items, 'status' => '404', 'action' => $action, 'barcode' => $barcode]);
+            }
         }
+
+
+
             
         $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
         $locations = array();
@@ -519,7 +548,7 @@ class InventoryLocationTrackingController extends Controller
             $locations = array_unique($locations);
         }
          
-       return response()->json(["locations" => array_values($locations), "items" => $items, 'status' => 'success']);
+       return response()->json(["locations" => array_values($locations), "items" => $items, 'status' => 'success', 'action' => $action, 'barcode' => $barcode]);
 
     }
     public function getExiprationDateAndQuantity(Request $request){
