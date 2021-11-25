@@ -240,10 +240,11 @@ class InventoryLocationTrackingController extends Controller
 
 
             $eachBarcodeData = array();
-            $eachBarcodeData['locations'] = array();
+           
             
             // Now looping through each location
             foreach ($locations as $barcode_as_key => $location_Array){
+                $eachBarcodeData['locations'] = array();
                 $total_inventory = 0;
                 $acount = 0;
                 foreach ($location_Array as $location_key => $final_location ){
@@ -295,9 +296,9 @@ class InventoryLocationTrackingController extends Controller
                 }
                 $eachBarcodeData['total'] = $total_inventory;
             }
-
-
-            $inventories['data'][] = $eachBarcodeData;
+            
+            if(!empty($eachBarcodeData))
+                $inventories['data'][] = $eachBarcodeData;
 
         }     
         
