@@ -33,7 +33,8 @@ Route::middleware(['is_admin'])->group(function (){
 	Route::post('/users/edituser', [HomeController::class, 'edituser'])->name('edituser');
 	Route::get('/users/delete{id}', [HomeController::class, 'deleteuser'])->name('deleteuser');
 	Route::get('/users/allUsers', [HomeController::class, 'userDisplay'])->name('userDisplay');
-// File Upload
+//Roles
+	// File Upload
 	Route::get('/files/import', [FileUploadController::class, 'importFiles'])->name('import_files');
 	Route::post('/files/import/save', [FileUploadController::class, 'saveImportFiles'])->name('saveImportFiles');
 	// On hand
