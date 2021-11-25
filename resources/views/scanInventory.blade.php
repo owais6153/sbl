@@ -43,7 +43,9 @@
 					    <select class="form-control" id="from" placeholder="From Location" name="from">
 					        <option value="">Select From Location</option>
 					    	<option value="Receiving">Receiving</option>
+							@can('inventory_adjustment')
 					    	<option value="Adjustment">Adjustment</option>
+							@endcan
 					    	<optgroup id="options" label="Locations"></optgroup>
 					    </select>
 					    <img src="{{asset('images/preloader.gif')}}" id="from_loader" style="display: none;">
@@ -164,6 +166,17 @@
 	$('#saveInventory').submit( function (e){
 		e.preventDefault();
 	})
+	@cannot('inventory_adjustment')
+	$('#to').keyup(function(){
+	if($(this).val() == "Adjustment" || $(this).val() == "adjustment"){
+		alert('You Are Forbidden to make adjustments');
+		$('#submitForm').attr("disabled", true);
+	}else{
+		$('#submitForm').attr("disabled", false);
+
+	}
+	});
+	@endcannot
 	$('#submitForm').click( function (e){
 		var max = $('#quantity').attr('max');
 		let flag = true;
@@ -275,8 +288,7 @@
 			       if(response.items.length > 0){
 			       	let item = '';
 			       	for(var index = 0; index < response.items.length; index++) {
-				       	item += '<span>'+response.items[index][`item_number`]+'</span>';
-				       	item += '<input type="hidden" name="item_id" value="'+response.items[index][`id`]+'" class="item_id"><br>';
+				       	item += '<span>'+response.items[index][`item_number`]+'</span><br>';
 					}	
 					$('#items').append($(item));
 			       }

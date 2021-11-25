@@ -9,7 +9,9 @@ use Redirect;
 use Hash;
 use Validator;
 use Session;
+use Bouncer;
 use DataTables;
+use Silber\Bouncer\Bouncer as BouncerBouncer;
 
 class HomeController extends Controller
 {
@@ -45,6 +47,7 @@ class HomeController extends Controller
       return redirect('/');
     }
     public function users(){
+        
         return view('userlist');
     }
     public function userDisplay()
@@ -64,9 +67,14 @@ class HomeController extends Controller
         ->addColumn('action', function($row){
 
             if($row->id != Session::get('id') && $row->id != 1){
-                $actionBtn= '<a href="' . route('edit_user', ['id' => $row->id]) . '" class="mr-3"><i class="fas fa-pencil-alt mr-2"></i>Edit</a> <a class="deleteIt" href="' .route('deleteuser', ['id' => $row->id]). '"><i class="fas fa-trash-alt mr-2"></i>Delete</a>
-
-                ';
+                $actionBtn= '';
+                if(Bouncer::can('user_update')){
+                    $actionBtn .='<a href="' . route('edit_role', ['id' => $row->id]) . '" class="mr-3"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>';
+                }
+                if(Bouncer::can('user_delete')){
+                $actionBtn .= '<a class="deleteIt" href="' .route('delete_role', ['id' => $row->id]). '"><i class="fas fa-trash-alt mr-2"></i>Delete</a>';
+                }
+                // $actionBtn= '<a href="' . route('edit_user', ['id' => $row->id]) . '" class="mr-3"><i class="fas fa-pencil-alt mr-2"></i>Edit</a> <a class="deleteIt" href="' .route('deleteuser', ['id' => $row->id]). '"><i class="fas fa-trash-alt mr-2"></i>Delete</a>';
                 return $actionBtn;
             }
         })
@@ -75,13 +83,17 @@ class HomeController extends Controller
         ->toJson();
     }
     public function add_user(){
-        return view('adduser');
+       
+        $roles = Bouncer::role()->all()->pluck('name');
+       
+        return view('adduser',compact('roles'));
     }
     public function addusers(Request $request){
         $validation = Validator::make($request->all(),[
             'name' => 'required',
             'email' => 'email|unique:users|required',
             'password' => 'required',
+            'role'=>'required'
         ]);
         if ($validation->fails())
         {
@@ -92,13 +104,13 @@ class HomeController extends Controller
             return Redirect::back()->with('danger', $error_array);
         }
         else{
+            
             $user = new User;
             $user->name = $request->name;
             $user->email = $request->email;
             $user->password = Hash::make($request->password);
             $user->save();
-
-
+            $user->assign($request->role);
             return Redirect::route('user_list')->with('success', "User added successfuly.");
 
         }
@@ -107,11 +119,13 @@ class HomeController extends Controller
     public function edit_user(Request $request){
         if( $request->id != Session::get('id') && $request->id != 1 ){
             $user = User::where('id', '=', $request->id)->first();
+            $roles = Bouncer::role()->all()->pluck('name');
+            
             if (empty($user)) {
                 abort(404);
             }
 
-            return view('edituser', compact('user'));
+            return view('edituser', compact('user','roles'));
         }
         else{
             abort(404);
@@ -133,6 +147,7 @@ class HomeController extends Controller
                 return Redirect::back()->with('danger', $error_array);
             }
             else{
+                
                 $user = new User;
                 $user->exists = true;
                 $user->id = $request->id;
@@ -141,8 +156,20 @@ class HomeController extends Controller
                 if($request->password != ''){
                     $user->password =   Hash::make($request->password);
                 }
-                $user->save();
 
+                
+                $user->save();
+                $currentRole= $user->getRoles();
+                
+                if(empty($currentRole[0])){
+                    $user->assign($request->role);
+                }else{
+                    if($currentRole[0] != $request->role){
+                        $user->retract($currentRole[0]);
+                        $user->assign($request->role);
+                    }
+                }
+                
 
                 return Redirect::route('user_list')->with('success', "User updated successfuly.");
 
