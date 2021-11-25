@@ -13,7 +13,10 @@
 				@endif
 			</div>
 			<img src="{{asset('images/preloader.gif')}}" id="loader" style="display: none;">
-			<div class="wc-content">			    
+			<div class="wc-content">		
+				<a href="{{route('inventoryByBarcode')}}" class="btn btn-primary mb-3 <?= ($filter == 'barcode') ? 'disabled' : '' ; ?>">Show Locations By Barcode</a>
+				<a href="{{route('inventory')}}" class="btn btn-primary mb-3 <?= ($filter == 'item') ? 'disabled' : '' ; ?>">Show Locations By Items</a>
+			<div class="wc-content-inner">	    
 				<div class="custom_data_filter"><label>Search:<input type="search" value="{{ Request::get('search') }}" class="" placeholder="">					  	</label></div>
 
 				<table id="wc-table" class="display">
@@ -109,6 +112,7 @@
 				</table>
 				{{$inventories['links']}}
 			</div>
+			</div>
 		</div>
 	</div>
 
@@ -152,7 +156,7 @@
 			     $('#loader').hide();
 			     if (response.status == 'success') {
 			        xhrRunning = false;
-			     	$('.wc-content').html(response.html);
+			     	$('.wc-content-inner').html(response.html);
 			     	  $('#wc-table').DataTable({  "paging":   false,"info":     false, searching: false});
 			     }
 			     if (response.status == '404') {

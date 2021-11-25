@@ -943,3 +943,6 @@ table.display table thead {
       font-size: 12px;
     color: #15b5ff;
 }
+table#wc-table tr td:first-child {
+    max-width: 300px;
+}

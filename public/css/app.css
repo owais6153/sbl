@@ -957,3 +957,7 @@ table.display table thead {
   color: #15b5ff;
 }
 
+table#wc-table tr td:first-child {
+  max-width: 300px;
+}
+

@@ -177,6 +177,7 @@ class InventoryLocationTrackingController extends Controller
         // print_r($inventories);
         // exit();
 
+        $filter = 'item';
         if (isset($request->output) && $request->output = 'html') {
           $barcodes->withPath(route('inventory'));
         }
@@ -187,7 +188,7 @@ class InventoryLocationTrackingController extends Controller
             return response()->json(['html'=> $html, 'status' => 'success']);
         }
         else{
-            return view('inventorylist', compact('inventories'));        
+            return view('inventorylist', compact('inventories', 'filter'));        
         }
 
 
@@ -213,7 +214,7 @@ class InventoryLocationTrackingController extends Controller
         }
 
         //Getting all barcodes         
-        $barcodes = $query->groupBy('barcode')->paginate(10);
+        $barcodes = $query->where('item_id', '=', null)->groupBy('barcode')->paginate(10);
         if (empty($barcodes)) {
             return response()->json(["error" => 'Barcode not found', 'status' => '404']);
         }
@@ -234,7 +235,7 @@ class InventoryLocationTrackingController extends Controller
             // Get all locations against this barcode
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
 
-            // Looping through all location to filter  
+     
             $locations = $this->filterAllLocations($from_to_query, $barcode->barcode);
 
 
@@ -283,7 +284,7 @@ class InventoryLocationTrackingController extends Controller
 
                                 // Get total inventory by adding quantity of each location
                                 $total_inventory = $total_inventory + $LocationDetail->quantity;
-
+                                $eachBarcodeData['locationsData'][$count]['barcode'] = $barcode_as_key;
                                 $eachBarcodeData['locationsData'][$count]['name'] = $final_location;
                                 $eachBarcodeData['locationsData'][$count]['count'] = $LocationDetail->quantity;
                                 $eachBarcodeData['locationsData'][$count]['expiration'] =$LocationDetail->expiration_date;
@@ -291,9 +292,6 @@ class InventoryLocationTrackingController extends Controller
                             }
                         }
                     }
-                    // Check if locations have items more then 0
-
-                    
                 }
                 $eachBarcodeData['total'] = $total_inventory;
             }
@@ -311,14 +309,14 @@ class InventoryLocationTrackingController extends Controller
         if (isset($request->output) && $request->output = 'html') {
           $barcodes->withPath(route('inventory'));
         }
-
+        $filter = 'barcode';
         $inventories['links'] = $barcodes->links();
         if (isset($request->output) && $request->output = 'html') {
             $html = view('response.inventorylist', compact('inventories', 'search'))->render();
             return response()->json(['html'=> $html, 'status' => 'success']);
         }
         else{
-            return view('inventorylist', compact('inventories'));        
+            return view('inventorylist', compact('inventories', 'filter'));        
         }
 
 

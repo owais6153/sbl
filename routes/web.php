@@ -43,7 +43,8 @@ Route::middleware(['is_admin'])->group(function (){
 	Route::get('/files/onrecive', [FileUploadController::class, 'inventoryOnRecive'])->name('inventoryOnRecive');
 	Route::get('/files/onrecive/get', [FileUploadController::class, 'getOnReciveList'])->name('getOnReciveList');
 // Inventory Location
-	Route::get('/inventory', [InventoryLocationTrackingController::class, 'getDataByItems'])->name('inventory');	
+	Route::get('/inventory', [InventoryLocationTrackingController::class, 'getDataByItems'])->name('inventory');
+	Route::get('/inventory-by-barcode', [InventoryLocationTrackingController::class, 'index'])->name('inventoryByBarcode');	
 	Route::get('/inventory/getdetail/{barcode}', [InventoryLocationTrackingController::class, 'getInventoryDetails'])->name('getInventoryDetails');
 	Route::get('/inventory/detail/{barcode}', [InventoryLocationTrackingController::class, 'getInventoryDetailsView'])->name('getInventoryDetailsView');
 	Route::get('/inventory/add', [InventoryLocationTrackingController::class, 'create'])->name('addInventory');
@@ -60,7 +61,6 @@ Route::middleware(['is_admin'])->group(function (){
 
 // AJAX REQUEST
 Route::middleware(['validate_ajax'])->group(function (){
-	Route::post('/inventory/listsearch', [InventoryLocationTrackingController::class, 'listsearch'])->name('listsearch');
 	Route::post('/inventory/getExiprationDateAndQuantity', [InventoryLocationTrackingController::class, 'getExiprationDateAndQuantity'])->name('getExiprationDateAndQuantity');
 	Route::post('/inventory/upload', [InventoryLocationTrackingController::class, 'uploadImage'])->name('uploadImage');
 	Route::post('/inventory/upload/remove', [InventoryLocationTrackingController::class, 'removeImage'])->name('removeImage');
