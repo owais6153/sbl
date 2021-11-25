@@ -253,6 +253,45 @@
 	    if(xhrrunning){
 	        xhr.abort();
 	    }
+		$('#items').html('');
+		if ($(this).val() != '') {
+	    	$('#barcode_loader').show();
+			let barcode = $(this).val() ;
+			xhrrunning = true;
+			xhr = $.ajax({
+		         headers: {
+	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+	             },
+			     url: "{{route('getlocationbybarcode')}}", 
+			     type: 'post',
+			     data: {'barcode': barcode},
+			     dataType: 'json',
+			     success: function (response) {
+                    xhrrunning = false;
+					$('#barcode_loader').hide();
+			       if (response.status == 'error') {
+					alert(response.error);
+			       }
+			       if(response.items.length > 0){
+			       	let item = '';
+			       	for(var index = 0; index < response.items.length; index++) {
+				       	item += '<span>'+response.items[index][`item_number`]+'</span>';
+				       	item += '<input type="hidden" name="item_id" value="'+response.items[index][`id`]+'" class="item_id"><br>';
+					}	
+					$('#items').append($(item));
+			       }
+
+			     },
+			     error: function (){
+                    xhrrunning = false;
+					$('#barcode_loader').hide();
+			     //	alert("Something Went Wrong...");
+			     }
+			});
+		}
+	})
+
+	$('#barcode').change(function(){
 		$('#options').html('');
 		$('#from_id').val();
 		$('#expiration_date_select').html('');
@@ -263,7 +302,6 @@
 		$('#expiration_date').val('');
 		$('#expiration_date').show();
 		$('#expiration_date_select').hide();
-		$('#items').html('');
         $('#from').select2();
 		if ($(this).val() != '') {
 	    	$('#barcode_loader').show();
@@ -279,7 +317,6 @@
 			     data: {'barcode': barcode},
 			     dataType: 'json',
 			     success: function (response) {
-                    xhrrunning = false;
 					$('#barcode_loader').hide();
 					$('#from_loader').hide();
 			       if (response.status == 'success') {
@@ -301,13 +338,6 @@
 					$('#from_loader').hide();
 					alert(response.error);
 			       }
-			       if(response.items.length > 0){
-			       	let item = '';
-			       	for(var index = 0; index < response.items.length; index++) {
-				       	item += '<span>'+response.items[index][`item_number`]+'</span><br>';
-					}	
-					$('#items').append($(item));
-			       }
 
 			       if (response.action == 'append') {
 			       	 $('#barcode').val(response.barcode);
@@ -315,7 +345,6 @@
 
 			     },
 			     error: function (){
-                    xhrrunning = false;
 					$('#barcode_loader').hide();
 					$('#from_loader').hide();
 			     //	alert("Something Went Wrong...");
@@ -323,8 +352,6 @@
 			});
 		}
 	})
-
-
 	function setExiprationDateAndQuantity(elem) {
 		$('#quantity').attr('max', $(elem).find('option:selected').attr('data-count'));
 		$('#from_id').val($(elem).find('option:selected').attr('data-fromid'));

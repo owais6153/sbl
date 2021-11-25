@@ -85,7 +85,10 @@
 													    		@endif
 												    		@endforeach
 							    						</td>
-												    	<td>{{$inventory['barcode']}}</td>
+												    	<td>										@isset($locationsData['barcode'])		    	{{$locationsData['barcode']}}
+										@else
+        										{{$inventory['barcode']}}
+        								@endif</td>
 												    	<td>{{$locationsData['name']}}</td>
 												    	<td>{{$locationsData['count']}}</td>
 												    	<td>{{$locationsData['expiration']}}</td>
@@ -126,7 +129,7 @@
 			    $('#wc-table').DataTable({  "paging":   false,"info":     false, searching: false});
 			}
 			if ( $('#wc-table table').length > 0) {
-			    $('#wc-table table').DataTable({  "paging":   false,"info":     false, searching: false});
+			    $('#wc-table table').DataTable({  "paging":   false,"info":     false});
 			}
 		} );
         var xhrRunning = false;
@@ -141,9 +144,9 @@
 		         headers: {
 	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 	             },
-			     url: "{{route('listsearch')}}", 
-			     type: 'post',
-			     data: {'search': $(this).val()},
+			     url: "{{route('inventory')}}", 
+			     type: 'get',
+			     data: {'search': $(this).val(), 'output' : 'html'},
 			     dataType: 'json',
 			     success: function (response) {
 			     $('#loader').hide();

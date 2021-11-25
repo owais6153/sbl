@@ -71,7 +71,10 @@
 													    		@endif
 												    		@endforeach
 												    	</td>
-												    	<td>{{$inventory['barcode']}}</td>
+												    	<td>										@isset($locationsData['barcode'])		    	{{$locationsData['barcode']}}
+										@else
+        										{{$inventory['barcode']}}
+        								@endif</td>
 												    	<td>{{$locationsData['name']}}</td>
 												    	<td>{{$locationsData['count']}}</td>
 												    	<td>{{$locationsData['expiration']}}</td>

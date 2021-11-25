@@ -16,12 +16,37 @@ use Redirect;
 
 class InventoryLocationTrackingController extends Controller
 {
-    public function index(Request $request)
+
+    public function filterAllLocations($from_to_query, $barcode, $unique = true){
+        $location = array();
+        foreach ($from_to_query as $k => $from_to_rec){
+            if(!in_array($from_to_rec->to,$location) && (strtolower($from_to_rec->to) != 'receiving' && strtolower($from_to_rec->to) != 'shipping'  && strtolower($from_to_rec->to) != 'production' && strtolower($from_to_rec->to) != 'adjustment' ) )
+            {
+                $location[$barcode][] = $from_to_rec->to;
+            }
+            elseif(!in_array($from_to_rec->from,$location) && (strtolower($from_to_rec->from) != 'receiving' && strtolower($from_to_rec->from) != 'shipping'  && strtolower($from_to_rec->from) != 'production' && strtolower($from_to_rec->from) != 'adjustment') )
+            {
+                $location[$barcode][] = $from_to_rec->from;
+            }
+
+            // Unique the locations to prevent duplications
+            // Use barcode as key to prevent barcode duplication
+            if($unique){
+                $location[$barcode] = array_unique($location[$barcode]);
+            }
+        }
+        return $location;
+    }
+
+
+
+    public function getDataByItems(Request $request)
     {
+        // Search for in all columns
         $InventoryModel = new InventoryModel();
         $tablename = $InventoryModel->getTable();
         $columns = Schema::getColumnListing($tablename);
-        $query = InventoryModel::query()->select('barcode');
+        $query = InventoryModel::query()->select('barcode', 'item_id');
         $search = $request->search;
         if ($request->search != '') {
             foreach ($columns as $column) {
@@ -31,127 +56,149 @@ class InventoryLocationTrackingController extends Controller
             }
         }
 
-
-        $barcodes = $query->groupBy('barcode')->paginate(10);
+        //Getting all barcodes         
+        $barcodes = $query->groupBy('item_id')->paginate(10);
         if (empty($barcodes)) {
             return response()->json(["error" => 'Barcode not found', 'status' => '404']);
         }
         
 
         
-        $inventories = array(); 
+        $inventories = $from_to_query = array(); 
         $items; 
+        
+        // Getting data foreach barcode        
         foreach ($barcodes as $barcode){
             $count = 0;
-            $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
-            $location = array();           
-            $items =  Items::select('item.item_number')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=', '0' . $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=',  substr($barcode->barcode, 1))->get();
-            foreach ($from_to_query as $k => $from_to_rec){
-                if(!in_array($from_to_rec->to,$location) && (strtolower($from_to_rec->to) != 'receiving' && strtolower($from_to_rec->to) != 'shipping'  && strtolower($from_to_rec->to) != 'production' && strtolower($from_to_rec->to) != 'adjustment' ) )
-                {
-                    $location[$barcode->barcode][] = $from_to_rec->to;
-                }
-                elseif(!in_array($from_to_rec->from,$location) && (strtolower($from_to_rec->from) != 'receiving' && strtolower($from_to_rec->from) != 'shipping'  && strtolower($from_to_rec->from) != 'production' && strtolower($from_to_rec->from) != 'adjustment') )
-                {
-                    $location[$barcode->barcode][] = $from_to_rec->from;
-                }
-                $location[$barcode->barcode] = array_unique($location[$barcode->barcode]);
-            }
+            $locations = array();   
+
+            // Getting item against barcode
+            $items =  Items::select('item.item_number', 'item.id')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item.id', '=', $barcode->item_id)->first();
+          
+            // Get all locations against this barcode
+            $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('item_id', '=', $barcode->item_id)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
+
+             
+            $locations = $this->filterAllLocations($from_to_query, $barcode->barcode, true);
+
+
             $eachBarcodeData = array();
             $eachBarcodeData['locations'] = array();
-            foreach ($location as $k => $v){
+            
+            // Now looping through each location
+            foreach ($locations as $barcode_as_key => $location_Array){
                 $total_inventory = 0;
                 $acount = 0;
-                foreach ($v as $k2 => $v2 ){
-                    $get_location_sum = DB::table('inventory_location')->where('location', '=', $v2)->where('barcode', '=', $barcode->barcode)->where('deleted_at', '=', null)->sum('count');
-
-  
+                foreach ($location_Array as $location_key => $final_location ){
+                    // Get specific location detail against barcode 
+                    $LocationDetails =  DB::table('inventory_location')
+                         ->select(DB::raw('SUM(`count`) as `quantity`, expiration_date'))
+                         ->where('location', '=', $final_location)
+                         ->where('item_id', '=', $barcode->item_id)
+                         ->where('deleted_at', '=', null)
+                        //  ->groupBy('expiration_date')
+                         ->get();                 
+                    $eachBarcodeData['barcode'] = $barcode_as_key;
                     
-                    // echo $get_location_sum;
-                        $eachBarcodeData['barcode'] = $k;
-                        foreach($items as $item){
-                           $eachBarcodeData['item'][] = (isset($item->item_number)) ? $item->item_number : 'Not Found';                            
+                    if (!isset($eachBarcodeData['item'])) {
+                        $eachBarcodeData['item'][] = (isset($items->item_number)) ? $items->item_number : 'Not Found';                            
+                    }
+
+                    
+                    if (!isset($eachBarcodeData['item'])) {
+                         $eachBarcodeData['item'][] = 'Not Found';
+                    }
+
+                    if (!empty($LocationDetails)) {
+                        foreach($LocationDetails as $key => $LocationDetail){                        
+                            if ($LocationDetail->quantity  > 0) {
+                                // Dont display location more then 3
+                                if ($acount < 3) {
+                                    $eachBarcodeData['locations'][] = array(
+                                        'location_name' => $final_location,
+                                        'location_sum'  => $LocationDetail->quantity,
+                                    );
+                                    
+                                }
+                                else if($acount == 3){
+                                    $eachBarcodeData['more'] = true;
+                                }
+                                $acount++;    
+
+                                // Get total inventory by adding quantity of each location
+                                $total_inventory = $total_inventory + $LocationDetail->quantity;
+
+                                
+                                
+                            }
+                        }
+                    }
+                    // Getting all barcode by item_id
+                    $barcodesForInnerTable = InventoryLocation::select('barcode')->where('item_id', '=', $barcode->item_id)->where('location', '=', $final_location)->groupBy('barcode')->get();
+                    // Looping through each barcode
+                    foreach ($barcodesForInnerTable as $eachTableRow){
+                         // Getting location details
+                         $LocationDetails =  DB::table('inventory_location')
+                         ->select(DB::raw('SUM(`count`) as `quantity`, expiration_date'))
+                         ->where('location', '=', $final_location)
+                         ->where('barcode', '=', $eachTableRow->barcode)
+                         ->where('item_id', '=', $barcode->item_id)
+                         ->where('deleted_at', '=', null)
+                        //  ->groupBy('expiration_date')
+                         ->get();         
+
+                         // Putting data in array
+                        foreach($LocationDetails as $key => $LocationDetail){                
+                            if ($LocationDetail->quantity  > 0) {
+                                 $eachBarcodeData['locationsData'][$count]['barcode'] = $eachTableRow->barcode; $eachBarcodeData['locationsData'][$count]['name'] = $final_location;
+                                $eachBarcodeData['locationsData'][$count]['count'] = $LocationDetail->quantity;
+                                $eachBarcodeData['locationsData'][$count]['expiration'] =$LocationDetail->expiration_date;
+                                $count++;
+                            }
                         }
 
-                        
-                        if (!isset($eachBarcodeData['item'])) {
-                             $eachBarcodeData['item'][] = 'Not Found';
-                        }
-                        if ($get_location_sum  > 0) {
-                        if ($acount < 3) {
-                            $eachBarcodeData['locations'][] = array(
-                                'location_name' => $v2,
-                                'location_sum'  => $get_location_sum,
-                            );
-                            
-                        }
-                        else if($acount == 3){
-                            $eachBarcodeData['more'] = true;
-                        }
-                        $acount++;    
-                        $total_inventory = $total_inventory + $get_location_sum;
-                        }
+                    }
+
+
+
+
                     
                 }
                 $eachBarcodeData['total'] = $total_inventory;
             }
 
 
-
-            $getAllLocationData = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->where('deleted_at', '=', null)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
-
-            $locationData = array();
-            foreach ($getAllLocationData as $k => $getlocationData){
-                if(!in_array($getlocationData->to,$locationData) && (strtolower($getlocationData->to) != 'receiving' && strtolower($getlocationData->to) != 'shipping' && strtolower($getlocationData->to) != 'production' && strtolower($getlocationData->to) != 'adjustment') )
-                {
-                    $locationData[$barcode->barcode][] = $getlocationData->to;
-                }
-                elseif(!in_array($getlocationData->from,$locationData) && (strtolower($getlocationData->from) != 'receiving' && strtolower($getlocationData->from) != 'shipping' && strtolower($getlocationData->from) != 'production' && strtolower($getlocationData->from) != 'adjustment') )
-                {
-                    $locationData[$barcode->barcode][] = $getlocationData->from;
-                }
-                $locationData[$barcode->barcode] = array_unique($locationData[$barcode->barcode]);
-            }
-            foreach ($locationData as $k => $v){
-               foreach($v as $k2 => $from){
-                    $LocationDetails =  DB::table('inventory_location')
-                         ->select(DB::raw('SUM(`count`) as `quantity`, expiration_date'))
-                         ->where('location', '=', $from)
-                         ->where('barcode', '=', $barcode->barcode)
-                         ->where('deleted_at', '=', null)
-                        //  ->groupBy('expiration_date')
-                         ->get();
-                    if (!empty($LocationDetails)) {
-                        foreach($LocationDetails as $key => $LocationDetail){
-                            if ($LocationDetail->quantity > 0) {
-
-                                $eachBarcodeData['locationsData'][$count]['name'] = $from;
-                                $eachBarcodeData['locationsData'][$count]['count'] = $LocationDetail->quantity;
-                                $eachBarcodeData['locationsData'][$count]['expiration'] =$LocationDetail->expiration_date;
-                                $count++;
-                            }
-                        }
-                    }
-               }
-            }
-
-
-
             $inventories['data'][] = $eachBarcodeData;
 
         }     
-        $inventories['links'] = $barcodes->links();
+        
 
         // echo "<pre>";
         // print_r($inventories);
         // exit();
 
-        return view('inventorylist', compact('inventories'));        
+        if (isset($request->output) && $request->output = 'html') {
+          $barcodes->withPath(route('inventory'));
+        }
 
+        $inventories['links'] = $barcodes->links();
+        if (isset($request->output) && $request->output = 'html') {
+            $html = view('response.inventorylist', compact('inventories', 'search'))->render();
+            return response()->json(['html'=> $html, 'status' => 'success']);
+        }
+        else{
+            return view('inventorylist', compact('inventories'));        
+        }
 
 
     }
-    public function listsearch (Request $request){
+
+
+
+
+    public function index(Request $request)
+    {
+        // Search for in all columns
         $InventoryModel = new InventoryModel();
         $tablename = $InventoryModel->getTable();
         $columns = Schema::getColumnListing($tablename);
@@ -165,108 +212,118 @@ class InventoryLocationTrackingController extends Controller
             }
         }
 
-
+        //Getting all barcodes         
         $barcodes = $query->groupBy('barcode')->paginate(10);
         if (empty($barcodes)) {
             return response()->json(["error" => 'Barcode not found', 'status' => '404']);
         }
-        $items;
-        $inventories = array();
+        
+
+        
+        $inventories = $from_to_query = array(); 
+        $items; 
+        
+        // Getting data foreach barcode        
         foreach ($barcodes as $barcode){
             $count = 0;
+            $locations = array();   
+
+            // Getting item against barcode
+            $items =  Items::select('item.item_number', 'item.id')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=', '0' . $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=',  substr($barcode->barcode, 1))->first();
+          
+            // Get all locations against this barcode
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
-            $location = array();
-            $items =  Items::select('item.item_number')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=', '0' . $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=',  substr($barcode->barcode, 1))->get();
-            foreach ($from_to_query as $k => $from_to_rec){
-                if(!in_array($from_to_rec->to,$location) && (strtolower($from_to_rec->to) != 'receiving' && strtolower($from_to_rec->to) != 'shipping'  && strtolower($from_to_rec->to) != 'production' && strtolower($from_to_rec->to) != 'adjustment') )
-                {
-                    $location[$barcode->barcode][] = $from_to_rec->to;
-                }
-                elseif(!in_array($from_to_rec->from,$location) && (strtolower($from_to_rec->from) != 'receiving' && strtolower($from_to_rec->from) != 'shipping'  && strtolower($from_to_rec->from) != 'production' && strtolower($from_to_rec->from) != 'adjustment') )
-                {
-                    $location[$barcode->barcode][] = $from_to_rec->from;
-                }
-                $location[$barcode->barcode] = array_unique($location[$barcode->barcode]);
-            }
+
+            // Looping through all location to filter  
+            $locations = $this->filterAllLocations($from_to_query, $barcode->barcode);
+
 
             $eachBarcodeData = array();
             $eachBarcodeData['locations'] = array();
-            foreach ($location as $k => $v){
+            
+            // Now looping through each location
+            foreach ($locations as $barcode_as_key => $location_Array){
                 $total_inventory = 0;
                 $acount = 0;
-                foreach ($v as $k2 => $v2 ){
-                    $get_location_sum = DB::table('inventory_location')->where('location', '=', $v2)->where('barcode', '=', $barcode->barcode)->where('deleted_at', '=', null)->sum('count');
-                        foreach($items as $item){
-                           $eachBarcodeData['item'][] = (isset($item->item_number)) ? $item->item_number : 'Not Found';                            
-                        }
-                        if (!isset($eachBarcodeData['item'])) {
-                             $eachBarcodeData['item'][] = 'Not Found';
-                        }
-                    $eachBarcodeData['barcode'] = $k;
-                    if ( $get_location_sum > 1) {
-
-                        if ($acount < 3) {
-                            $eachBarcodeData['locations'][] = array(
-                                'location_name' => $v2,
-                                'location_sum'  => $get_location_sum,
-                            );
-                        }
-                        
-                        else if($acount == 3){
-                            $eachBarcodeData['more'] = true;
-                        }
-                        
-                            $acount++;
-                        $total_inventory = $total_inventory + $get_location_sum;
-
-                    }
-                }
-                $eachBarcodeData['total'] = $total_inventory;
-            }
-            $getAllLocationData = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->where('deleted_at', '=', null)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
-
-            $locationData = array();
-            foreach ($getAllLocationData as $k => $getlocationData){
-                if(!in_array($getlocationData->to,$locationData) && (strtolower($getlocationData->to) != 'receiving' && strtolower($getlocationData->to) != 'shipping' && strtolower($getlocationData->to) != 'production' && strtolower($getlocationData->to) != 'adjustment') )
-                {
-                    $locationData[$barcode->barcode][] = $getlocationData->to;
-                }
-                elseif(!in_array($getlocationData->from,$locationData) && (strtolower($getlocationData->from) != 'receiving' && strtolower($getlocationData->from) != 'shipping' && strtolower($getlocationData->from) != 'production' && strtolower($getlocationData->from) != 'adjustment') )
-                {
-                    $locationData[$barcode->barcode][] = $getlocationData->from;
-                }
-                $locationData[$barcode->barcode] = array_unique($locationData[$barcode->barcode]);
-            }
-            foreach ($locationData as $k => $v){
-               foreach($v as $k2 => $from){
+                foreach ($location_Array as $location_key => $final_location ){
+                    // Get quantity against barcode in each location
                     $LocationDetails =  DB::table('inventory_location')
                          ->select(DB::raw('SUM(`count`) as `quantity`, expiration_date'))
-                         ->where('location', '=', $from)
+                         ->where('location', '=', $final_location)
                          ->where('barcode', '=', $barcode->barcode)
                          ->where('deleted_at', '=', null)
                         //  ->groupBy('expiration_date')
-                         ->get();
+                         ->get();                 
+                    $eachBarcodeData['barcode'] = $barcode_as_key;
+                    
+                    if (!isset($eachBarcodeData['item'])) {
+                        $eachBarcodeData['item'][] = (isset($items->item_number)) ? $items->item_number : 'Not Found';                            
+                    }
+
+                    
+                    if (!isset($eachBarcodeData['item'])) {
+                         $eachBarcodeData['item'][] = 'Not Found';
+                    }
+
                     if (!empty($LocationDetails)) {
-                        foreach($LocationDetails as $key => $LocationDetail){
-                            if ($LocationDetail->quantity > 0) {
-                                $eachBarcodeData['locationsData'][$count]['name'] = $from;
+                        foreach($LocationDetails as $key => $LocationDetail){                        
+                            if ($LocationDetail->quantity  > 0) {
+                                // Dont display location more then 3
+                                if ($acount < 3) {
+                                    $eachBarcodeData['locations'][] = array(
+                                        'location_name' => $final_location,
+                                        'location_sum'  => $LocationDetail->quantity,
+                                    );
+                                    
+                                }
+                                else if($acount == 3){
+                                    $eachBarcodeData['more'] = true;
+                                }
+                                $acount++;    
+
+                                // Get total inventory by adding quantity of each location
+                                $total_inventory = $total_inventory + $LocationDetail->quantity;
+
+                                $eachBarcodeData['locationsData'][$count]['name'] = $final_location;
                                 $eachBarcodeData['locationsData'][$count]['count'] = $LocationDetail->quantity;
                                 $eachBarcodeData['locationsData'][$count]['expiration'] =$LocationDetail->expiration_date;
                                 $count++;
                             }
                         }
                     }
-               }
+                    // Check if locations have items more then 0
+
+                    
+                }
+                $eachBarcodeData['total'] = $total_inventory;
             }
+
 
             $inventories['data'][] = $eachBarcodeData;
 
         }     
-        $barcodes->withPath(route('inventory'));
+        
+
+        // echo "<pre>";
+        // print_r($inventories);
+        // exit();
+
+        if (isset($request->output) && $request->output = 'html') {
+          $barcodes->withPath(route('inventory'));
+        }
+
         $inventories['links'] = $barcodes->links();
-        $html = view('response.inventorylist', compact('inventories', 'search'))->render();
-        return response()->json(['html'=> $html, 'status' => 'success']);
+        if (isset($request->output) && $request->output = 'html') {
+            $html = view('response.inventorylist', compact('inventories', 'search'))->render();
+            return response()->json(['html'=> $html, 'status' => 'success']);
+        }
+        else{
+            return view('inventorylist', compact('inventories'));        
+        }
+
+
     }
+
     public function getInventoryDetailsView(Request $request){
         return view('InventoryDetails');
     }
@@ -414,6 +471,7 @@ class InventoryLocationTrackingController extends Controller
         $Inventory->to = $request->to;
         $Inventory->expiration_date = $request->expiration_date;
         $Inventory->pallet_number = $request->pallet_number;
+        $Inventory->item_id = (isset($request->item_id)) ? $request->item_id : null;
         if (isset($request->images) && !empty($request->images)) {
             $Inventory->images = implode(',', $request->images);
         }
@@ -481,7 +539,7 @@ class InventoryLocationTrackingController extends Controller
         }
 
         $barcode = $request->barcode;        
-        $items =  Items::select('item.*', 'item_identifiers.*')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode)->orWhere('item_identifiers.productIdentifier', '=', '0' . $barcode)->orWhere('item_identifiers.productIdentifier', '=',  substr($barcode, 1))->get();
+        $items =  Items::select('item.*')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode)->orWhere('item_identifiers.productIdentifier', '=', '0' . $barcode)->orWhere('item_identifiers.productIdentifier', '=',  substr($barcode, 1))->get();
 
 
 
@@ -493,7 +551,7 @@ class InventoryLocationTrackingController extends Controller
 
             if (strlen($barcode) == 11) {
                 $barcodes = InventoryModel::select('barcode')->where('barcode', '=', '0' . $barcode )->first();
-                if (!empty($barcode)) {
+                if (!empty($barcodes)) {
                     $action = 'append';
                     $barcode = '0' . $barcode;
                 }
@@ -501,7 +559,7 @@ class InventoryLocationTrackingController extends Controller
             elseif (strlen($barcode) == 12) {
                 if ($barcode[0] == '0') {
                     $barcodes = InventoryModel::select('barcode')->where('barcode', '=',  substr($barcode, 1) )->first();
-                    if (!empty($barcode)) {
+                    if (!empty($barcodes)) {
                         $action = 'append';
                         $barcode = substr($barcode, 1);
                     }                    

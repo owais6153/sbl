@@ -43,7 +43,7 @@ Route::middleware(['is_admin'])->group(function (){
 	Route::get('/files/onrecive', [FileUploadController::class, 'inventoryOnRecive'])->name('inventoryOnRecive');
 	Route::get('/files/onrecive/get', [FileUploadController::class, 'getOnReciveList'])->name('getOnReciveList');
 // Inventory Location
-	Route::get('/inventory', [InventoryLocationTrackingController::class, 'index'])->name('inventory');	
+	Route::get('/inventory', [InventoryLocationTrackingController::class, 'getDataByItems'])->name('inventory');	
 	Route::get('/inventory/getdetail/{barcode}', [InventoryLocationTrackingController::class, 'getInventoryDetails'])->name('getInventoryDetails');
 	Route::get('/inventory/detail/{barcode}', [InventoryLocationTrackingController::class, 'getInventoryDetailsView'])->name('getInventoryDetailsView');
 	Route::get('/inventory/add', [InventoryLocationTrackingController::class, 'create'])->name('addInventory');
