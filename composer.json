@@ -12,6 +12,7 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "league/csv": "^9.0",
+        "silber/bouncer": "v1.0.0-rc.11",
         "yajra/laravel-datatables": "^1.5"
     },
     "require-dev": {

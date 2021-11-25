@@ -17,42 +17,82 @@
 			    </div>
 			    <div class="collapse navbar-collapse" id="myNavbar">
 			      <ul class="nav navbar-nav">
-
-
+					  @if (Bouncer::can('view_all_users') || Bouncer::can('user_add') )
 			        <li class="dropdown {{ (request()->is('users/*') || request()->is('users')) ? 'active' : '' }}">
 			          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fas fa-users"></i>Users</a>
 			          <ul class="dropdown-menu">
-			            <li><a href="{{route('user_list')}}"><i class="fas fa-user"></i>All Users</a></li>
-			            <li><a href="{{route('add_user')}}"><i class="fas fa-user-plus"></i>Add User</a></li>
+						 	@can('view_all_users')
+			            	<li><a href="{{route('user_list')}}"><i class="fas fa-user"></i>All Users</a></li>
+							@endcan
+							@can('user_add')
+			           			 <li><a href="{{route('add_user')}}"><i class="fas fa-user-plus"></i>Add User</a></li>
+							@endcan
 			          </ul>
 			        </li>
+					@endif
+					@if (Bouncer::can('view_all_role') || Bouncer::can('role_add') )
+					<li class="dropdown {{ (request()->is('roles/*') || request()->is('roles')) ? 'active' : '' }}">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fas fa-users"></i>Roles</a>
+						<ul class="dropdown-menu">
+							@can('view_all_role')
+						 	 <li><a href="{{route('role_list')}}"><i class="fas fa-user"></i>All Roles</a></li>
+							@endcan
+							@can('role_add')
+							  <li><a href="{{route('add_role')}}"><i class="fas fa-user-plus"></i>Add Role</a></li>
+							@endcan
+							</ul>
+					  </li>
+					  @endif
+					@if (Bouncer::can('view_all_item') || Bouncer::can('item_skip') )
 
 			        <li class="dropdown {{ ( request()->is('items') ) ? 'active' : '' }}">
 			          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fas fa-box-open"></i>Items</a>
 			          <ul class="dropdown-menu">
-			            <li><a href="{{route('listitems')}}"><i class="fas fa-user"></i>Items</a></li>
-			            <li><a href="{{route('listSkippedItems')}}"><i class="fas fa-user-plus"></i>Skipped Items</a></li>
-			          </ul>
+						@can('view_all_item')
+			            	<li><a href="{{route('listitems')}}"><i class="fas fa-user"></i>Items</a></li>
+						@endcan
+						@can('item_skip')
+							<li><a href="{{route('listSkippedItems')}}"><i class="fas fa-user-plus"></i>Skipped Items</a></li>
+						@endcan
+			          
+					</ul>
 			        </li>		
+					@endif
+					@if (Bouncer::can('inventory_view_on_hand') || Bouncer::can('inventory_view_on_receive') || Bouncer::can('import_files')  )
 
 			        <li class="dropdown {{ (request()->is('files/*') || request()->is('files')) ? 'active' : '' }}">
 			        <a class="dropdown-toggle" data-toggle="dropdown" href="{{route('user_list')}}"><i class="fas fa-users"></i>Inventory Aging Report</a>
 					<ul class="dropdown-menu">
-						<li><a href="{{route('inventoryOnhand')}}"><i class="fas fa-user"></i>List All on Hands</a></li>
-						<li><a href="{{route('inventoryOnRecive')}}" ><i class="fas fa-user-plus"></i>List All on Receive</a></li>
-						<li><a href="{{route('import_files')}}" ><i class="fas fa-user-plus"></i>Import (browse, radio on hands/receive)</a></li>
+						@can('inventory_view_on_hand')	
+							<li><a href="{{route('inventoryOnhand')}}"><i class="fas fa-user"></i>List All on Hands</a></li>
+						@endcan
+						@can('inventory_view_on_receive')
+							<li><a href="{{route('inventoryOnRecive')}}" ><i class="fas fa-user-plus"></i>List All on Receive</a></li>
+						@endcan
+						@can('inventory_import')
+							<li><a href="{{route('import_files')}}" ><i class="fas fa-user-plus"></i>Import (browse, radio on hands/receive)</a></li>
+						@endcan
+					
 					</ul>
 				</li>
+				@endif
+				@if (Bouncer::can('scan_inventroy') || Bouncer::can('inventory_location') )
 
 				<li class="dropdown {{ (request()->is('inventory/*') || request()->is('inventory')) ? 'active' : '' }}">
 				<a class="dropdown-toggle" data-toggle="dropdown" href="{{route('user_list')}}"><i class="fas fa-users"></i>Inventory Location Tracking</a>
 					<ul class="dropdown-menu">
-						<li><a href="{{route('addInventory')}}"><i class="fas fa-user"></i>Scan Inventory</a></li>						
-						<li><a href="{{route('inventory')}}" ><i class="fas fa-user-plus"></i>Location</a></li>
+						@can('scan_inventroy')
+							<li><a href="{{route('addInventory')}}"><i class="fas fa-user"></i>Scan Inventory</a></li>						
+						@endcan
+						
+						@can('inventory_location')
+							<li><a href="{{route('inventory')}}" ><i class="fas fa-user-plus"></i>Location</a></li>
+						@endcan
+					
 					</ul>
 				</li>
 
-
+@endif
 			        <li><a href="{{route('logout')}}"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
 			        
 			      </ul>
