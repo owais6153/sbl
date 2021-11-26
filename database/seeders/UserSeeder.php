@@ -20,5 +20,6 @@ class UserSeeder extends Seeder
         $user->password = Hash::make('@Admin!23#');
         $user->email_verified_at = date("Y-m-d",time());
         $user->save();
+        $user->assign('admin');
     }
 }
