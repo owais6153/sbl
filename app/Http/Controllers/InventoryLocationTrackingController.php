@@ -31,7 +31,7 @@ class InventoryLocationTrackingController extends Controller
 
             // Unique the locations to prevent duplications
             // Use barcode as key to prevent barcode duplication
-            if($unique){
+            if($unique && !empty($location)){
                 $location[$barcode] = array_unique($location[$barcode]);
             }
         }
@@ -49,9 +49,18 @@ class InventoryLocationTrackingController extends Controller
         $query = InventoryModel::query()->select('barcode', 'item_id');
         $search = $request->search;
         if ($request->search != '') {
-            foreach ($columns as $column) {
-                if ($column != 'id' && $column != 'user_id' && $column != 'images' && $column != 'created_at' && $column != 'updated_at') {
-                    $query->orWhere($column, 'LIKE', '%' . $search . '%');
+            
+            $searchitems =  Items::select('item.id')->where('item.item_number', '=', $search)->first();
+            
+            
+            if(!empty($searchitems)){
+                $query->where('item_id', '=', $searchitems->id);
+            }
+            else{
+                foreach ($columns as $column) {
+                    if ($column != 'id' && $column != 'user_id' && $column != 'images' && $column != 'created_at' && $column != 'updated_at') {
+                        $query->orWhere($column, 'LIKE', '%' . $search . '%');
+                    }
                 }
             }
         }
@@ -83,10 +92,10 @@ class InventoryLocationTrackingController extends Controller
 
 
             $eachBarcodeData = array();
-            $eachBarcodeData['locations'] = array();
             
             // Now looping through each location
             foreach ($locations as $barcode_as_key => $location_Array){
+                 $eachBarcodeData['locations'] = array();
                 $total_inventory = 0;
                 $acount = 0;
                 foreach ($location_Array as $location_key => $final_location ){
@@ -167,8 +176,8 @@ class InventoryLocationTrackingController extends Controller
                 $eachBarcodeData['total'] = $total_inventory;
             }
 
-
-            $inventories['data'][] = $eachBarcodeData;
+            if(!empty($eachBarcodeData))
+                $inventories['data'][] = $eachBarcodeData;
 
         }     
         
@@ -236,7 +245,7 @@ class InventoryLocationTrackingController extends Controller
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
 
      
-            $locations = $this->filterAllLocations($from_to_query, $barcode->barcode);
+            $locations = $this->filterAllLocations($from_to_query, $barcode->barcode, true);
 
 
             $eachBarcodeData = array();
