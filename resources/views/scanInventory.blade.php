@@ -288,7 +288,8 @@
 			       if(response.items.length > 0){
 			       	let item = '';
 			       	for(var index = 0; index < response.items.length; index++) {
-				       	item += '<span>'+response.items[index][`item_number`]+'</span><br>';
+				       	item += '<span>'+response.items[index][`item_number`]+'</span>';
+				       	item += '<input type="hidden" name="item_id" value="'+response.items[index][`id`]+'" class="item_id"><br>';
 					}	
 					$('#items').append($(item));
 			       }
