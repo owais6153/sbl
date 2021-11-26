@@ -69,10 +69,10 @@ class HomeController extends Controller
             if($row->id != Session::get('id') && $row->id != 1){
                 $actionBtn= '';
                 if(Bouncer::can('user_update')){
-                    $actionBtn .='<a href="' . route('edit_role', ['id' => $row->id]) . '" class="mr-3"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>';
+                    $actionBtn .='<a href="' . route('edit_user', ['id' => $row->id]) . '" class="mr-3"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>';
                 }
                 if(Bouncer::can('user_delete')){
-                $actionBtn .= '<a class="deleteIt" href="' .route('delete_role', ['id' => $row->id]). '"><i class="fas fa-trash-alt mr-2"></i>Delete</a>';
+                $actionBtn .= '<a class="deleteIt" href="' .route('deleteuser', ['id' => $row->id]). '"><i class="fas fa-trash-alt mr-2"></i>Delete</a>';
                 }
                 // $actionBtn= '<a href="' . route('edit_user', ['id' => $row->id]) . '" class="mr-3"><i class="fas fa-pencil-alt mr-2"></i>Edit</a> <a class="deleteIt" href="' .route('deleteuser', ['id' => $row->id]). '"><i class="fas fa-trash-alt mr-2"></i>Delete</a>';
                 return $actionBtn;

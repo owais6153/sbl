@@ -24,10 +24,20 @@
 					    <label for="email">Email address</label>
 					    <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter Email" name="email">
 					  </div>
+
 					  <div class="form-group">
 					    <label for="exampleInputPassword1">Password</label>
 					    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password">
 					  </div>
+					  <div class="form-group">
+					    <label for="exampleInputPassword1">Role</label>
+					    <select name="role" id="role" class="form-control">
+							@foreach ($roles as $role)
+								<option value="{{$role}}">{{$role}}</option>
+							@endforeach
+						</select>
+					  </div>
+
 					  <button type="submit" class="btn btn-primary">Submit</button>
 				</form>
 			</div>
