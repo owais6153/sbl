@@ -194,6 +194,11 @@ class ImportItems extends Command
                                         $SkippedItemIdentifiers->duplicate_item_id = $items->id;
                                         $SkippedItemIdentifiers->save();
                                     }
+
+                                    $InventoryLocationTracking = InventoryModel::where('barcode', 'LIKE', $productIdentifier->productIdentifier)->orWhere('barcode', 'LIKE', '0' . $productIdentifier->productIdentifier)->orWhere('barcode', 'LIKE',  substr($productIdentifier->productIdentifier, 1))
+                                      ->update(['item_id' => $items->id]);
+                                    $InventoryLocation = InventoryLocation::where('barcode', 'LIKE', $productIdentifier->productIdentifier)->orWhere('barcode', 'LIKE', '0' . $productIdentifier->productIdentifier)->orWhere('barcode', 'LIKE',  substr($productIdentifier->productIdentifier, 1))
+                                      ->update(['item_id' => $items->id]);
                                 }
                             }
                         }
