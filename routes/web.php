@@ -21,6 +21,7 @@ use App\Http\Controllers\SkippedItemIdentifiersController;
 // Login & Authentication
 Route::get('/', [HomeController::class, 'index']);
 Route::post('/adminlogin', [HomeController::class, 'authenticate'])->name('admin_login');
+Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
 
 // If login
 Route::middleware(['is_admin'])->group(function (){
