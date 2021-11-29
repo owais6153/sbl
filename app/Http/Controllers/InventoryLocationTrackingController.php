@@ -24,7 +24,7 @@ class InventoryLocationTrackingController extends Controller
             {
                 $location[$barcode][] = $from_to_rec->to;
             }
-            elseif(!in_array($from_to_rec->from,$location) && (strtolower($from_to_rec->from) != 'receiving' && strtolower($from_to_rec->from) != 'shipping'  && strtolower($from_to_rec->from) != 'production' && strtolower($from_to_rec->from) != 'adjustment') )
+            if(!in_array($from_to_rec->from,$location) && (strtolower($from_to_rec->from) != 'receiving' && strtolower($from_to_rec->from) != 'shipping'  && strtolower($from_to_rec->from) != 'production' && strtolower($from_to_rec->from) != 'adjustment') )
             {
                 $location[$barcode][] = $from_to_rec->from;
             }
