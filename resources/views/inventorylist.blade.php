@@ -148,7 +148,11 @@
 		         headers: {
 	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 	             },
-			     url: "{{route('inventory')}}", 
+	             @if ($filter == 'barcode')		     
+				     url: "{{route('inventoryByBarcode')}}",
+			     @else	
+	    		     url: "{{route('inventory')}}",  
+			     @endif
 			     type: 'get',
 			     data: {'search': $(this).val(), 'output' : 'html'},
 			     dataType: 'json',

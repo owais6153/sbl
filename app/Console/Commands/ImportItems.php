@@ -11,6 +11,8 @@ use App\Models\Itemlisting;
 use App\Models\SkippedItemIdentifiers;
 use League\Fractal\Resource\Item;
 use Log;
+use App\Models\InventoryLocationTracking as InventoryModel;
+use App\Models\InventoryLocation;
 class ImportItems extends Command
 {
     /**
@@ -90,7 +92,7 @@ class ImportItems extends Command
                     $cron_data->save();
                     foreach ($res->data as $item) {
 
-                        $checkItem = Items::where('itemNumber', '=', $item->itemNumber)->count();
+                        $checkItem = Items::where('item_number', '=', $item->itemNumber)->count();
                         if ($checkItem < 1) {
                             $items = new Items();
                             $items->item_number = $item->itemNumber;
@@ -153,6 +155,11 @@ class ImportItems extends Command
                                         $SkippedItemIdentifiers->save();
 
                                     }
+
+                                    $InventoryLocationTracking = InventoryModel::where('barcode', 'LIKE', $productIdentifier->productIdentifier)->orWhere('barcode', 'LIKE', '0' . $productIdentifier->productIdentifier)->orWhere('barcode', 'LIKE',  substr($productIdentifier->productIdentifier, 1))->where('item_id', '=', null)
+                                      ->update(['item_id' => $items->id]);
+                                    $InventoryLocation = InventoryLocation::where('barcode', 'LIKE', $productIdentifier->productIdentifier)->orWhere('barcode', 'LIKE', '0' . $productIdentifier->productIdentifier)->orWhere('barcode', 'LIKE',  substr($productIdentifier->productIdentifier, 1))->where('item_id', '=', null)
+                                      ->update(['item_id' => $items->id]);
                                 }
                             }                                                       
                         }
