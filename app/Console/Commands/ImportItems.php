@@ -93,8 +93,13 @@ class ImportItems extends Command
                         $items->item_number = $item->itemNumber;
                         $items->avg_cost = $item->avgCost;
                         $items->avg_cost_source = $item->avgCostSource;
-                        if(!empty($item->inventory) && isset($item->inventory[0]->warehouse) && $item->inventory[0]->warehouse == "Default Ridgefield" && isset($item->inventory[0]->onHand)){
-                            $items->ridgefield_onhand = $item->inventory[0]->onHand;
+                        if(!empty($item->inventory)){
+                            foreach($item->inventory as $inventory){
+                                if (isset($inventory->warehouse) && $inventory->warehouse == "Default Ridgefield") {
+                                    $inventory->ridgefield_onhand = $inventory->onHand;
+                                    break;
+                                }
+                            }
                         }
                         $items->save();
                         if(!empty($item->listings)){
