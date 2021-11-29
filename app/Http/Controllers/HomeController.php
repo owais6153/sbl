@@ -36,7 +36,8 @@ class HomeController extends Controller
             $request->session()->regenerate();
             Session::put('id', Auth::user()->getId());
 
-            return redirect::route('user_list');
+            return redirect::route('dashboard');
+            
         }
         else{
             return Redirect::back()->with('danger', array("Credentials not matched."));
@@ -45,6 +46,9 @@ class HomeController extends Controller
     public function logout(Request $request) {
       Auth::logout();
       return redirect('/');
+    }
+    public function dashboard(){
+        return view('dashboard');
     }
     public function users(){
         
