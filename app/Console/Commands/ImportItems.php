@@ -2,11 +2,14 @@
 
 namespace App\Console\Commands;
 
+use App\Models\ItemChildren;
 use Illuminate\Console\Command;
 use App\Models\Items;
 use App\Models\ItemsCron;
 use App\Models\ItemIdentifier;
+use App\Models\Itemlisting;
 use App\Models\SkippedItemIdentifiers;
+use League\Fractal\Resource\Item;
 use Log;
 class ImportItems extends Command
 {
@@ -88,7 +91,40 @@ class ImportItems extends Command
                     foreach ($res->data as $item){
                         $items = new Items();
                         $items->item_number = $item->itemNumber;
+                        $items->avg_cost = $item->avgCost;
+                        $items->avg_cost_source = $item->avgCostSource;
+                        if(!empty($item->inventory) && isset($item->inventory[0]->warehouse) && $item->inventory[0]->warehouse == "Default Ridgefield" && isset($item->inventory[0]->onHand)){
+                            $items->ridgefield_onhand = $item->inventory[0]->onHand;
+                        }
                         $items->save();
+                        if(!empty($item->listings)){
+                            foreach($item->listings as $listings){
+                                $list = new Itemlisting();
+                                $list->item_id =$items->id;
+                                $list->_id =$listings->_id;
+                                $list->storeSKU =$listings->storeSKU;
+                                $list->listingId =$listings->listingId;
+                                $list->fnSKU =$listings->fnSKU;
+                                $list->listingName =$listings->listingName;
+                                $list->store =$listings->store;
+                                $list->urlId =$listings->urlId;
+                                $list->fulfilledBy =$listings->fulfilledBy;
+                                $list->save();
+                            }
+                        }
+                        if(!empty($item->productChildren)){
+                            foreach($item->productChildren as $pchild){
+                                $child = new ItemChildren();
+                                $child->kit_item_id =$items->id;
+                                $check = Items::where('item_number',$pchild->childItemNumber)->first();
+                                if($check){
+                                    $child->child_item_id =$check->id;
+                                }
+                                $child->qty =$pchild->childQuantity;
+                                $child->save();
+                            }
+                        }
+                        
                         foreach ($item->productIdentifiers as $productIdentifier){
                             if ($productIdentifier->identifierType == 'UPC') {
                                 $check = ItemIdentifier::where('productIdentifier', '=', $productIdentifier->productIdentifier)->count();
