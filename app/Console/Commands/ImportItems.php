@@ -125,7 +125,7 @@ class ImportItems extends Command
        
 
                                                         $Inventory_track = new InventoryModel();
-                                                        $Inventory_track->user_id = 1;
+                                                        $Inventory_track->user_id = 13;
                                                         $Inventory_track->barcode = $productIdentifier->productIdentifier;
                                                         $Inventory_track->quantity = $inventory->onHand- $LocationDetails->quantity;
                                                         $Inventory_track->from = 'Adjustment';
@@ -136,6 +136,7 @@ class ImportItems extends Command
                                                         $ToLocation->barcode = $productIdentifier->productIdentifier;
                                                         $ToLocation->count =  $inventory->onHand - $LocationDetails->quantity;
                                                         $ToLocation->location = 'NoLocation';
+                                                        $ToLocation->item_id = $items->id;
                                                         $ToLocation->inventory_track_id = $Inventory_track->id;
                                                         $ToLocation->save();
                                                     }
@@ -143,6 +144,7 @@ class ImportItems extends Command
                                                
                                             }
                                         }
+                                    break;
                                     }
                                 }
                             }
