@@ -88,66 +88,74 @@ class ImportItems extends Command
                     $cron_data->item_offset = $offset;
                     $cron_data->item_limit = $limit;
                     $cron_data->save();
-                    foreach ($res->data as $item){
-                        $items = new Items();
-                        $items->item_number = $item->itemNumber;
-                        $items->avg_cost = $item->avgCost;
-                        $items->avg_cost_source = $item->avgCostSource;
-                        if(!empty($item->inventory) && isset($item->inventory[0]->warehouse) && $item->inventory[0]->warehouse == "Default Ridgefield" && isset($item->inventory[0]->onHand)){
-                            $items->ridgefield_onhand = $item->inventory[0]->onHand;
-                        }
-                        $items->save();
-                        if(!empty($item->listings)){
-                            foreach($item->listings as $listings){
-                                $list = new Itemlisting();
-                                $list->item_id =$items->id;
-                                $list->_id =$listings->_id;
-                                $list->storeSKU =$listings->storeSKU;
-                                $list->listingId =$listings->listingId;
-                                $list->fnSKU =$listings->fnSKU;
-                                $list->listingName =$listings->listingName;
-                                $list->store =$listings->store;
-                                $list->urlId =$listings->urlId;
-                                $list->fulfilledBy =$listings->fulfilledBy;
-                                $list->save();
-                            }
-                        }
-                        if(!empty($item->productChildren)){
-                            foreach($item->productChildren as $pchild){
-                                $child = new ItemChildren();
-                                $child->kit_item_id =$items->id;
-                                $check = Items::where('item_number',$pchild->childItemNumber)->first();
-                                if($check){
-                                    $child->child_item_id =$check->id;
-                                }
-                                $child->qty =$pchild->childQuantity;
-                                $child->save();
-                            }
-                        }
-                        
-                        foreach ($item->productIdentifiers as $productIdentifier){
-                            if ($productIdentifier->identifierType == 'UPC') {
-                                $check = ItemIdentifier::where('productIdentifier', '=', $productIdentifier->productIdentifier)->count();
-                                if($check < 1){
-                                    $ItemIdentifier = new ItemIdentifier();
-                                    $ItemIdentifier->item_id = $items->id;
-                                    $ItemIdentifier->productIdentifier = $productIdentifier->productIdentifier;
-                                    $ItemIdentifier->save();
-                                }
-                                else{
+                    foreach ($res->data as $item) {
 
-                                    $getIdentifier = ItemIdentifier::select('item_id', 'id', 'productIdentifier')->where('productIdentifier', '=', $productIdentifier->productIdentifier)->first();
-                                    $SkippedItemIdentifiers = new SkippedItemIdentifiers();
-                                    $SkippedItemIdentifiers->item_id = $getIdentifier->item_id;
-                                    $SkippedItemIdentifiers->identifier_id = $getIdentifier->id;
-                                    $SkippedItemIdentifiers->barcode = $getIdentifier->productIdentifier;
-                                    $SkippedItemIdentifiers->duplicate_item_id = $items->id;
-                                    $SkippedItemIdentifiers->save();
-
+                        $checkItem = Items::where('itemNumber', '=', $item->itemNumber)->count();
+                        if ($checkItem < 1) {
+                            $items = new Items();
+                            $items->item_number = $item->itemNumber;
+                            $items->avg_cost = $item->avgCost;
+                            $items->avg_cost_source = $item->avgCostSource;
+                            if(!empty($item->inventory)){
+                                foreach($item->inventory as $inventory){
+                                    if (isset($inventory->warehouse) && $inventory->warehouse == "Default Ridgefield") {
+                                        $inventory->ridgefield_onhand = $inventory->onHand;
+                                        break;
+                                    }
                                 }
                             }
-                        }                                                       
-                        
+                            $items->save();
+                            if(!empty($item->listings)){
+                                foreach($item->listings as $listings){
+                                    $list = new Itemlisting();
+                                    $list->item_id =$items->id;
+                                    $list->_id =$listings->_id;
+                                    $list->storeSKU =$listings->storeSKU;
+                                    $list->listingId =$listings->listingId;
+                                    $list->fnSKU =$listings->fnSKU;
+                                    $list->listingName =$listings->listingName;
+                                    $list->store =$listings->store;
+                                    $list->urlId =$listings->urlId;
+                                    $list->fulfilledBy =$listings->fulfilledBy;
+                                    $list->save();
+                                }
+                            }
+                            if(!empty($item->productChildren)){
+                                foreach($item->productChildren as $pchild){
+                                    $child = new ItemChildren();
+                                    $child->kit_item_id =$items->id;
+                                    $check = Items::where('item_number',$pchild->childItemNumber)->first();
+                                    if($check){
+                                        $child->child_item_id =$check->id;
+                                    }
+                                    $child->qty =$pchild->childQuantity;
+                                    $child->save();
+                                }
+                            }
+                            
+                            foreach ($item->productIdentifiers as $productIdentifier){
+                                if ($productIdentifier->identifierType == 'UPC') {
+                                    $check = ItemIdentifier::where('productIdentifier', '=', $productIdentifier->productIdentifier)->count();
+                                    if($check < 1){
+                                        $ItemIdentifier = new ItemIdentifier();
+                                        $ItemIdentifier->item_id = $items->id;
+                                        $ItemIdentifier->productIdentifier = $productIdentifier->productIdentifier;
+                                        $ItemIdentifier->save();
+                                    }
+                                    else{
+
+                                        $getIdentifier = ItemIdentifier::select('item_id', 'id', 'productIdentifier')->where('productIdentifier', '=', $productIdentifier->productIdentifier)->first();
+                                        $SkippedItemIdentifiers = new SkippedItemIdentifiers();
+                                        $SkippedItemIdentifiers->item_id = $getIdentifier->item_id;
+                                        $SkippedItemIdentifiers->identifier_id = $getIdentifier->id;
+                                        $SkippedItemIdentifiers->barcode = $getIdentifier->productIdentifier;
+                                        $SkippedItemIdentifiers->duplicate_item_id = $items->id;
+                                        $SkippedItemIdentifiers->save();
+
+                                    }
+                                }
+                            }                                                       
+                        }
                     }
                 }
             }
