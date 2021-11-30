@@ -280,7 +280,7 @@ class InventoryLocationTrackingController extends Controller
         }
 
         //Getting all barcodes         
-        $barcodes = $query->where('item_id', '=', null)->groupBy('barcode')->paginate(10);
+        $barcodes = $query->groupBy('barcode')->paginate(10);
         if (empty($barcodes)) {
             return response()->json(["error" => 'Barcode not found', 'status' => '404']);
         }
