@@ -154,11 +154,14 @@
         var xhr;
 		page =1;
 		order = "asc";
-		route ="{{route('inventory')}}";
+		@if ($filter == 'barcode')		     
+			route = "{{route('inventoryByBarcode')}}";
+	    @else	
+	    	route ="{{route('inventory')}}"; 
+		@endif
+		
 		const urlParams = new URLSearchParams(window.location.search);
-		if(window.location.href == 'http://127.0.0.1:8000/inventory-by-barcode'){
-			route = '{{route('inventoryByBarcode')}}';
-		}
+		
 		if(document.URL.indexOf("page") >= 0){ 
 			page = urlParams.get('page');
 		}
