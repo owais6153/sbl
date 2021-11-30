@@ -153,7 +153,7 @@
         var xhrRunning = false;
         var xhr;
 		page =1;
-		order = "asc";
+		order = "desc";
 		@if ($filter == 'barcode')		     
 			route = "{{route('inventoryByBarcode')}}";
 	    @else	
@@ -165,6 +165,24 @@
 		if(document.URL.indexOf("page") >= 0){ 
 			page = urlParams.get('page');
 		}
+		if(document.URL.indexOf("order") >= 0 && urlParams.get('order') == "asc"){
+				order = "desc";
+			}else{
+				order = "asc";
+			}
+		if(document.URL.indexOf("order") >= 0){
+			if ($('nav.flex.items-center.justify-between a').length >0) {
+				$('nav.flex.items-center.justify-between a').each(function(index, item){
+					
+					$(item).attr('href', $(item).attr('href') + '&sort=' + urlParams.get('sort')+"&order="+urlParams.get('order'))
+				})
+			}
+			var fieldInput = $('.custom_data_filter input');
+			var fldLength= fieldInput.val().length;
+			fieldInput.focus();
+			fieldInput[0].setSelectionRange(fldLength, fldLength);
+
+		 }
 		$(document).on('keyup', '.custom_data_filter input' , function(){
 		    if(xhrRunning){
                 xhr.abort();
@@ -204,139 +222,16 @@
 			     }
 			});
 		});
-		
-		$(document).on('click', '#sortbyitemname' , function(){
-			
-			
-			if(order == "asc"){
-				order = "desc";
-			}else{
-				order = "asc";
-			}
-		    if(xhrRunning){
-                xhr.abort();
-		    }
-			$('#loader').show();
-		    xhrRunning = true;
-			xhr = $.ajax({
-		         headers: {
-	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-	             },
-			     url: route, 
-			     type: 'get',
-			     data: {'sort': 'byItemName', 'output' : 'html',"order":order,'page':page},
-			     dataType: 'json',
-			     success: function (response) {
-					//  console.log(response);
-			     $('#loader').hide();
-			     if (response.status == 'success') {
-			        xhrRunning = false;
-					
-			     	$('.wc-content-inner').html(response.html);
-			     	  $('#wc-table').DataTable({  "paging":   false,"info":     false, searching: false});
-			     }
-			     if (response.status == '404') {
-			     	alert(response.error);
-			     }
-			     if (response.status == 'error') {
-			     	alert(response.error);
-			     }
-			     },
-			     error: function (){
-			     	$('#loader').hide();
-			     	xhrRunning = false;
-			     //	alert("Something Went Wrong...");
-			     }
-			});
+	
+		$(document).on('click', '#sortbyitemname' , function(){		
+			window.location.href = route+"?page="+page+"&sort=byItemName&order="+order;
 		});
 		$(document).on('click', '#sortbytotalinventory' , function(){
-			
-			
-			if(order == "asc"){
-				order = "desc";
-			}else{
-				order = "asc";
-			}
-		    if(xhrRunning){
-                xhr.abort();
-		    }
-			$('#loader').show();
-		    xhrRunning = true;
-			xhr = $.ajax({
-		         headers: {
-	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-	             },
-			     url: route, 
-			     type: 'get',
-			     data: {'sort': 'byTotalInventory', 'output' : 'html',"order":order,'page':page},
-			     dataType: 'json',
-			     success: function (response) {
-					//  console.log(response);
-			     $('#loader').hide();
-			     if (response.status == 'success') {
-			        xhrRunning = false;
-					
-			     	$('.wc-content-inner').html(response.html);
-			     	  $('#wc-table').DataTable({  "paging":   false,"info":     false, searching: false});
-			     }
-			     if (response.status == '404') {
-			     	alert(response.error);
-			     }
-			     if (response.status == 'error') {
-			     	alert(response.error);
-			     }
-			     },
-			     error: function (){
-			     	$('#loader').hide();
-			     	xhrRunning = false;
-			     //	alert("Something Went Wrong...");
-			     }
-			});
+			window.location.href = route+"?page="+page+"&sort=byTotalInventory&order="+order;
 		});
 		
 		$(document).on('click', '#sortbyonhand' , function(){
-			
-			if(order == "asc"){
-				order = "desc";
-			}else{
-				order = "asc";
-			}
-		    if(xhrRunning){
-                xhr.abort();
-		    }
-			$('#loader').show();
-		    xhrRunning = true;
-			xhr = $.ajax({
-		         headers: {
-	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-	             },
-			     url: route
-				 , 
-			     type: 'get',
-			     data: {'sort': 'byonHand', 'output' : 'html',"order":order,'page':page},
-			     dataType: 'json',
-			     success: function (response) {
-					//  console.log(response);
-			     $('#loader').hide();
-			     if (response.status == 'success') {
-			        xhrRunning = false;
-					
-			     	$('.wc-content-inner').html(response.html);
-			     	  $('#wc-table').DataTable({  "paging":   false,"info":     false, searching: false});
-			     }
-			     if (response.status == '404') {
-			     	alert(response.error);
-			     }
-			     if (response.status == 'error') {
-			     	alert(response.error);
-			     }
-			     },
-			     error: function (){
-			     	$('#loader').hide();
-			     	xhrRunning = false;
-			     //	alert("Something Went Wrong...");
-			     }
-			});
+			window.location.href = route+"?page="+page+"&sort=byonHand&order="+order;
 		});
 	</script>
 @endsection
