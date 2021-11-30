@@ -125,7 +125,7 @@ class ImportItems extends Command
        
 
                                                         $Inventory_track = new InventoryModel();
-                                                        $Inventory_track->user_id = 13;
+                                                        $Inventory_track->user_id = 1;
                                                         $Inventory_track->barcode = $productIdentifier->productIdentifier;
                                                         $Inventory_track->quantity = $inventory->onHand- $LocationDetails->quantity;
                                                         $Inventory_track->from = 'Adjustment';
