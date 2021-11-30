@@ -1,7 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-
+<style>
+	table.dataTable th, table.dataTable td {
+    padding: 16px 16px !important;
+}
+</style>
 	<div class="col-lg-9 col-md-9">
 		<div class="wrap-content">
 			<div class="wc-title">
@@ -22,10 +26,12 @@
 				<table id="wc-table" class="display">
 					<thead>
 					    <tr>
-					      <th scope="col">Item Name</th>
+					      <th scope="col">Item Name <span id='sortbyitemname' style="float: right"><i class="fas fa-sort"></i></span></th>
 					      <th scope="col">Barcode</th>
 					      <th scope="col">Locations (QTY)</th>
-					      <th scope="col">Total Inventory</th>
+					      <th scope="col">Total Inventory <span id='sortbytotalinventory' style="float: right"><i class="fas fa-sort"></i></span></th>
+					      <th scope="col">OnHand (RidgeField) <span id='sortbyonhand' style="float: right"><i class="fas fa-sort"></i></span></th>
+					      <th scope="col">Diff  </th>
 					      <th scope="col">Moves</th>
 					      <th scope="col"></th>
 					    </tr>
@@ -37,7 +43,7 @@
 							    <tr>
 							    	<td>
 							    		@foreach ($inventory['item'] as $itemindex => $item)
-								    		{{$item}}
+								    		{{$item}} 
 								    		@if (isset($inventory['item'][$itemindex + 1]))
 								    			,<br>
 								    		@endif
@@ -54,6 +60,12 @@
 							    		
 							    	</td>
 							    	<td>{{$inventory['total']}}</td>
+							    	<td>{{$inventory['onhand']}}</td>
+									@if($inventory['onhand'] > 0 && $inventory['total'] < $inventory['onhand'])
+							    		<td>{{ $inventory['onhand'] - $inventory['total']}}</td>
+									@else
+										<td>0</td>
+									@endif
 							    	<td>
 							    		<a href="{{route('getInventoryDetailsView', ['barcode' => $inventory['barcode']] ) }}">All moves</a><br>
 							    	</td>
@@ -130,14 +142,26 @@
 		})
 		$(document).ready( function () {
 			if ( $('#wc-table').length > 0) {
+				
 			    $('#wc-table').DataTable({  "paging":   false,"info":     false, searching: false});
 			}
 			if ( $('#wc-table table').length > 0) {
 			    $('#wc-table table').DataTable({  "paging":   false,"info":     false});
+
 			}
 		} );
         var xhrRunning = false;
         var xhr;
+		page =1;
+		order = "asc";
+		route ="{{route('inventory')}}";
+		const urlParams = new URLSearchParams(window.location.search);
+		if(window.location.href == 'http://127.0.0.1:8000/inventory-by-barcode'){
+			route = '{{route('inventoryByBarcode')}}';
+		}
+		if(document.URL.indexOf("page") >= 0){ 
+			page = urlParams.get('page');
+		}
 		$(document).on('keyup', '.custom_data_filter input' , function(){
 		    if(xhrRunning){
                 xhr.abort();
@@ -173,6 +197,139 @@
 			     }
 			});
 		});
-
+		
+		$(document).on('click', '#sortbyitemname' , function(){
+			
+			
+			if(order == "asc"){
+				order = "desc";
+			}else{
+				order = "asc";
+			}
+		    if(xhrRunning){
+                xhr.abort();
+		    }
+			$('#loader').show();
+		    xhrRunning = true;
+			xhr = $.ajax({
+		         headers: {
+	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+	             },
+			     url: route, 
+			     type: 'get',
+			     data: {'sort': 'byItemName', 'output' : 'html',"order":order,'page':page},
+			     dataType: 'json',
+			     success: function (response) {
+					//  console.log(response);
+			     $('#loader').hide();
+			     if (response.status == 'success') {
+			        xhrRunning = false;
+					
+			     	$('.wc-content-inner').html(response.html);
+			     	  $('#wc-table').DataTable({  "paging":   false,"info":     false, searching: false});
+			     }
+			     if (response.status == '404') {
+			     	alert(response.error);
+			     }
+			     if (response.status == 'error') {
+			     	alert(response.error);
+			     }
+			     },
+			     error: function (){
+			     	$('#loader').hide();
+			     	xhrRunning = false;
+			     //	alert("Something Went Wrong...");
+			     }
+			});
+		});
+		$(document).on('click', '#sortbytotalinventory' , function(){
+			
+			
+			if(order == "asc"){
+				order = "desc";
+			}else{
+				order = "asc";
+			}
+		    if(xhrRunning){
+                xhr.abort();
+		    }
+			$('#loader').show();
+		    xhrRunning = true;
+			xhr = $.ajax({
+		         headers: {
+	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+	             },
+			     url: route, 
+			     type: 'get',
+			     data: {'sort': 'byTotalInventory', 'output' : 'html',"order":order,'page':page},
+			     dataType: 'json',
+			     success: function (response) {
+					//  console.log(response);
+			     $('#loader').hide();
+			     if (response.status == 'success') {
+			        xhrRunning = false;
+					
+			     	$('.wc-content-inner').html(response.html);
+			     	  $('#wc-table').DataTable({  "paging":   false,"info":     false, searching: false});
+			     }
+			     if (response.status == '404') {
+			     	alert(response.error);
+			     }
+			     if (response.status == 'error') {
+			     	alert(response.error);
+			     }
+			     },
+			     error: function (){
+			     	$('#loader').hide();
+			     	xhrRunning = false;
+			     //	alert("Something Went Wrong...");
+			     }
+			});
+		});
+		
+		$(document).on('click', '#sortbyonhand' , function(){
+			
+			if(order == "asc"){
+				order = "desc";
+			}else{
+				order = "asc";
+			}
+		    if(xhrRunning){
+                xhr.abort();
+		    }
+			$('#loader').show();
+		    xhrRunning = true;
+			xhr = $.ajax({
+		         headers: {
+	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+	             },
+			     url: route
+				 , 
+			     type: 'get',
+			     data: {'sort': 'byonHand', 'output' : 'html',"order":order,'page':page},
+			     dataType: 'json',
+			     success: function (response) {
+					//  console.log(response);
+			     $('#loader').hide();
+			     if (response.status == 'success') {
+			        xhrRunning = false;
+					
+			     	$('.wc-content-inner').html(response.html);
+			     	  $('#wc-table').DataTable({  "paging":   false,"info":     false, searching: false});
+			     }
+			     if (response.status == '404') {
+			     	alert(response.error);
+			     }
+			     if (response.status == 'error') {
+			     	alert(response.error);
+			     }
+			     },
+			     error: function (){
+			     	$('#loader').hide();
+			     	xhrRunning = false;
+			     //	alert("Something Went Wrong...");
+			     }
+			});
+		});
 	</script>
 @endsection

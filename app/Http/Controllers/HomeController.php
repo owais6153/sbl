@@ -48,7 +48,7 @@ class HomeController extends Controller
       return redirect('/');
     }
     public function dashboard(){
-        view('dashboard');
+       return view('dashboard');
     }
     public function users(){
         
