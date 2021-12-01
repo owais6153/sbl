@@ -1,7 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-
+<style>
+	table.dataTable th, table.dataTable td {
+    padding: 16px 16px !important;
+}
+</style>
 	<div class="col-lg-9 col-md-9">
 		<div class="wrap-content">
 			<div class="wc-title">
@@ -22,10 +26,12 @@
 				<table id="wc-table" class="display">
 					<thead>
 					    <tr>
-					      <th scope="col">Item Name</th>
+					      <th scope="col">Item Name <span id='sortbyitemname' style="float: right"><i class="fas fa-sort"></i></span></th>
 					      <th scope="col">Barcode</th>
 					      <th scope="col">Locations (QTY)</th>
-					      <th scope="col">Total Inventory</th>
+					      <th scope="col">Total Inventory <span id='sortbytotalinventory' style="float: right"><i class="fas fa-sort"></i></span></th>
+					      <th scope="col">OnHand (RidgeField) <span id='sortbyonhand' style="float: right"><i class="fas fa-sort"></i></span></th>
+					      <th scope="col">Diff  </th>
 					      <th scope="col">Moves</th>
 					      <th scope="col"></th>
 					    </tr>
@@ -37,7 +43,7 @@
 							    <tr>
 							    	<td>
 							    		@foreach ($inventory['item'] as $itemindex => $item)
-								    		{{$item}}
+								    		{{$item}} 
 								    		@if (isset($inventory['item'][$itemindex + 1]))
 								    			,<br>
 								    		@endif
@@ -54,6 +60,12 @@
 							    		
 							    	</td>
 							    	<td>{{$inventory['total']}}</td>
+							    	<td>{{$inventory['onhand']}}</td>
+									@if($inventory['onhand'] > 0 && $inventory['total'] < $inventory['onhand'])
+							    		<td>{{ $inventory['onhand'] - $inventory['total']}}</td>
+									@else
+										<td>0</td>
+									@endif
 							    	<td>
 							    		<a href="{{route('getInventoryDetailsView', ['barcode' => $inventory['barcode']] ) }}">All moves</a><br>
 							    	</td>
@@ -130,14 +142,47 @@
 		})
 		$(document).ready( function () {
 			if ( $('#wc-table').length > 0) {
+				
 			    $('#wc-table').DataTable({  "paging":   false,"info":     false, searching: false});
 			}
 			if ( $('#wc-table table').length > 0) {
 			    $('#wc-table table').DataTable({  "paging":   false,"info":     false});
+
 			}
 		} );
         var xhrRunning = false;
         var xhr;
+		page =1;
+		order = "desc";
+		@if ($filter == 'barcode')		     
+			route = "{{route('inventoryByBarcode')}}";
+	    @else	
+	    	route ="{{route('inventory')}}"; 
+		@endif
+		
+		const urlParams = new URLSearchParams(window.location.search);
+		
+		if(document.URL.indexOf("page") >= 0){ 
+			page = urlParams.get('page');
+		}
+		if(document.URL.indexOf("order") >= 0 && urlParams.get('order') == "asc"){
+				order = "desc";
+			}else{
+				order = "asc";
+			}
+		if(document.URL.indexOf("order") >= 0){
+			if ($('nav.flex.items-center.justify-between a').length >0) {
+				$('nav.flex.items-center.justify-between a').each(function(index, item){
+					
+					$(item).attr('href', $(item).attr('href') + '&sort=' + urlParams.get('sort')+"&order="+urlParams.get('order'))
+				})
+			}
+			var fieldInput = $('.custom_data_filter input');
+			var fldLength= fieldInput.val().length;
+			fieldInput.focus();
+			fieldInput[0].setSelectionRange(fldLength, fldLength);
+
+		 }
 		$(document).on('keyup', '.custom_data_filter input' , function(){
 		    if(xhrRunning){
                 xhr.abort();
@@ -177,6 +222,16 @@
 			     }
 			});
 		});
-
+	
+		$(document).on('click', '#sortbyitemname' , function(){		
+			window.location.href = route+"?page="+page+"&sort=byItemName&order="+order;
+		});
+		$(document).on('click', '#sortbytotalinventory' , function(){
+			window.location.href = route+"?page="+page+"&sort=byTotalInventory&order="+order;
+		});
+		
+		$(document).on('click', '#sortbyonhand' , function(){
+			window.location.href = route+"?page="+page+"&sort=byonHand&order="+order;
+		});
 	</script>
 @endsection
