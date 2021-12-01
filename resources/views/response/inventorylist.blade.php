@@ -4,13 +4,11 @@
 				<table id="wc-table" class="display">
 					<thead>
 					    <tr>
-					      <th scope="col">Item Name <span id='sortbyitemname' style="float: right"><i class="fas fa-sort"></i></span></th>
+					      <th scope="col">Item Name</th>
 					      <th scope="col">Barcode</th>
 					      <th scope="col">Locations (QTY)</th>
-						  <th scope="col">Total Inventory <span id='sortbytotalinventory' style="float: right"><i class="fas fa-sort"></i></span></th>
-					      <th scope="col">OnHand (RidgeField) <span id='sortbyonhand' style="float: right"><i class="fas fa-sort"></i></span></th>
-					    	<th scope="col">Diff  </th>
-						   <th scope="col">Moves</th>
+					      <th scope="col">Total Inventory</th>
+					      <th scope="col">Moves</th>
 					      <th scope="col"></th>
 					    </tr>
 					</thead>
@@ -38,12 +36,6 @@
 							    		@endif
 							    	</td>
 							    	<td>{{$inventory['total']}}</td>
-							    	<td>{{$inventory['onhand']}}</td>
-									@if($inventory['onhand'] > 0 && $inventory['total'] < $inventory['onhand'])
-							    		<td>{{ $inventory['onhand'] - $inventory['total']}}</td>
-									@else
-										<td>0</td>
-									@endif
 							    	<td>
 							    		
 							    		<a href="{{route('getInventoryDetailsView', ['barcode' => $inventory['barcode']] ) }}">All moves</a><br>

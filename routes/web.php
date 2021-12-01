@@ -19,13 +19,12 @@ use App\Http\Controllers\SkippedItemIdentifiersController;
 */
 
 // Login & Authentication
-
-	Route::get('/', [HomeController::class, 'index']);
-	Route::post('/adminlogin', [HomeController::class, 'authenticate'])->name('admin_login');
-	Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
+Route::get('/', [HomeController::class, 'index']);
+Route::post('/adminlogin', [HomeController::class, 'authenticate'])->name('admin_login');
+Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
 
 // If login
-	Route::middleware(['is_admin'])->group(function (){
+Route::middleware(['is_admin'])->group(function (){
 // Logout
 	Route::get('/logout', [HomeController::class, 'logout'])->name('logout');
 // Users

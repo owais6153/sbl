@@ -64,9 +64,6 @@ class InventoryLocationTrackingController extends Controller
                 }
             }
         }
-        
-        
-
 
         //Getting all barcodes         
         $barcodes = $query->groupBy('item_id')->paginate(10);
@@ -85,7 +82,7 @@ class InventoryLocationTrackingController extends Controller
             $locations = array();   
 
             // Getting item against barcode
-            $items =  Items::select('item.item_number', 'item.id','item.ridgefield_onhand')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item.id', '=', $barcode->item_id)->first();
+            $items =  Items::select('item.item_number', 'item.id')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item.id', '=', $barcode->item_id)->first();
           
             // Get all locations against this barcode
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('item_id', '=', $barcode->item_id)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
@@ -111,15 +108,11 @@ class InventoryLocationTrackingController extends Controller
                         //  ->groupBy('expiration_date')
                          ->get();                 
                     $eachBarcodeData['barcode'] = $barcode_as_key;
-                
+                    
                     if (!isset($eachBarcodeData['item'])) {
                         $eachBarcodeData['item'][] = (isset($items->item_number)) ? $items->item_number : 'Not Found';                            
                     }
 
-                    //getting on hand ridgefield data 
-                    if (!isset($eachBarcodeData['onhand'])) {
-                        $eachBarcodeData['onhand'] = (isset($items->ridgefield_onhand)) ? $items->ridgefield_onhand : '0';                            
-                    }
                     
                     if (!isset($eachBarcodeData['item'])) {
                          $eachBarcodeData['item'][] = 'Not Found';
@@ -192,56 +185,6 @@ class InventoryLocationTrackingController extends Controller
         // echo "<pre>";
         // print_r($inventories);
         // exit();
-      
-
-
-
-
-        // this sort data according to Item Name 
-        
-        if(isset($request->sort) && $request->sort == 'byItemName'){
-            $itemnames =array();
-
-            foreach($inventories['data'] as $key=>$items){
-                $itemnames[$key] = $items['item'][0];
-            }
-            if($request->order == 'asc'){
-                array_multisort($itemnames, SORT_ASC, $inventories['data']);
-            }else{
-                array_multisort($itemnames, SORT_DESC, $inventories['data']);
-            }
-        }
-
-        // this sort data according to total inventary or total qunatity
-
-        if(isset($request->sort) && $request->sort == 'byTotalInventory'){
-            $itemTotalInventroy =array();
-
-            foreach($inventories['data'] as $key=>$items){
-                $itemTotalInventroy[$key] = $items['total'];
-            }
-            if($request->order == 'asc'){
-                array_multisort($itemTotalInventroy, SORT_ASC, $inventories['data']);
-            }else{
-                array_multisort($itemTotalInventroy, SORT_DESC, $inventories['data']);
-            }
-        }
-        // this sort data according to On hand 
-
-        if(isset($request->sort) && $request->sort == 'byonHand'){
-            $itemTotalInventroy = array();
-
-            foreach($inventories['data'] as $key=>$items){
-                $itemTotalInventroy[$key] = $items['onhand'];
-            }
-            if($request->order == 'asc'){
-                array_multisort($itemTotalInventroy, SORT_ASC, $inventories['data']);
-            }else{
-                array_multisort($itemTotalInventroy, SORT_DESC, $inventories['data']);
-            }
-        }
-        
-        
 
         $filter = 'item';
         if (isset($request->output) && $request->output = 'html') {
@@ -328,10 +271,6 @@ class InventoryLocationTrackingController extends Controller
                         $eachBarcodeData['item'][] = (isset($items->item_number)) ? $items->item_number : 'Not Found';                            
                     }
 
-                    //getting on hand ridgefield data 
-                    if (!isset($eachBarcodeData['onhand'])) {
-                        $eachBarcodeData['onhand'] = (isset($items->ridgefield_onhand)) ? $items->ridgefield_onhand : '0';                            
-                    }
                     
                     if (!isset($eachBarcodeData['item'])) {
                          $eachBarcodeData['item'][] = 'Not Found';
@@ -373,50 +312,9 @@ class InventoryLocationTrackingController extends Controller
         }     
         
 
-         // this sort data according to Item Name 
-        
-        if(isset($request->sort) && $request->sort == 'byItemName'){
-            $itemnames =array();
-
-            foreach($inventories['data'] as $key=>$items){
-                $itemnames[$key] = $items['item'][0];
-            }
-            if($request->order == 'asc'){
-                array_multisort($itemnames, SORT_ASC, $inventories['data']);
-            }else{
-                array_multisort($itemnames, SORT_DESC, $inventories['data']);
-            }
-        }
-
-        // this sort data according to total inventary or total qunatity
-
-        if(isset($request->sort) && $request->sort == 'byTotalInventory'){
-            $itemTotalInventroy =array();
-
-            foreach($inventories['data'] as $key=>$items){
-                $itemTotalInventroy[$key] = $items['total'];
-            }
-            if($request->order == 'asc'){
-                array_multisort($itemTotalInventroy, SORT_ASC, $inventories['data']);
-            }else{
-                array_multisort($itemTotalInventroy, SORT_DESC, $inventories['data']);
-            }
-        }
-        // this sort data according to On hand 
-
-        if(isset($request->sort) && $request->sort == 'byonHand'){
-            $itemTotalInventroy = array();
-
-            foreach($inventories['data'] as $key=>$items){
-                $itemTotalInventroy[$key] = $items['onhand'];
-            }
-            if($request->order == 'asc'){
-                array_multisort($itemTotalInventroy, SORT_ASC, $inventories['data']);
-            }else{
-                array_multisort($itemTotalInventroy, SORT_DESC, $inventories['data']);
-            }
-        }
-        
+        // echo "<pre>";
+        // print_r($inventories);
+        // exit();
 
         if (isset($request->output) && $request->output = 'html') {
           $barcodes->withPath(route('inventory'));
