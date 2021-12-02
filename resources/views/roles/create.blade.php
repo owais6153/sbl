@@ -73,6 +73,14 @@
                             <input id="item_skip" type="checkbox" name="permission[item_skip]" >
                             Item Skipped
                         </label>
+                        <label class="ml-4" for="importnolocation">
+                            <input id="importnolocation" type="checkbox" name="permission[importnolocation]" >
+                            Add Ridgetfield Inventory to Nolocation 
+                        </label>
+                        <label class="ml-4" for="removenolocation">
+                            <input id="removenolocation" type="checkbox" name="permission[removenolocation]" >
+                            Remove Ridgetfield Inventory From Nolocation
+                        </label>
                         
                       </div>
                       <p>Inventory</p>

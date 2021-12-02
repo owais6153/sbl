@@ -6,7 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Items;
 use DataTables;
 use App\Models\ItemIdentifier;
-
+use Illuminate\Support\Facades\Bus;
+use App\Jobs\importToNoLocation;
+use App\Models\InventoryLocation;
+use App\Models\InventoryLocationTracking;
 
 class ItemsController extends Controller
 {
@@ -42,5 +45,15 @@ class ItemsController extends Controller
             }
         })
         ->toJson();
+    }
+    function importToNoLocation(){
+        $batch  = Bus::batch([])->dispatch();
+        $batch->add(new importToNoLocation());
+        return redirect()->back()->with('success', "In Processing.");
+    }
+    function RemoveFromNoLocation(){
+        InventoryLocationTracking::where(['to'=>'NoLocation','from'=>'Adjustment'])->delete();
+        InventoryLocation::where('location','NoLocation')->delete();
+        return redirect()->back()->with('success', "Successfully Removed.");
     }
 }
