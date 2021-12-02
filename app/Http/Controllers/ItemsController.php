@@ -7,7 +7,7 @@ use App\Models\Items;
 use DataTables;
 use App\Models\ItemIdentifier;
 use Illuminate\Support\Facades\Bus;
-use App\Jobs\importToNoLocation;
+use App\Jobs\ImportToNoLocation;
 use App\Models\InventoryLocation;
 use App\Models\InventoryLocationTracking;
 
@@ -48,7 +48,7 @@ class ItemsController extends Controller
     }
     function onHoldToNoLocation(){
         $batch  = Bus::batch([])->dispatch();
-        $batch->add(new importToNoLocation());
+        $batch->add(new ImportToNoLocation());
         return redirect()->back()->with('success', "In Processing.");
     }
     function RemoveFromNoLocation(){
