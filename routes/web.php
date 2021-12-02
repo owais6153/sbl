@@ -64,7 +64,7 @@ use App\Http\Controllers\SkippedItemIdentifiersController;
 // Items
 	Route::get('/items', [ItemsController::class, 'index'])->name('listitems')->middleware('role:view_all_item');	
 	Route::get('/items/getItems', [ItemsController::class, 'getItems'])->name('getItems');
-	Route::get('/items/add/NoLocation', [ItemsController::class, 'importToNoLocation'])->name('addtonolocation');
+	Route::get('/items/add/NoLocation', [ItemsController::class, 'onHoldToNoLocation'])->name('addtonolocation');
 	Route::get('/items//remove/NoLocation', [ItemsController::class, 'RemoveFromNoLocation'])->name('removefromnolocation');
 // Skipped Items
 	Route::get('/skipped-items', [SkippedItemIdentifiersController::class, 'index'])->name('listSkippedItems')->middleware('role:item_skip');	

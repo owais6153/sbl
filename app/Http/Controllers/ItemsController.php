@@ -46,7 +46,7 @@ class ItemsController extends Controller
         })
         ->toJson();
     }
-    function importToNoLocation(){
+    function onHoldToNoLocation(){
         $batch  = Bus::batch([])->dispatch();
         $batch->add(new importToNoLocation());
         return redirect()->back()->with('success', "In Processing.");
