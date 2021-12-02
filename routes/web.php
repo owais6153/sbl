@@ -25,7 +25,7 @@ use App\Http\Controllers\SkippedItemIdentifiersController;
 	Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
 
 // If login
-	Route::middleware(['is_admin'])->group(function (){
+Route::middleware(['is_admin'])->group(function (){
 // Logout
 	Route::get('/logout', [HomeController::class, 'logout'])->name('logout');
 // Users
