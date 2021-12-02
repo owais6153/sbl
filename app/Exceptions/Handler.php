@@ -34,8 +34,12 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->renderable(function (AuthenticationException  $e, $request) {
+            return response()->route('dashboard');
         });
+       
     }
+    
+
+    
 }

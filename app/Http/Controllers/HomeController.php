@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
@@ -51,7 +52,7 @@ class HomeController extends Controller
         return view('dashboard');
     }
     public function users(){
-        
+       
         return view('userlist');
     }
     public function userDisplay()

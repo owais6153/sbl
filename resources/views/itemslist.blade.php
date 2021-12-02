@@ -13,6 +13,14 @@
 				@endif
 			</div>
 			<div class="wc-content">
+				<div>
+					@can('importnolocation')
+					<a class="btn btn-primary text-light" href="{{route('addtonolocation')}}">Add Ridgefield inventory to NoLocation</a>
+					@endcan
+					@can('removenolocation')
+					<a class="btn btn-primary text-light" href="{{route('removefromnolocation')}}">Remove All Ridgefield from NoLocation</a>
+					@endcan
+				</div>
 				<table id="wc-table" class="display">
 					<thead>
 					    <tr>
