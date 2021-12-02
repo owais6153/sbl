@@ -38,7 +38,7 @@ class ReplenImportJob implements ShouldQueue
         $offset = 0;
         $totalItemsInDB = Items::count();
         while($totalItemsInDB > $offset){
-            $Items = Items::limit($limit)->offset($offset)->get();
+            $Items = Items::where('ridgefield_onhand', '!=', null)->where('ridgefield_onhand', '>', 0)->limit($limit)->offset($offset)->get();
             $itemsSepratedByCommas = '[';
 
             foreach ($Items as $itemIndex => $item){  
