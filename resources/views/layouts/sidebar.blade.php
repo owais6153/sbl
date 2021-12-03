@@ -30,6 +30,7 @@
 			          </ul>
 			        </li>
 					@endif
+
 					@if (Bouncer::can('view_all_role') || Bouncer::can('role_add') )
 					<li class="dropdown {{ (request()->is('roles/*') || request()->is('roles')) ? 'active' : '' }}">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fas fa-users"></i>Roles</a>
@@ -43,6 +44,10 @@
 							</ul>
 					  </li>
 					  @endif
+					  
+					<li class=" {{ (request()->is('replen-data/*') || request()->is('replen-detail/*')) ? 'active' : '' }}">
+			          <a href="{{route('replenBatch')}}"><i class="fas fa-users"></i>Replen Batches</a>
+			        </li>
 					@if (Bouncer::can('view_all_item') || Bouncer::can('item_skip') )
 
 			        <li class="dropdown {{ ( request()->is('items') ) ? 'active' : '' }}">

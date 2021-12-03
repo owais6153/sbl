@@ -7,6 +7,9 @@ use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\InventoryLocationTrackingController;
 use App\Http\Controllers\ItemsController;
 use App\Http\Controllers\SkippedItemIdentifiersController;
+use App\Http\Controllers\ReplenController;
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -69,6 +72,13 @@ Route::middleware(['is_admin'])->group(function (){
 // Skipped Items
 	Route::get('/skipped-items', [SkippedItemIdentifiersController::class, 'index'])->name('listSkippedItems')->middleware('role:item_skip');	
 	Route::get('/skipped-items/getItems', [SkippedItemIdentifiersController::class, 'getSkippedItems'])->name('getSkippedItems');
+// Replen Data 
+	Route::get('/replen-data', [ReplenController::class, 'index'])->name('replenBatch');
+	Route::get('/replen-data/get', [ReplenController::class, 'getReplenBatch'])->name('getReplenBatch');
+
+	Route::get('/replen-detail/{id}', [ReplenController::class, 'replenDetail'])->name('replenDetail');
+	Route::get('/replen-detail/get/{id}', [ReplenController::class, 'getReplenDetail'])->name('getReplenDetail');
+
 
 });
 
