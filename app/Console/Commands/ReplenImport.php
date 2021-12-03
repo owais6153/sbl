@@ -237,6 +237,6 @@ class ReplenImport extends Command
             $offset = $offset + 200;
         }
         $ReplenBatch = ReplenBatch::find($ReplenBatch->id)->update(['status' => 'completed']); 
-        $this->info('Queue added for Replen import');
+        $this->info('Replen Imported');
     }
 }
