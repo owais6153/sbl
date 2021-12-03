@@ -22,6 +22,7 @@ class ReplenImportJob implements ShouldQueue
      *
      * @return void
      */
+    public $timeout = 0;
     public $replenbatch_id;
     public function __construct($replenbatch_id)
     {
@@ -36,9 +37,13 @@ class ReplenImportJob implements ShouldQueue
     public function handle(){
         $limit = 200;
         $offset = 0;
-        $totalItemsInDB = Items::count();
+        $totalItemsInDB = Items::where('ridgefield_onhand', '!=', null)->where('ridgefield_onhand', '>', 0)->count();
         while($totalItemsInDB > $offset){
             $Items = Items::where('ridgefield_onhand', '!=', null)->where('ridgefield_onhand', '>', 0)->limit($limit)->offset($offset)->get();
+            if (count($Items) < 1) {
+                continue;
+            }
+
             $itemsSepratedByCommas = '[';
 
             foreach ($Items as $itemIndex => $item){  
@@ -76,7 +81,10 @@ class ReplenImportJob implements ShouldQueue
             }
             else{
                 $getTotalInventoriesByCurlRes = json_decode($getTotalInventoriesByCurlResponse);
-                if ($getTotalInventoriesByCurlRes->Status != 'Success') {
+                if (!isset($getTotalInventoriesByCurlRes->Status)) {
+                   continue;
+                }
+                if ($getTotalInventoriesByCurlRes->Status != 'Success' ) {
                     \Log::info("API Response Status is: ". $getTotalInventoriesByCurlRes->Status . " Batch ID: ". $this->replenbatch_id. " Failed to import. Curl: 1");
                     $ReplenBatch = ReplenBatch::find($this->replenbatch_id)->update(['status' => 'error']);
                     continue;
@@ -109,6 +117,9 @@ class ReplenImportJob implements ShouldQueue
                     }
                     else{
                         $getTotalUnsellableByCurlRes = json_decode($getTotalUnsellableByCurlResponse);
+                        if (!isset($getTotalUnsellableByCurlRes->Status)) {
+                           continue;
+                        }
                         if ($getTotalUnsellableByCurlRes->Status != 'Success') {
                             \Log::info("API Response Status is: ". $getTotalUnsellableByCurlRes->Status . " Batch ID: ". $this->replenbatch_id. " Failed to import. Curl: 2");
                             $ReplenBatch = ReplenBatch::find($this->replenbatch_id)->update(['status' => 'error']);
@@ -144,6 +155,9 @@ class ReplenImportJob implements ShouldQueue
                             }
                             else{
                                 $getLast30DaysSaleBycurlRes = json_decode($getLast30DaysSaleBycurlResponse);
+                                if (!isset($getLast30DaysSaleBycurlRes->Status)) {
+                                   continue;
+                                }
                                 if ($getLast30DaysSaleBycurlRes->Status != 'Success') {
                                     \Log::info("API Response Status is: ". $getLast30DaysSaleBycurlRes->Status . " Batch ID: ". $this->replenbatch_id. " Failed to import. Curl: 3");
                                     $ReplenBatch = ReplenBatch::find($this->replenbatch_id)->update(['status' => 'error']);
