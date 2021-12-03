@@ -52,10 +52,10 @@ class ReplenImport extends Command
         $limit = 200;
         $offset = 0;
         $totalItemsInDB = Items::where('ridgefield_onhand', '!=', null)->where('ridgefield_onhand', '>', 0)->count();
-         \Log::info('Total Items: '. $totalItemsInDB);
+         // \Log::info('Total Items: '. $totalItemsInDB);
         while($totalItemsInDB > $offset){
 
-         \Log::info('Total Offset: '. $offset);
+         // \Log::info('Total Offset: '. $offset);
             $Items = Items::where('ridgefield_onhand', '!=', null)->where('ridgefield_onhand', '>', 0)->limit($limit)->offset($offset)->get();
             if (count($Items) < 1) {
                  $offset = $offset + 200;
