@@ -486,6 +486,8 @@ table.dataTable.display tbody td a {
   padding: 10px 16px;
   border-radius: 7px;
   text-decoration: none;
+  display: inline-block;
+  text-align: center;
 }
 
 table.dataTable thead .sorting {

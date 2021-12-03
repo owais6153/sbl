@@ -103,8 +103,7 @@ class ImportItems extends Command
                             if (!empty($item->inventory)) {
                                 foreach ($item->inventory as $inventory) {
                                     if (isset($inventory->warehouse) && $inventory->warehouse == "Default Ridgefield") {
-                                        $inventory->ridgefield_onhand = $inventory->onHand;
-                                        break;
+                                        $items->ridgefield_onhand = $inventory->onHand;
                                     }
                                 }
                             }
