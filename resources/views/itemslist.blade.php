@@ -12,6 +12,7 @@
 				    </div>
 				@endif
 			</div>
+			<img src="{{asset('images/preloader.gif')}}" id="loader" style="display: none;">
 			<div class="wc-content">
 				<div>
 					@can('importnolocation')
@@ -66,7 +67,8 @@
 		var xhrRunning = false;
 		$(document).on('click', '#addtonoimport' , function(){
 			$('#addtonoimport').html('Processing, please wait this may take time...');
-			$('#addtonoimport').attr('disable',true);
+			
+			$('#addtonoimport').prop('disabled', true);
 		    if(xhrRunning){
                 xhr.abort();
 		    }
@@ -87,7 +89,8 @@
 			        xhrRunning = false;
 			     	alert('Successfully Imported to Nolocation');
 					 $('#addtonoimport').html('Add Ridgefield inventory to NoLocation');
-					$('#addtonoimport').attr('disable',false);
+					
+					$('#addtonoimport').prop('disabled', false);
 
 			     }
 			     if (response.status == '404') {
