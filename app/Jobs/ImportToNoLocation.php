@@ -24,9 +24,12 @@ class ImportToNoLocation implements ShouldQueue
      *
      * @return void
      */
-    public function __construct()
+    protected $offset= 0;
+    protected $limit = 0;
+    public function __construct($offset,$limit)
     {
-        //
+        $this->offset = $offset;
+        $this->limit = $limit;
     }
 
     /**
@@ -36,16 +39,17 @@ class ImportToNoLocation implements ShouldQueue
      */
     public function handle()
     {
-        $offset = 1000;
-        $limit = 0;
         $loop = true;
         echo "job started \n";
+        $count = 0;
+        \Log::info("offset no ".$this->offset); 
 
-        while($loop){
+        // while($loop){
+      
             $curl = curl_init();
-            
+            \Log::info("loop count ".$count++); 
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'http://161.35.3.201/products?limit=' . $limit . '&offset=' . $offset,
+                CURLOPT_URL => 'http://161.35.3.201/products?limit=' . $this->limit . '&offset=' . $this->offset,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -67,6 +71,8 @@ class ImportToNoLocation implements ShouldQueue
                 
                 if (!empty($res->data)) {
                     foreach ($res->data as $item) {
+                         
+                        echo "Items name ".$item->itemNumber."\n";
                         if (!empty($item->inventory)) {
                             foreach ($item->inventory as $inventory) {
                                 if (isset($inventory->warehouse) && $inventory->warehouse == "Default Ridgefield" && isset($inventory->onHand)) {
@@ -117,14 +123,14 @@ class ImportToNoLocation implements ShouldQueue
                         }
                     }
                 }
-                if($offset >= $res->totalRecords){
-                    $loop = false;
-                    break;
-                }
-                $offset = $offset+1000;
-                echo "\n offset".$offset;
+                // if($offset >= $res->totalRecords){
+                //     $loop = false;
+                   
+                // }
+                // $offset = $offset+1000;
+                // echo "\n offset".$offset;
             }
-        }       
+        // }       
          \Log::info("Items Imported  To NoLocation. ");  
         echo "job ended Suceessfully";
 

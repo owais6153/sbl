@@ -15,7 +15,8 @@
 			<div class="wc-content">
 				<div>
 					@can('importnolocation')
-					<a class="btn btn-primary text-light" href="{{route('addtonolocation')}}">Add Ridgefield inventory to NoLocation</a>
+					{{-- href="{{route('addtonolocation')}}" --}}
+					<a class="btn btn-primary text-light" id="addtonoimport" >Add Ridgefield inventory to NoLocation</a>
 					@endcan
 					@can('removenolocation')
 					<a class="btn btn-primary text-light" href="{{route('removefromnolocation')}}">Remove All Ridgefield from NoLocation</a>
@@ -61,6 +62,47 @@
 		        order: [[0, 'desc']]
 		  });
 		  
+		});
+		var xhrRunning = false;
+		$(document).on('click', '#addtonoimport' , function(){
+			$('#addtonoimport').html('Processing, please wait this may take time...');
+			$('#addtonoimport').attr('disable',true);
+		    if(xhrRunning){
+                xhr.abort();
+		    }
+			$('#loader').show();
+		    xhrRunning = true;
+			xhr = $.ajax({
+		         headers: {
+	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+	             },
+	                
+				 url: "{{route('addtonolocation')}}",
+			     type: 'get',
+			     data: {'output' : 'html'},
+			     dataType: 'json',
+			     success: function (response) {
+			     $('#loader').hide();
+			     if (response.status == 'success') {
+			        xhrRunning = false;
+			     	alert('Successfully Imported to Nolocation');
+					 $('#addtonoimport').html('Add Ridgefield inventory to NoLocation');
+					$('#addtonoimport').attr('disable',false);
+
+			     }
+			     if (response.status == '404') {
+			     	alert(response.error);
+			     }
+			     if (response.status == 'error') {
+			     	alert(response.error);
+			     }
+			     },
+			     error: function (){
+			     	$('#loader').hide();
+			     	xhrRunning = false;
+			     //	alert("Something Went Wrong...");
+			     }
+			});
 		});
 	</script>
 @endsection
