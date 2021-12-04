@@ -96,7 +96,7 @@ class ItemsController extends Controller
                 }
             }
             $offset += $limit;
-            echo $offset."\n";
+            
             
             $items = Items::where('ridgefield_onhand',">",'0')->where('ridgefield_onhand',"!=",'null')->skip($offset)->take($limit)->get();
             if($count < round($offset/1000)){
