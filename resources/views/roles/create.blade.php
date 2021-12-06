@@ -83,6 +83,23 @@
                         </label>
                         
                       </div>
+                      <p>Replen Batches </p>
+                      <hr>
+                      <div class="form-group">
+                        <label for="replen_batches">
+                            <input id="replen_batches" type="checkbox" name="permission[replen_batches]" >
+                            Replen Batches List
+                        </label>
+
+                        <label class="ml-4" for="replen_batches_details">
+                            <input id="replen_batches_details" type="checkbox" name="permission[replen_batches_details]" >
+                            Replen View Details
+                        </label>
+                        <label class="ml-4" for="replen_batches_export">
+                            <input id="replen_batches_export" type="checkbox" name="permission[replen_batches_export]" >
+                            Replen Export
+                        </label>
+                      </div>
                       <p>Inventory</p>
                       <hr>
                       <div class="form-group">
