@@ -181,10 +181,10 @@ class InventoryLocationTrackingController extends Controller
                     
                 }
                 $eachBarcodeData['total'] = $total_inventory;
-                     $eachBarcodeData['diference'] = 0;
-                if($eachBarcodeData['onhand'] > 0){
-                    $eachBarcodeData['diference'] = $total_inventory - $eachBarcodeData['onhand'] ;
-                }
+                //      $eachBarcodeData['diference'] = 0;
+                // if($eachBarcodeData['onhand'] > 0){
+                    $eachBarcodeData['diference'] =$eachBarcodeData['onhand']-$total_inventory;
+                // }
 
             }
 
@@ -387,10 +387,10 @@ class InventoryLocationTrackingController extends Controller
                 }
                 $eachBarcodeData['total'] = $total_inventory;
                 $eachBarcodeData['total'] = $total_inventory;
-                     $eachBarcodeData['diference'] = 0;
-                if($eachBarcodeData['onhand'] > 0){
-                    $eachBarcodeData['diference'] = $total_inventory - $eachBarcodeData['onhand'] ;
-                }
+                //      $eachBarcodeData['diference'] = 0;
+                // if($eachBarcodeData['onhand'] > 0){
+                    $eachBarcodeData['diference'] =  $eachBarcodeData['onhand']-$total_inventory ;
+                // }
             }
             
             if(!empty($eachBarcodeData))
