@@ -90,7 +90,7 @@ class InventoryLocationTrackingController extends Controller
             // Get all locations against this barcode
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('item_id', '=', $barcode->item_id)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
 
-             
+        
             $locations = $this->filterAllLocations($from_to_query, $barcode->barcode, true);
 
 

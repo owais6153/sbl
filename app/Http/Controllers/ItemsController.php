@@ -74,7 +74,7 @@ class ItemsController extends Controller
                     ->where('deleted_at', '=', null)
                     ->first();
                     $barcode = $checkcode->barcode;
-                    $item_id =$item->item_id;
+                    $item_id =$item->id;
                     if ($LocationDetails->quantity < $item->ridgefield_onhand) {
                                         
                         $Inventory_track = new InventoryModel();
@@ -112,8 +112,8 @@ class ItemsController extends Controller
         return redirect()->back()->with('success', "Successfully Imported To No Location");
     }
     function RemoveFromNoLocation(){
-        InventoryLocationTracking::where(['to'=>'NoLocation','from'=>'Adjustment'])->delete();
-        InventoryLocation::where('location','NoLocation')->delete();
+        InventoryLocationTracking::where(['to'=>'NoLocation','from'=>'Adjustment'])->forceDelete();
+        InventoryLocation::where('location','NoLocation')->forceDelete();
         return redirect()->back()->with('success', "Successfully Removed.");
     }
 }
