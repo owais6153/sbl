@@ -90,7 +90,7 @@ class InventoryLocationTrackingController extends Controller
             // Get all locations against this barcode
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('item_id', '=', $barcode->item_id)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
 
-        
+             
             $locations = $this->filterAllLocations($from_to_query, $barcode->barcode, true);
 
 
@@ -181,7 +181,7 @@ class InventoryLocationTrackingController extends Controller
                     
                 }
                 $eachBarcodeData['total'] = $total_inventory;
-                $eachBarcodeData['diference'] = 0;
+                     $eachBarcodeData['diference'] = 0;
                 if($eachBarcodeData['onhand'] > 0){
                     $eachBarcodeData['diference'] = $total_inventory - $eachBarcodeData['onhand'] ;
                 }
@@ -216,6 +216,7 @@ class InventoryLocationTrackingController extends Controller
                 array_multisort($itemnames, SORT_DESC, $inventories['data']);
             }
         }
+
 
         // this sort data according to Difference
 
@@ -316,7 +317,7 @@ class InventoryLocationTrackingController extends Controller
             $locations = array();   
 
             // Getting item against barcode
-            $items =  Items::select('item.item_number', 'item.id')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=', '0' . $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=',  substr($barcode->barcode, 1))->first();
+            $items =  Items::select('item.item_number', 'item.id', 'item.ridgefield_onhand')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=', '0' . $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=',  substr($barcode->barcode, 1))->first();
           
             // Get all locations against this barcode
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
@@ -385,6 +386,11 @@ class InventoryLocationTrackingController extends Controller
                     }
                 }
                 $eachBarcodeData['total'] = $total_inventory;
+                $eachBarcodeData['total'] = $total_inventory;
+                     $eachBarcodeData['diference'] = 0;
+                if($eachBarcodeData['onhand'] > 0){
+                    $eachBarcodeData['diference'] = $total_inventory - $eachBarcodeData['onhand'] ;
+                }
             }
             
             if(!empty($eachBarcodeData))
@@ -422,6 +428,22 @@ class InventoryLocationTrackingController extends Controller
                 array_multisort($itemTotalInventroy, SORT_DESC, $inventories['data']);
             }
         }
+        
+          // this sort data according to Difference
+
+        if(isset($request->sort) && $request->sort == 'byDifference'){
+            $itemTotalInventroy =array();
+
+            foreach($inventories['data'] as $key=>$items){
+                $itemTotalInventroy[$key] = $items['diference'];
+            }
+            if($request->order == 'asc'){
+                array_multisort($itemTotalInventroy, SORT_ASC, $inventories['data']);
+            }else{
+                array_multisort($itemTotalInventroy, SORT_DESC, $inventories['data']);
+            }
+        }
+
         // this sort data according to On hand 
 
         if(isset($request->sort) && $request->sort == 'byonHand'){
