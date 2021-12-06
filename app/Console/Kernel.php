@@ -25,6 +25,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('importItems:hourly')->hourly();
+        $schedule->command('replen:import')->daily();
     }
 
     /**

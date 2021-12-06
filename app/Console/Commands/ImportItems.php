@@ -103,8 +103,7 @@ class ImportItems extends Command
                             if (!empty($item->inventory)) {
                                 foreach ($item->inventory as $inventory) {
                                     if (isset($inventory->warehouse) && $inventory->warehouse == "Default Ridgefield") {
-                                        $inventory->ridgefield_onhand = $inventory->onHand;
-                                        break;
+                                        $items->ridgefield_onhand = $inventory->onHand;
                                     }
                                 }
                             }
@@ -163,45 +162,7 @@ class ImportItems extends Command
                                       ->update(['item_id' => $items->id]);
                                 }
                             }
-                            if (!empty($item->inventory)) {
-                                foreach ($item->inventory as $inventory) {
-                                    if (isset($inventory->warehouse) && $inventory->warehouse == "Default Ridgefield" && isset($inventory->onHand)) {
-                                        foreach ($item->productIdentifiers as $productIdentifier) {
-                                            if ($productIdentifier->identifierType == 'UPC') {
-
-
-                                                $LocationDetails =  DB::table('inventory_location')
-                                                    ->select(DB::raw('SUM(`count`) as `quantity`'))
-                                                    ->where('barcode', '=', $productIdentifier->productIdentifier)
-                                                    ->where('deleted_at', '=', null)->whereRaw("LOWER(`location`) != 'shipping' and LOWER(`location`) != 'production' and LOWER(`location`) != 'adjustment' and LOWER(`location`) != 'receiving'")
-                                                    ->first();
-                                                    if($LocationDetails->quantity < $inventory->onHand){
-       
-
-                                                        $Inventory_track = new InventoryModel();
-                                                        $Inventory_track->user_id = 1;
-                                                        $Inventory_track->barcode = $productIdentifier->productIdentifier;
-                                                        $Inventory_track->quantity = $inventory->onHand- $LocationDetails->quantity;
-                                                        $Inventory_track->from = 'Adjustment';
-                                                        $Inventory_track->item_id = $items->id;
-                                                        $Inventory_track->to = 'NoLocation';
-                                                        $Inventory_track->save();
-                                                        $ToLocation = new InventoryLocation();
-                                                        $ToLocation->barcode = $productIdentifier->productIdentifier;
-                                                        $ToLocation->count =  $inventory->onHand - $LocationDetails->quantity;
-                                                        $ToLocation->location = 'NoLocation';
-                                                        $ToLocation->item_id = $items->id;
-                                                        $ToLocation->inventory_track_id = $Inventory_track->id;
-                                                        $ToLocation->save();
-                                                    }
-
-                                               
-                                            }
-                                        }
-                                    break;
-                                    }
-                                }
-                            }
+                            
                         }
                     }
                 }

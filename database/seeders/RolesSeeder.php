@@ -13,7 +13,7 @@ class RolesSeeder extends Seeder
      */
     public function run()
     {
-        $permissions =array('view_all_users','user_add','user_update','user_delete','view_all_role','role_add','role_update','role_delete','view_all_item','item_skip','inventory_view_on_hand','inventory_view_on_receive','inventory_import','scan_inventroy','inventory_location','inventory_adjustment');
+        $permissions =array('view_all_users','user_add','user_update','user_delete','view_all_role','role_add','role_update','role_delete','view_all_item','importnolocation','removenolocation','item_skip','inventory_view_on_hand','inventory_view_on_receive','inventory_import','scan_inventroy','inventory_location','inventory_adjustment');
         foreach($permissions as $per){
            Bouncer::allow('admin')->to($per);
 

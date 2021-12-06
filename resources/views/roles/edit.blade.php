@@ -78,6 +78,14 @@
                             <input id="item_skip" type="checkbox" name="permission[item_skip]" {!! in_array('item_skip',$abilitiesarray) == true ?"checked":"" !!} >
                             Item Skipped
                         </label>
+                        <label class="ml-4" for="importnolocation">
+                            <input id="importnolocation" type="checkbox" name="permission[importnolocation]" {!! in_array('importnolocation',$abilitiesarray) == true ?"checked":"" !!}>
+                            Add Ridgetfield Inventory to Nolocation 
+                        </label>
+                        <label class="ml-4" for="removenolocation">
+                            <input id="removenolocation" type="checkbox" name="permission[removenolocation]" {!! in_array('removenolocation',$abilitiesarray) == true ?"checked":"" !!}>
+                            Remove Ridgetfield Inventory From Nolocation
+                        </label>
                         
                       </div>
                       <p>Inventory</p>
