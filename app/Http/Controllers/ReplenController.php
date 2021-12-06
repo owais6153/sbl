@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\ReplenBatch;
 use App\Models\ReplenDetail;
 use DataTables;
+use Bouncer;
+
 
 class ReplenController extends Controller
 {
@@ -25,8 +27,11 @@ class ReplenController extends Controller
             return  $datetime->format('m/d/Y g:i:s A'); 
         })
         ->addColumn('actions', function($row){
-            if ($row->status == 'completed') {
-                $html = '<a href="'.route('replenDetail', ['id' => $row->id]).'" class="mr-3">View Detail</a><a href="">Export</a>';
+            if ($row->status == 'completed' && Bouncer::can('replen_batches_details')) {
+                $html = '<a href="'.route('replenDetail', ['id' => $row->id]).'" class="mr-3">View Detail</a>';
+                if (Bouncer::can('replen_batches_export')) {
+                    $html .='<a href="">Export</a>';
+                }
                 return $html;
             }
         })
