@@ -9,7 +9,7 @@
 					      <th scope="col">Locations (QTY)</th>
 						  <th scope="col">Total Inventory <span id='sortbytotalinventory' style="float: right"><i class="fas fa-sort"></i></span></th>
 					      <th scope="col">OnHand (RidgeField) <span id='sortbyonhand' style="float: right"><i class="fas fa-sort"></i></span></th>
-					    	<th scope="col">Diff  </th>
+						  <th scope="col">Diff <span id='sortbyDifference' style="float: right"><i class="fas fa-sort"></i></span> </th>
 						   <th scope="col">Moves</th>
 					      <th scope="col"></th>
 					    </tr>
@@ -39,11 +39,9 @@
 							    	</td>
 							    	<td>{{$inventory['total']}}</td>
 							    	<td>{{$inventory['onhand']}}</td>
-									@if($inventory['onhand'] > 0 && $inventory['total'] < $inventory['onhand'])
-							    		<td>{{ $inventory['onhand'] - $inventory['total']}}</td>
-									@else
-										<td>0</td>
-									@endif
+									
+							    		<td>{{ $inventory['diference']}}</td>
+									
 							    	<td>
 							    		
 							    		<a href="{{route('getInventoryDetailsView', ['barcode' => $inventory['barcode']] ) }}">All moves</a><br>
