@@ -181,6 +181,11 @@ class InventoryLocationTrackingController extends Controller
                     
                 }
                 $eachBarcodeData['total'] = $total_inventory;
+                $eachBarcodeData['diference'] = 0;
+                if($eachBarcodeData['onhand'] > 0){
+                    $eachBarcodeData['diference'] = $total_inventory - $eachBarcodeData['onhand'] ;
+                }
+
             }
 
             if(!empty($eachBarcodeData))
@@ -209,6 +214,21 @@ class InventoryLocationTrackingController extends Controller
                 array_multisort($itemnames, SORT_ASC, $inventories['data']);
             }else{
                 array_multisort($itemnames, SORT_DESC, $inventories['data']);
+            }
+        }
+
+        // this sort data according to Difference
+
+        if(isset($request->sort) && $request->sort == 'byDifference'){
+            $itemTotalInventroy =array();
+
+            foreach($inventories['data'] as $key=>$items){
+                $itemTotalInventroy[$key] = $items['diference'];
+            }
+            if($request->order == 'asc'){
+                array_multisort($itemTotalInventroy, SORT_ASC, $inventories['data']);
+            }else{
+                array_multisort($itemTotalInventroy, SORT_DESC, $inventories['data']);
             }
         }
 
