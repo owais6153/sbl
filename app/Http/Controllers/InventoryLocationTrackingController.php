@@ -296,7 +296,7 @@ class InventoryLocationTrackingController extends Controller
             $locations = array();   
 
             // Getting item against barcode
-            $items =  Items::select('item.item_number', 'item.id')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=', '0' . $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=',  substr($barcode->barcode, 1))->first();
+            $items =  Items::select('item.item_number', 'item.id', 'item.ridgefield_onhand')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=', '0' . $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=',  substr($barcode->barcode, 1))->first();
           
             // Get all locations against this barcode
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
