@@ -90,7 +90,7 @@ class InventoryLocationTrackingController extends Controller
             // Get all locations against this barcode
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('item_id', '=', $barcode->item_id)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
 
-        
+             
             $locations = $this->filterAllLocations($from_to_query, $barcode->barcode, true);
 
 
@@ -181,10 +181,10 @@ class InventoryLocationTrackingController extends Controller
                     
                 }
                 $eachBarcodeData['total'] = $total_inventory;
-                $eachBarcodeData['diference'] = 0;
-                if($eachBarcodeData['onhand'] > 0){
-                    $eachBarcodeData['diference'] = $total_inventory - $eachBarcodeData['onhand'] ;
-                }
+                //      $eachBarcodeData['diference'] = 0;
+                // if($eachBarcodeData['onhand'] > 0){
+                    $eachBarcodeData['diference'] =$eachBarcodeData['onhand']-$total_inventory;
+                // }
 
             }
 
@@ -216,6 +216,7 @@ class InventoryLocationTrackingController extends Controller
                 array_multisort($itemnames, SORT_DESC, $inventories['data']);
             }
         }
+
 
         // this sort data according to Difference
 
@@ -385,6 +386,11 @@ class InventoryLocationTrackingController extends Controller
                     }
                 }
                 $eachBarcodeData['total'] = $total_inventory;
+                $eachBarcodeData['total'] = $total_inventory;
+                //      $eachBarcodeData['diference'] = 0;
+                // if($eachBarcodeData['onhand'] > 0){
+                    $eachBarcodeData['diference'] =  $eachBarcodeData['onhand']-$total_inventory ;
+                // }
             }
             
             if(!empty($eachBarcodeData))
@@ -422,6 +428,22 @@ class InventoryLocationTrackingController extends Controller
                 array_multisort($itemTotalInventroy, SORT_DESC, $inventories['data']);
             }
         }
+        
+          // this sort data according to Difference
+
+        if(isset($request->sort) && $request->sort == 'byDifference'){
+            $itemTotalInventroy =array();
+
+            foreach($inventories['data'] as $key=>$items){
+                $itemTotalInventroy[$key] = $items['diference'];
+            }
+            if($request->order == 'asc'){
+                array_multisort($itemTotalInventroy, SORT_ASC, $inventories['data']);
+            }else{
+                array_multisort($itemTotalInventroy, SORT_DESC, $inventories['data']);
+            }
+        }
+
         // this sort data according to On hand 
 
         if(isset($request->sort) && $request->sort == 'byonHand'){

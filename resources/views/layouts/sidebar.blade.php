@@ -45,9 +45,11 @@
 					  </li>
 					  @endif
 					  
+					  @can('replen_batches')
 					<li class=" {{ (request()->is('replen-data/*') || request()->is('replen-detail/*')) ? 'active' : '' }}">
 			          <a href="{{route('replenBatch')}}"><i class="fas fa-users"></i>Replen Batches</a>
 			        </li>
+					@endcan
 					@if (Bouncer::can('view_all_item') || Bouncer::can('item_skip') )
 
 			        <li class="dropdown {{ ( request()->is('items') ) ? 'active' : '' }}">
