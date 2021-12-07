@@ -637,6 +637,7 @@ class InventoryLocationTrackingController extends Controller
             $FromLocation->location = $request->from ;
             $FromLocation->inventory_track_id = $Inventory->id;    
             $FromLocation->expiration_date = $request->expiration_date;  
+            $FromLocation->item_id = (isset($request->item_id)) ? $request->item_id : null;  
             $FromLocation->from_id = $request->from_id;      
             $FromLocation->save();
             if ($request->to == 'shipping' || $request->to == 'production' || $request->to == 'adjustment'){
@@ -647,7 +648,8 @@ class InventoryLocationTrackingController extends Controller
                 $newFromLocation->location = $request->to;
                 $newFromLocation->inventory_track_id = $Inventory->id;    
                 $newFromLocation->expiration_date = $request->expiration_date;  
-                $newFromLocation->from_id = $request->from_id;      
+                $newFromLocation->from_id = $request->from_id;     
+                $newFromLocation->item_id = (isset($request->item_id)) ? $request->item_id : null;   
                 $newFromLocation->save();
             }
         }
@@ -659,7 +661,8 @@ class InventoryLocationTrackingController extends Controller
             $ToLocation->location = $request->to;
             $ToLocation->inventory_track_id = $Inventory->id;
             $ToLocation->expiration_date = $request->expiration_date; 
-            $ToLocation->from_id = $request->from_id;   
+            $ToLocation->from_id = $request->from_id;               
+            $ToLocation->item_id = (isset($request->item_id)) ? $request->item_id : null;
             $ToLocation->save();
             if($request->from == 'receiving' || $request->from == 'adjustment'){
                  // If Receiving
@@ -668,6 +671,7 @@ class InventoryLocationTrackingController extends Controller
                 $newToLocation->count = $request->quantity * -1;
                 $newToLocation->location = $request->from;
                 $newToLocation->inventory_track_id = $Inventory->id;
+                $newToLocation->item_id = (isset($request->item_id)) ? $request->item_id : null;
                 $newToLocation->expiration_date = $request->expiration_date; 
                 $newToLocation->from_id = $request->from_id;   
                 $newToLocation->save();
