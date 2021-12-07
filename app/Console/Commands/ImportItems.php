@@ -133,6 +133,7 @@ class ImportItems extends Command
                                         $child->child_item_id = $check->id;
                                     }
                                     $child->qty = $pchild->childQuantity;
+                                    $child->item_type = 'kit';
                                     $child->save();
                                 }
                             }

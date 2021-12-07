@@ -7,6 +7,7 @@ use App\Models\ReplenBatch;
 // use Illuminate\Support\Facades\Bus;
 // use App\Jobs\ReplenImportJob;
 use App\Models\Items;
+use App\Models\Itemlisting;
 use App\Models\ReplenDetail;
 use Log;
 
@@ -213,12 +214,16 @@ class ReplenImport extends Command
                                             }
                                         }
 
+
+                                        $Itemlisting = Itemlisting::select('storeSKU', 'store', 'urlId')->where('item_id', '=', $item_id)->first();
+
+
                                         $ReplenDetail = new ReplenDetail();
                                         $ReplenDetail->item_id = $item_id;
                                         $ReplenDetail->item_name = $item->item_number;
-                                        // $ReplenDetail->urlid = $item->urlid;
-                                        // $ReplenDetail->store_sku = $item->store_sku;
-                                        // $ReplenDetail->store = $item->store;
+                                        $ReplenDetail->urlid = (isset($Itemlisting->urlId)) ? $Itemlisting->urlId : null;
+                                        $ReplenDetail->store_sku = (isset($Itemlisting->storeSKU)) ? $Itemlisting->storeSKU : null;
+                                        $ReplenDetail->store = (isset($Itemlisting->store)) ? $Itemlisting->store : null;
                                         $ReplenDetail->days_30_sales = $last30DaysSale;
                                         $ReplenDetail->amazon_inventory = $totalInventory;
                                         $ReplenDetail->unsellable = $unsellable;

@@ -78,6 +78,7 @@ Route::middleware(['is_admin'])->group(function (){
 
 	Route::get('/replen-detail/{id}', [ReplenController::class, 'replenDetail'])->name('replenDetail');
 	Route::get('/replen-detail/get/{id}', [ReplenController::class, 'getReplenDetail'])->name('getReplenDetail');
+	Route::get('/replen-detail/export/{id}', [ReplenController::class, 'exportCsv'])->name('getReplenDetailexport');
 
 
 });
