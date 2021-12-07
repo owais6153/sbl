@@ -33,7 +33,7 @@ class ReplenController extends Controller
                
                
             }
-            if (Bouncer::can('replen_batches_export')) {
+            if ($row->status == 'completed' && Bouncer::can('replen_batches_export')) {
                 $html .='<a href="'.route('getReplenDetailexport',$row->id).'">Export</a>';
             }
             return $html;

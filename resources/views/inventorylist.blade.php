@@ -76,7 +76,7 @@
 							    </tr>
 							    @isset($inventory['locationsData'])
 							    <tr>
-							    	<td colspan="6" style="padding: 5px !important; display: none;" id="b{{ $inventory['barcode'] }}i-{{$index}}">
+							    	<td colspan="8" style="padding: 5px !important; display: none;" id="b{{ $inventory['barcode'] }}i-{{$index}}">
 							    		<table class="display">
 							    			<thead class="bg-dark text-light">
 							    				<tr>
