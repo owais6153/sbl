@@ -20,8 +20,8 @@
 			<div class="wc-content">		
 				<a href="{{route('inventoryByBarcode')}}" class="btn btn-primary mb-3 <?= ($filter == 'barcode') ? 'disabled' : '' ; ?>">Show Locations By Barcode</a>
 				<a href="{{route('inventory')}}" class="btn btn-primary mb-3 <?= ($filter == 'item') ? 'disabled' : '' ; ?>">Show Locations By Items</a>
-			<div class="wc-content-inner">	    
 				<div class="custom_data_filter"><label>Search:<input type="search" value="{{ Request::get('search') }}" class="" placeholder="">					  	</label></div>
+			<div class="wc-content-inner">	    
 
 				<table id="wc-table" class="display">
 					<thead>
