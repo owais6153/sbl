@@ -296,9 +296,16 @@ class InventoryLocationTrackingController extends Controller
         $query = InventoryModel::query()->select('barcode');
         $search = $request->search;
         if ($request->search != '') {
-            foreach ($columns as $column) {
-                if ($column != 'id' && $column != 'user_id' && $column != 'images' && $column != 'created_at' && $column != 'updated_at') {
-                    $query->orWhere($column, 'LIKE', '%' . $search . '%');
+            $searchitems =  Items::where('item.item_number', 'LIKE','%' . $search. '%')->get()->pluck('id')->toArray();
+    
+            if(!empty($searchitems)){
+                $query->whereIn('item_id', $searchitems);
+            }
+            else{
+                foreach ($columns as $column) {
+                    if ($column != 'id' && $column != 'user_id' && $column != 'images' && $column != 'created_at' && $column != 'updated_at') {
+                        $query->orWhere($column, 'LIKE', '%' . $search . '%');
+                    }
                 }
             }
         }
