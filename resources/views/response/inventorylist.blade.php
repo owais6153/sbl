@@ -1,5 +1,5 @@
 		    
-				<div class="custom_data_filter"><label>Search:<input type="search" value="{{$search}}" class="" placeholder=""></label></div>
+				{{-- <div class="custom_data_filter"><label>Search:<input type="search" value="{{$search}}" class="" placeholder=""></label></div> --}}
 
 				<table id="wc-table" class="display">
 					<thead>
