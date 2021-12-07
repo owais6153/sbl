@@ -50,11 +50,13 @@ class InventoryLocationTrackingController extends Controller
         $search = $request->search;
         if ($request->search != '') {
             
-            $searchitems =  Items::select('item.id')->where('item.item_number', '=', $search)->first();
             
-            
+            $searchitems =  Items::where('item.item_number', 'LIKE','%' . $search. '%')->get()->pluck('id')->toArray();
+           
             if(!empty($searchitems)){
-                $query->where('item_id', '=', $searchitems->id);
+        
+            
+                $query->whereIn('item_id', $searchitems);
             }
             else{
                 foreach ($columns as $column) {
@@ -70,6 +72,7 @@ class InventoryLocationTrackingController extends Controller
 
         //Getting all barcodes         
         $barcodes = $query->groupBy('item_id')->paginate(10);
+                
         if (empty($barcodes)) {
             return response()->json(["error" => 'Barcode not found', 'status' => '404']);
         }
@@ -83,16 +86,16 @@ class InventoryLocationTrackingController extends Controller
         foreach ($barcodes as $barcode){
             $count = 0;
             $locations = array();   
-
             // Getting item against barcode
             $items =  Items::select('item.item_number', 'item.id','item.ridgefield_onhand')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item.id', '=', $barcode->item_id)->first();
-          
+            
             // Get all locations against this barcode
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('item_id', '=', $barcode->item_id)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
 
              
             $locations = $this->filterAllLocations($from_to_query, $barcode->barcode, true);
 
+          
 
             $eachBarcodeData = array();
             
@@ -293,9 +296,16 @@ class InventoryLocationTrackingController extends Controller
         $query = InventoryModel::query()->select('barcode');
         $search = $request->search;
         if ($request->search != '') {
-            foreach ($columns as $column) {
-                if ($column != 'id' && $column != 'user_id' && $column != 'images' && $column != 'created_at' && $column != 'updated_at') {
-                    $query->orWhere($column, 'LIKE', '%' . $search . '%');
+            $searchitems =  Items::where('item.item_number', 'LIKE','%' . $search. '%')->get()->pluck('id')->toArray();
+    
+            if(!empty($searchitems)){
+                $query->whereIn('item_id', $searchitems);
+            }
+            else{
+                foreach ($columns as $column) {
+                    if ($column != 'id' && $column != 'user_id' && $column != 'images' && $column != 'created_at' && $column != 'updated_at') {
+                        $query->orWhere($column, 'LIKE', '%' . $search . '%');
+                    }
                 }
             }
         }
@@ -637,6 +647,7 @@ class InventoryLocationTrackingController extends Controller
             $FromLocation->location = $request->from ;
             $FromLocation->inventory_track_id = $Inventory->id;    
             $FromLocation->expiration_date = $request->expiration_date;  
+            $FromLocation->item_id = (isset($request->item_id)) ? $request->item_id : null;  
             $FromLocation->from_id = $request->from_id;      
             $FromLocation->save();
             if ($request->to == 'shipping' || $request->to == 'production' || $request->to == 'adjustment'){
@@ -647,7 +658,8 @@ class InventoryLocationTrackingController extends Controller
                 $newFromLocation->location = $request->to;
                 $newFromLocation->inventory_track_id = $Inventory->id;    
                 $newFromLocation->expiration_date = $request->expiration_date;  
-                $newFromLocation->from_id = $request->from_id;      
+                $newFromLocation->from_id = $request->from_id;     
+                $newFromLocation->item_id = (isset($request->item_id)) ? $request->item_id : null;   
                 $newFromLocation->save();
             }
         }
@@ -659,7 +671,8 @@ class InventoryLocationTrackingController extends Controller
             $ToLocation->location = $request->to;
             $ToLocation->inventory_track_id = $Inventory->id;
             $ToLocation->expiration_date = $request->expiration_date; 
-            $ToLocation->from_id = $request->from_id;   
+            $ToLocation->from_id = $request->from_id;               
+            $ToLocation->item_id = (isset($request->item_id)) ? $request->item_id : null;
             $ToLocation->save();
             if($request->from == 'receiving' || $request->from == 'adjustment'){
                  // If Receiving
@@ -668,6 +681,7 @@ class InventoryLocationTrackingController extends Controller
                 $newToLocation->count = $request->quantity * -1;
                 $newToLocation->location = $request->from;
                 $newToLocation->inventory_track_id = $Inventory->id;
+                $newToLocation->item_id = (isset($request->item_id)) ? $request->item_id : null;
                 $newToLocation->expiration_date = $request->expiration_date; 
                 $newToLocation->from_id = $request->from_id;   
                 $newToLocation->save();
