@@ -69,6 +69,10 @@ Route::middleware(['is_admin'])->group(function (){
 	Route::get('/items/getItems', [ItemsController::class, 'getItems'])->name('getItems');
 	Route::get('/items/add/NoLocation', [ItemsController::class, 'onHoldToNoLocation'])->name('addtonolocation');
 	Route::get('/items//remove/NoLocation', [ItemsController::class, 'RemoveFromNoLocation'])->name('removefromnolocation');
+	Route::get('all-moves', [ItemsController::class, 'getAllMoves'])->name('getAllMoves');
+	Route::get('all-moves/get', [ItemsController::class, 'getAllMovesData'])->name('getAllMovesData');
+
+
 // Skipped Items
 	Route::get('/skipped-items', [SkippedItemIdentifiersController::class, 'index'])->name('listSkippedItems')->middleware('role:item_skip');	
 	Route::get('/skipped-items/getItems', [SkippedItemIdentifiersController::class, 'getSkippedItems'])->name('getSkippedItems');
