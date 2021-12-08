@@ -61,6 +61,7 @@
 						@can('item_skip')
 							<li><a href="{{route('listSkippedItems')}}"><i class="fas fa-user-plus"></i>Skipped Items</a></li>
 						@endcan
+							<li><a href="{{route('getAllMoves')}}"><i class="fas fa-user-plus"></i>All Moves</a></li>
 			          
 					</ul>
 			        </li>		

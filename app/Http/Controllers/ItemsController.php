@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\InventoryLocation;
 use Illuminate\Support\Facades\Bus;
 use App\Jobs\ImportToNoLocation;
+use App\Models\User;
 
-use App\Models\InventoryLocationTracking;
 
 class ItemsController extends Controller
 {
@@ -112,8 +112,48 @@ class ItemsController extends Controller
         return redirect()->back()->with('success', "Successfully Imported To No Location");
     }
     function RemoveFromNoLocation(){
-        InventoryLocationTracking::where(['to'=>'NoLocation','from'=>'Adjustment'])->forceDelete();
+        InventoryModel::where(['to'=>'NoLocation','from'=>'Adjustment'])->forceDelete();
         InventoryLocation::where('location','NoLocation')->forceDelete();
         return redirect()->back()->with('success', "Successfully Removed.");
     }
+    public function getAllMoves(){
+        $users = User::all();
+        return view('getAllMoves', compact('users'));
+    }
+    public function getAllMovesData()
+    {
+
+        $model = InventoryModel::query();
+
+        return DataTables::eloquent($model)
+        ->filter(function ($query) {
+            $user = request('user');
+            $start_date = request('start_date');
+            $end_date = request('end_date');
+            if (!empty($user)) {
+                $query->where('user_id', '=', $user);                
+            }
+            if (!empty($start_date) && !empty($end_date)) {
+                $query->whereBetween('created_at', [$start_date, $end_date]);
+            }
+            return $query;
+
+        }, true)
+        ->addColumn('item_number', function($row){
+            $item = Items::select('item_number')->where('id', '=', $row->item_id)->first();
+            return $item['item_number'];
+
+        })
+        ->addColumn('time', function($row){
+            $created_at = $row->created_at;
+            $created_at = date('m/d/Y h:i:s A', strtotime($created_at));      
+            $datetime = new \DateTime($created_at);
+            $la_time = new \DateTimeZone('America/New_York');
+            $datetime->setTimezone($la_time);
+            return  $datetime->format('m/d/Y g:i:s A'); 
+        })
+        ->toJson();
+
+    }
+
 }
