@@ -12,4 +12,8 @@ class ReplenDetail extends Model
     use SoftDeletes;
     protected $table='replen_details';
     protected $softDelete = true;
+    public function item(){
+        return $this->belongsTo('App\Models\Items','item_id'); 
+        
+    }
 }

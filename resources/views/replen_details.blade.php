@@ -21,6 +21,7 @@
 					      <th scope="col">Unsellable</th>
 					      <th scope="col">On Hand</th>
 					      <th scope="col">Amount To Replen</th>
+					      <th scope="col">Available to Build</th>
 					    </tr>
 					</thead>
 				</table>
@@ -58,6 +59,7 @@
 		                  { data: 'unsellable', name: 'unsellable' },
 		                  { data: 'on_hand_ridgefield', name: 'on_hand_ridgefield' },
 		                  { data: 'amount_to_replen', name: 'amount_to_replen' },
+		                  { data: 'available_to_build', name: 'available_to_build' },
 		               ],
 		        order: [[0, 'desc']]
 		  });
