@@ -650,18 +650,31 @@ class InventoryLocationTrackingController extends Controller
             $FromLocation->item_id = (isset($request->item_id)) ? $request->item_id : null;  
             $FromLocation->from_id = $request->from_id;      
             $FromLocation->save();
-            if ($request->to == 'shipping' || $request->to == 'production' || $request->to == 'adjustment'){
-                // If Shipping
-                $newFromLocation = new InventoryLocation();
-                $newFromLocation->barcode = $request->barcode;
-                $newFromLocation->count = $request->quantity;
-                $newFromLocation->location = $request->to;
-                $newFromLocation->inventory_track_id = $Inventory->id;    
-                $newFromLocation->expiration_date = $request->expiration_date;  
-                $newFromLocation->from_id = $request->from_id;     
-                $newFromLocation->item_id = (isset($request->item_id)) ? $request->item_id : null;   
-                $newFromLocation->save();
-            }
+        }
+        if($request->from == 'receiving' || $request->from == 'adjustment'){
+             // If Receiving
+            $newToLocation = new InventoryLocation();
+            $newToLocation->barcode = $request->barcode;
+            $newToLocation->count = $request->quantity * -1;
+            $newToLocation->location = $request->from;
+            $newToLocation->inventory_track_id = $Inventory->id;
+            $newToLocation->item_id = (isset($request->item_id)) ? $request->item_id : null;
+            $newToLocation->expiration_date = $request->expiration_date; 
+            $newToLocation->from_id = $request->from_id;   
+            $newToLocation->save();
+        }
+
+        if ($request->to == 'shipping' || $request->to == 'production' || $request->to == 'adjustment'){
+            // If Shipping
+            $newFromLocation = new InventoryLocation();
+            $newFromLocation->barcode = $request->barcode;
+            $newFromLocation->count = $request->quantity;
+            $newFromLocation->location = $request->to;
+            $newFromLocation->inventory_track_id = $Inventory->id;    
+            $newFromLocation->expiration_date = $request->expiration_date;  
+            $newFromLocation->from_id = $request->from_id;     
+            $newFromLocation->item_id = (isset($request->item_id)) ? $request->item_id : null;   
+            $newFromLocation->save();
         }
         if ($request->to != 'shipping' && $request->to != 'production' && $request->to != 'adjustment') {
             // When Moving From Location (Not Shipping)
@@ -674,18 +687,6 @@ class InventoryLocationTrackingController extends Controller
             $ToLocation->from_id = $request->from_id;               
             $ToLocation->item_id = (isset($request->item_id)) ? $request->item_id : null;
             $ToLocation->save();
-            if($request->from == 'receiving' || $request->from == 'adjustment'){
-                 // If Receiving
-                $newToLocation = new InventoryLocation();
-                $newToLocation->barcode = $request->barcode;
-                $newToLocation->count = $request->quantity * -1;
-                $newToLocation->location = $request->from;
-                $newToLocation->inventory_track_id = $Inventory->id;
-                $newToLocation->item_id = (isset($request->item_id)) ? $request->item_id : null;
-                $newToLocation->expiration_date = $request->expiration_date; 
-                $newToLocation->from_id = $request->from_id;   
-                $newToLocation->save();
-            }
         }
 
         return response()->json(['success'=>'Inventory Inserted', 'status' => 'success']);

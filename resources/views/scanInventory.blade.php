@@ -200,10 +200,10 @@
             alert("You can't put same values in both locations fields.");
             flag = false;
         }
-        if(flag && $('#from').val() == 'Receiving' && ($('input#to').val().toLowerCase() == 'shipping' || $('input#to').val().toLowerCase() == 'production')){
-            alert("You can't do shipping while receiving");
-            flag = false;
-        }
+        // if(flag && $('#from').val() == 'Receiving' && ($('input#to').val().toLowerCase() == 'shipping' || $('input#to').val().toLowerCase() == 'production')){
+        //     alert("You can't do shipping while receiving");
+        //     flag = false;
+        // }
         
         if(flag && $('#from').val() == 'Receiving' && $('input#to').val().toLowerCase() == 'adjustment'){
             alert("You can't do adjustment while receiving");
