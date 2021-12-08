@@ -140,8 +140,13 @@ class ItemsController extends Controller
 
         }, true)
         ->addColumn('item_number', function($row){
-            $item = Items::select('item_number')->where('id', '=', $row->item_id)->first();
-            return $item['item_number'];
+            if ($row->item_id) {                
+                $item = Items::select('item_number')->where('id', '=', $row->item_id)->first();
+                return $item['item_number'];
+            }
+            else{
+                return 'Not Found';
+            }
 
         })
         ->addColumn('time', function($row){
