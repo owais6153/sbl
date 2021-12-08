@@ -53,7 +53,7 @@ class ImportItems extends Command
         $offset = 0;
         $limit = 1000;
         $lastImport = ItemsCron::latest()->first();
-        if (!empty($lastImport) && $lastImport->remaining != 0 || $lastImport->totalRecords < $lastImport->item_offset) {
+        if (!empty($lastImport) && $lastImport->remaining != 0 ) {
             $offset = 1000 + $lastImport->item_offset;
         }
 
@@ -231,6 +231,7 @@ class ImportItems extends Command
                                     } else {
                                         $child = new ItemChildren();
                                         $child->kit_item_id = $checkItem->id;
+                                        $child->childitem_number =$pchild->childItemNumber;
                                         $check = Items::where('item_number', $pchild->childItemNumber)->first();
                                         if ($check) {
                                             $child->child_item_id = $check->id;
