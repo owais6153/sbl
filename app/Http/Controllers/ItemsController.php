@@ -134,7 +134,7 @@ class ItemsController extends Controller
                 $query->where('user_id', '=', $user);                
             }
             if (!empty($start_date) && !empty($end_date)) {
-                $query->whereBetween('created_at', [$start_date, $end_date]);
+                $query->whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59 ']);
             }
             return $query;
 
