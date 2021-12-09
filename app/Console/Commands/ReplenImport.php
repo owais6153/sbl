@@ -52,12 +52,16 @@ class ReplenImport extends Command
         // $batch->add(new ReplenImportJob($ReplenBatch->id));
         $limit = 200;
         $offset = 0;
-        $totalItemsInDB = Items::where('ridgefield_onhand', '!=', null)->where('ridgefield_onhand', '>', 0)->count();
+      
+        $totalItemsInDB =  Itemlisting::select('*')->leftJoin('item','item.id','=','item_listing.item_id')->where('item_listing.store','=','LYB Amazon')->where('item.ridgefield_onhand', '!=', null)->where('item.ridgefield_onhand','>','0')->orderBy('item_listing.item_id','ASC')->count();
+       
          // \Log::info('Total Items: '. $totalItemsInDB);
         while($totalItemsInDB > $offset){
 
          // \Log::info('Total Offset: '. $offset);
-            $Items = Items::where('ridgefield_onhand', '!=', null)->where('ridgefield_onhand', '>', 0)->limit($limit)->offset($offset)->get();
+           
+            $Items =  Itemlisting::select('*')->leftJoin('item','item.id','=','item_listing.item_id')->where('item_listing.store','=','LYB Amazon')->where('item.ridgefield_onhand', '!=', null)->where('item.ridgefield_onhand','>','0')->orderBy('item_listing.item_id','ASC')->limit($limit)->offset($offset)->get();
+
             if (count($Items) < 1) {
                  $offset = $offset + 200;
                 continue;
@@ -215,8 +219,8 @@ class ReplenImport extends Command
                                         }
 
 
-                                        $Itemlisting = Itemlisting::select('storeSKU', 'store', 'urlId')->where('item_id', '=', $item_id)->first();
-
+                                        // $Itemlisting = Itemlisting::select('storeSKU', 'store', 'urlId')->where('item_id', '=', $item_id)->first();
+                                        $Itemlisting = $item;
 
                                         $ReplenDetail = new ReplenDetail();
                                         $ReplenDetail->item_id = $item_id;

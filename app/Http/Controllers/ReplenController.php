@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Items;
 use Illuminate\Http\Request;
 use App\Models\ReplenBatch;
 use App\Models\ReplenDetail;
@@ -46,7 +47,13 @@ class ReplenController extends Controller
     }
     public function getReplenDetail(){
         $model = ReplenDetail::query()->where('replen_batch_id', '=', request('id'));
-        return DataTables::eloquent($model)
+        return DataTables::eloquent($model)->addColumn('available_to_build',function($row){
+           
+            if($row->item && isset($row->item->available_to_build)){
+                return $row->item->available_to_build;
+            }
+            return 0;
+        })       
         ->toJson();
     }
     public function exportCsv($id)
