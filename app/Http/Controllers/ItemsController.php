@@ -123,7 +123,7 @@ class ItemsController extends Controller
     public function getAllMovesData()
     {
 
-        $model = InventoryModel::query();
+        $model = InventoryModel::query()->where('to', '!=', 'NoLocation');
 
         return DataTables::eloquent($model)
         ->filter(function ($query) {
@@ -142,7 +142,7 @@ class ItemsController extends Controller
         ->addColumn('item_number', function($row){
             if ($row->item_id) {                
                 $item = Items::select('item_number')->where('id', '=', $row->item_id)->first();
-                return $item['item_number'];
+                return (isset($item['item_number'])) ? $item['item_number'] : 'Not Found';
             }
             else{
                 return 'Not Found';
@@ -151,7 +151,7 @@ class ItemsController extends Controller
         })
         ->addColumn('time', function($row){
             $created_at = $row->created_at;
-            $created_at = date('m/d/Y h:i:s A', strtotime($created_at));      
+            $created_at = date('m/d/Y g:i:s A', strtotime($created_at));      
             $datetime = new \DateTime($created_at);
             $la_time = new \DateTimeZone('America/New_York');
             $datetime->setTimezone($la_time);

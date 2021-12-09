@@ -37,6 +37,7 @@
 					    <tr>
 					      <th scope="col">ID</th>
 					      <th scope="col">Item Number</th>
+					      <th scope="col">Barcode</th>
 					      <th scope="col">Qty</th>
 					      <th scope="col">From</th>
 					      <th scope="col">To</th>
@@ -54,6 +55,14 @@
 
 @section('script')
 	<script type="text/javascript">
+
+		$('.filters button[type="submit"]').click(function (event) {
+			if (($('#start_date').val() == '' && $('#end_date').val() != '') || ($('#start_date').val() != '' && $('#end_date').val() == '')) {
+				event.preventDefault();
+				alert('Both Date Range Fields Are Required');
+			}
+		})
+
 		$(document).ready( function () {
 		   $.ajaxSetup({
 		      headers: {
@@ -78,13 +87,14 @@
 		         columns: [
 		                  { data: 'id', name: 'id', 'visible': false},
 		                  { data: 'item_number', name: 'item_number' },
+		                  { data: 'barcode', name: 'barcode' },
 		                  { data: 'quantity', name: 'quantity' },
 		                  { data: 'from', name: 'from' },
 		                  { data: 'to', name: 'to' },
 		                  { data: 'expiration_date', name: 'expiration_date' },
-		                  { data: 'time', name: 'time' },
+		                  { data: 'time', name: 'created_at' },
 		               ],
-		        order: [[6, 'desc']]
+		        order: [[7, 'desc']]
 		  });
 		  
 		});
