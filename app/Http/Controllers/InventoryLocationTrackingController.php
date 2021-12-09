@@ -51,8 +51,9 @@ class InventoryLocationTrackingController extends Controller
         if ($request->search != '') {
             
             
-            $searchitems =  Items::where('item.item_number', 'LIKE','%' . $search. '%')->get()->pluck('id')->toArray();
-           
+            $searchitems =  Items::select('item.id as itemid')->join('inventory_location_tracking','inventory_location_tracking.item_id','=','item.id')->where('item.item_number', 'LIKE','%' . $search. '%')->get()->pluck('itemid')->toArray();
+            
+            
             if(!empty($searchitems)){
         
             
@@ -72,6 +73,7 @@ class InventoryLocationTrackingController extends Controller
 
         //Getting all barcodes         
         $barcodes = $query->groupBy('item_id')->paginate(10);
+           
                 
         if (empty($barcodes)) {
             return response()->json(["error" => 'Barcode not found', 'status' => '404']);
@@ -301,7 +303,7 @@ class InventoryLocationTrackingController extends Controller
         $query = InventoryModel::query()->select('barcode','item_id');
         $search = $request->search;
         if ($request->search != '') {
-            $searchitems =  Items::where('item.item_number', 'LIKE','%' . $search. '%')->get()->pluck('id')->toArray();
+           $searchitems =  Items::select('item.id as itemid')->join('inventory_location_tracking','inventory_location_tracking.item_id','=','item.id')->where('item.item_number', 'LIKE','%' . $search. '%')->get()->pluck('itemid')->toArray();
     
             if(!empty($searchitems)){
                 $query->whereIn('item_id', $searchitems);
