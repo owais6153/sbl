@@ -41,7 +41,7 @@ class InventoryLocationTrackingController extends Controller
 
 
     public function getDataByItems(Request $request)
-    {
+    {   
         // Search for in all columns
         $InventoryModel = new InventoryModel();
         $tablename = $InventoryModel->getTable();
@@ -51,8 +51,9 @@ class InventoryLocationTrackingController extends Controller
         if ($request->search != '') {
             
             
-            $searchitems =  Items::where('item.item_number', 'LIKE','%' . $search. '%')->get()->pluck('id')->toArray();
-           
+            $searchitems =  Items::select('item.id as itemid')->join('inventory_location_tracking','inventory_location_tracking.item_id','=','item.id')->where('item.item_number', 'LIKE','%' . $search. '%')->get()->pluck('itemid')->toArray();
+            
+            
             if(!empty($searchitems)){
         
             
@@ -72,6 +73,7 @@ class InventoryLocationTrackingController extends Controller
 
         //Getting all barcodes         
         $barcodes = $query->groupBy('item_id')->paginate(10);
+           
                 
         if (empty($barcodes)) {
             return response()->json(["error" => 'Barcode not found', 'status' => '404']);
@@ -86,9 +88,14 @@ class InventoryLocationTrackingController extends Controller
         foreach ($barcodes as $barcode){
             $count = 0;
             $locations = array();   
-            // Getting item against barcode
-            $items =  Items::select('item.item_number', 'item.id','item.ridgefield_onhand')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item.id', '=', $barcode->item_id)->first();
             
+            if(isset($barcode->item_id)){
+                // Getting item against barcode
+            $items =  Items::select('item.item_number', 'item.id','item.ridgefield_onhand')->where('item.id', '=', $barcode->item_id)->first();
+            }else{
+                // Getting item against barcode
+            $items =  Items::select('item.item_number', 'item.id','item.ridgefield_onhand')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item.id', '=', $barcode->item_id)->first();
+            }
             // Get all locations against this barcode
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('item_id', '=', $barcode->item_id)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
 
@@ -293,10 +300,10 @@ class InventoryLocationTrackingController extends Controller
         $InventoryModel = new InventoryModel();
         $tablename = $InventoryModel->getTable();
         $columns = Schema::getColumnListing($tablename);
-        $query = InventoryModel::query()->select('barcode');
+        $query = InventoryModel::query()->select('barcode','item_id');
         $search = $request->search;
         if ($request->search != '') {
-            $searchitems =  Items::where('item.item_number', 'LIKE','%' . $search. '%')->get()->pluck('id')->toArray();
+           $searchitems =  Items::select('item.id as itemid')->join('inventory_location_tracking','inventory_location_tracking.item_id','=','item.id')->where('item.item_number', 'LIKE','%' . $search. '%')->get()->pluck('itemid')->toArray();
     
             if(!empty($searchitems)){
                 $query->whereIn('item_id', $searchitems);
@@ -315,7 +322,7 @@ class InventoryLocationTrackingController extends Controller
         if (empty($barcodes)) {
             return response()->json(["error" => 'Barcode not found', 'status' => '404']);
         }
-        
+       
 
         
         $inventories = $from_to_query = array(); 
@@ -325,10 +332,14 @@ class InventoryLocationTrackingController extends Controller
         foreach ($barcodes as $barcode){
             $count = 0;
             $locations = array();   
-
-            // Getting item against barcode
-            $items =  Items::select('item.item_number', 'item.id', 'item.ridgefield_onhand')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=', '0' . $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=',  substr($barcode->barcode, 1))->first();
-          
+            if($barcode->item_id){
+                // Getting item against barcode
+                $items =  Items::find($barcode->item_id);    
+            }else{
+                // Getting item against barcode
+                $items =  Items::select('item.item_number', 'item.id', 'item.ridgefield_onhand')->join('item_identifiers', 'item.id', '=', 'item_identifiers.item_id')->where('item_identifiers.productIdentifier', '=', $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=', '0' . $barcode->barcode)->orWhere('item_identifiers.productIdentifier', '=',  substr($barcode->barcode, 1))->first();        
+            }
+           
             // Get all locations against this barcode
             $from_to_query = InventoryModel::select('from', 'to', 'barcode')->where('barcode', '=', $barcode->barcode)->whereRaw("LOWER(`to`) != 'shipping' and LOWER(`to`) != 'production' and LOWER(`to`) != 'adjustment'")->get();
 
