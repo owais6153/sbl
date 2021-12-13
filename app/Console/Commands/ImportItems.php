@@ -150,7 +150,7 @@ class ImportItems extends Command
                             }
                             if (empty($item->productChildren)) {
                                 foreach ($item->productIdentifiers as $productIdentifier) {
-                                    if ($productIdentifier->identifierType == 'UPC') {
+                                    if ($productIdentifier->identifierType == 'UPC' || $productIdentifier->identifierType == 'EAN') {
                                         $check = ItemIdentifier::where('productIdentifier', '=', $productIdentifier->productIdentifier)->count();
                                         if ($check < 1) {
                                             $ItemIdentifier = new ItemIdentifier();
@@ -196,7 +196,7 @@ class ImportItems extends Command
                                 foreach ($item->listings as $listings) {
                                    
 
-                                    if (!empty($listings->_id)) {
+                                    if (!empty($listings->fnSKU) && !empty($listings->store)) {
                                         $list = Itemlisting::where('fnSKU', '=', $listings->fnSKU)->where('store','=',$listings->store)->where('item_id', '=', $checkItem->id)->first();
                                         if ($list) {
                                             $list->_id = $listings->_id;
@@ -260,7 +260,7 @@ class ImportItems extends Command
                             }
                             if (empty($item->productChildren)) {
                                 foreach ($item->productIdentifiers as $productIdentifier) {
-                                    if ($productIdentifier->identifierType == 'UPC') {
+                                    if ($productIdentifier->identifierType == 'UPC' || $productIdentifier->identifierType == 'EAN') {
                                         $check = ItemIdentifier::where('productIdentifier', '=', $productIdentifier->productIdentifier)->count();
                                         if ($check < 1) {
                                             $ItemIdentifier = new ItemIdentifier();
