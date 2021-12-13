@@ -197,13 +197,12 @@ class ImportItems extends Command
                                    
 
                                     if (!empty($listings->_id)) {
-                                        $list = Itemlisting::where('_id', '=', '$listings->_id')->where('item_id', '=', $checkItem->id)->first();
+                                        $list = Itemlisting::where('fnSKU', '=', $listings->fnSKU)->where('store','=',$listings->store)->where('item_id', '=', $checkItem->id)->first();
                                         if ($list) {
+                                            $list->_id = $listings->_id;
                                             $list->storeSKU = empty($listings->storeSKU) == false ? $listings->storeSKU : $list->storeSKU;
                                             $list->listingId = isset($listings->listingId) == true ? $listings->listingId : $list->listingId;
-                                            $list->fnSKU = isset($listings->fnSKU) == true ? $listings->fnSKU : $list->fnSKU;
                                             $list->listingName = isset($listings->listingName) == true ? $listings->listingName : $list->listingName;
-                                            $list->store = isset($listings->store) == true ? $listings->store : $list->store;
                                             $list->urlId = isset($listings->urlId) == true ? $listings->urlId : $list->urlId;
                                             $list->fulfilledBy = isset($listings->fulfilledBy) == true ? $listings->fulfilledBy : $list->fulfilledBy;
                                             $list->save();
