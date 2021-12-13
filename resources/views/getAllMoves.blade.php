@@ -87,7 +87,7 @@
 		         },
 		         columns: [
 		                  { data: 'id', name: 'id', 'visible': false},
-		                  { data: 'email', name: 'users.email' },
+		                  { data: 'name', name: 'users.name' },
 		                  { data: 'item_number', name: 'item_number' },
 		                  { data: 'barcode', name: 'barcode' },
 		                  { data: 'quantity', name: 'quantity' },
