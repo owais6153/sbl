@@ -36,6 +36,7 @@
 					<thead>
 					    <tr>
 					      <th scope="col">ID</th>
+					      <th scope="col">User</th>
 					      <th scope="col">Item Number</th>
 					      <th scope="col">Barcode</th>
 					      <th scope="col">Qty</th>
@@ -86,6 +87,7 @@
 		         },
 		         columns: [
 		                  { data: 'id', name: 'id', 'visible': false},
+		                  { data: 'name', name: 'users.name' },
 		                  { data: 'item_number', name: 'item_number' },
 		                  { data: 'barcode', name: 'barcode' },
 		                  { data: 'quantity', name: 'quantity' },

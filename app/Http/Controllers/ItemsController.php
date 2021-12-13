@@ -123,7 +123,7 @@ class ItemsController extends Controller
     public function getAllMovesData()
     {
 
-        $model = InventoryModel::query()->where('to', '!=', 'NoLocation');
+        $model = InventoryModel::query()->join('users', 'user_id', '=', 'users.id')->where('to', '!=', 'NoLocation');
 
         return DataTables::eloquent($model)
         ->filter(function ($query) {
