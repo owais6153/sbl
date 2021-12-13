@@ -129,17 +129,24 @@ class ImportItems extends Command
                                 }
                             }
                             if (!empty($item->productChildren)) {
+                                $available_to_build=array();
                                 foreach ($item->productChildren as $pchild) {
                                     $child = new ItemChildren();
                                     $child->kit_item_id = $items->id;
                                     $check = Items::where('item_number', $pchild->childItemNumber)->first();
                                     if ($check) {
                                         $child->child_item_id = $check->id;
+                                        $available_to_build[] = $check->ridgefield_onhand /$pchild->childQuantity;
                                     }
                                     $child->qty = $pchild->childQuantity;
                                     $child->item_type = 'kit';
                                     $child->save();
                                 }
+                                if(!empty($available_to_build)){
+                                    $items->available_to_build = min($available_to_build);
+                                    $items->save();
+                                }
+                                
                             }
                             if (empty($item->productChildren)) {
                                 foreach ($item->productIdentifiers as $productIdentifier) {
@@ -217,13 +224,17 @@ class ImportItems extends Command
                                 }
                             }
                             if (!empty($item->productChildren)) {
+                                $available_to_build=array();
                                 foreach ($item->productChildren as $pchild) {
 
                                     $child = ItemChildren::where('childitem_number', '=', $pchild->childItemNumber)->where('kit_item_id', '=', $checkItem->id)->first();
                                     if ($child) {
+                                        
                                         $check = Items::where('item_number', $pchild->childItemNumber)->first();
                                         if ($check) {
                                             $child->child_item_id = $check->id;
+                                            $available_to_build[] = $check->ridgefield_onhand /$pchild->childQuantity;
+                                            
                                         }
                                         $child->qty = $pchild->childQuantity;
                                         $child->item_type = 'kit';
@@ -235,11 +246,17 @@ class ImportItems extends Command
                                         $check = Items::where('item_number', $pchild->childItemNumber)->first();
                                         if ($check) {
                                             $child->child_item_id = $check->id;
+                                            $available_to_build[] = $check->ridgefield_onhand /$pchild->childQuantity;
+
                                         }
                                         $child->qty = $pchild->childQuantity;
                                         $child->item_type = 'kit';
                                         $child->save();
                                     }
+                                }
+                                if(!empty($available_to_build)){
+                                $checkItem->available_to_build = min($available_to_build);
+                                $checkItem->save();
                                 }
                             }
                             if (empty($item->productChildren)) {
@@ -251,6 +268,11 @@ class ImportItems extends Command
                                             $ItemIdentifier->item_id = $checkItem->id;
                                             $ItemIdentifier->productIdentifier = $productIdentifier->productIdentifier;
                                             $ItemIdentifier->save();
+                                        }else{
+                                            $checkItemid = ItemIdentifier::where('productIdentifier', '=', $productIdentifier->productIdentifier)->where('item_id', '=', $checkItem->id)->count();
+                                            if(!$checkItemid){
+                                                ItemIdentifier::where('productIdentifier', '=', $productIdentifier->productIdentifier)->update(['item_id'=>$checkItem->id]);
+                                            }
                                         }
 
                                         $InventoryLocationTracking = InventoryModel::where('barcode', 'LIKE', $productIdentifier->productIdentifier)->orWhere('barcode', 'LIKE', '0' . $productIdentifier->productIdentifier)->orWhere('barcode', 'LIKE',  substr($productIdentifier->productIdentifier, 1))
