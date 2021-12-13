@@ -182,44 +182,48 @@
 
 		 }
 		$(document).on('keyup', '.custom_data_filter input' , function(){
-		    if(xhrRunning){
-                xhr.abort();
-		    }
-			$('#loader').show();
-		    xhrRunning = true;
-			xhr = $.ajax({
-		         headers: {
-	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-	             },
-	             @if ($filter == 'barcode')		     
-				     url: "{{route('inventoryByBarcode')}}",
-			     @else	
-	    		     url: "{{route('inventory')}}",  
-			     @endif
-			     type: 'get',
-			     data: {'search': $(this).val(), 'output' : 'html'},
-			     dataType: 'json',
-			     success: function (response) {
-			     $('#loader').hide();
-			     if (response.status == 'success') {
-			        xhrRunning = false;
-			     	$('.wc-content-inner').html(response.html);
-			     	  $('#wc-table').DataTable({  "paging":   false,"info":     false, searching: false});
-			     }
-			     if (response.status == '404') {
-			     	alert(response.error);
-			     }
-			     if (response.status == 'error') {
-			     	alert(response.error);
-			     }
-			     },
-			     error: function (){
-			     	$('#loader').hide();
-			     	xhrRunning = false;
-			     //	alert("Something Went Wrong...");
-			     }
-			});
-		});
+			let elem = $(this);
+			setTimeout(function () {
+					if(xhrRunning){
+		                xhr.abort();
+				    }
+					$('#loader').show();
+				    xhrRunning = true;
+					xhr = $.ajax({
+				         headers: {
+			                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			             },
+			             @if ($filter == 'barcode')		     
+						     url: "{{route('inventoryByBarcode')}}",
+					     @else	
+			    		     url: "{{route('inventory')}}",  
+					     @endif
+					     type: 'get',
+					     data: {'search': $(elem).val(), 'output' : 'html'},
+					     dataType: 'json',
+					     success: function (response) {
+					     $('#loader').hide();
+					     if (response.status == 'success') {
+					        xhrRunning = false;
+					     	$('.wc-content-inner').html(response.html);
+					     	  $('#wc-table').DataTable({  "paging":   false,"info":     false, searching: false});
+					     }
+					     if (response.status == '404') {
+					     	alert(response.error);
+					     }
+					     if (response.status == 'error') {
+					     	alert(response.error);
+					     }
+					     },
+					     error: function (){
+					     	$('#loader').hide();
+					     	xhrRunning = false;
+					     //	alert("Something Went Wrong...");
+					     }
+					});
+				}, 1000);
+			})
+
 	
 		$(document).on('click', '#sortbyitemname' , function(){		
 			window.location.href = route+"?page="+page+"&sort=byItemName&order="+order;

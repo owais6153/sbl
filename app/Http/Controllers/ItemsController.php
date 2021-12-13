@@ -123,7 +123,7 @@ class ItemsController extends Controller
     public function getAllMovesData()
     {
 
-        $model = InventoryModel::query()->where('to', '!=', 'NoLocation');
+        $model = InventoryModel::query()->join('users', 'user_id', '=', 'users.id')->where('to', '!=', 'NoLocation');
 
         return DataTables::eloquent($model)
         ->filter(function ($query) {
@@ -134,7 +134,7 @@ class ItemsController extends Controller
                 $query->where('user_id', '=', $user);                
             }
             if (!empty($start_date) && !empty($end_date)) {
-                $query->whereBetween('created_at', [$start_date, $end_date]);
+                $query->whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59 ']);
             }
             return $query;
 
