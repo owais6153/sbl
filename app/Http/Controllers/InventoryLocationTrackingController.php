@@ -846,4 +846,8 @@ class InventoryLocationTrackingController extends Controller
         }
 
     }
+    public function createUnique()
+    {
+        return view('scanInventoryunique');        
+    }
 }
