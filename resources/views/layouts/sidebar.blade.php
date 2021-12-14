@@ -92,7 +92,7 @@
 						@can('scan_inventroy')
 							<li><a href="{{route('addInventory')}}"><i class="fas fa-user"></i>Scan Inventory</a></li>						
 						@endcan
-						
+							<li><a href="{{route('addUniqueInventory')}}"><i class="fas fa-user"></i>Scan Inventory Unique</a></li>
 						@can('inventory_location')
 							<li><a href="{{route('inventory')}}" ><i class="fas fa-user-plus"></i>Location</a></li>
 						@endcan
