@@ -11,4 +11,10 @@ class Items extends Model
     use SoftDeletes;
     protected $table='item';
     protected $softDelete = true;
+    public function itemidentifier(){
+        return $this->hasOne('App\Models\ItemIdentifier','item_id');
+    }
+    public function inventoryLocationTracking(){
+        return $this->hasMany('App\Models\InventoryLocationTracking','item_id');
+    }
 }

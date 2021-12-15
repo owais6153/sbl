@@ -71,6 +71,9 @@ Route::middleware(['is_admin'])->group(function (){
 	Route::get('/items//remove/NoLocation', [ItemsController::class, 'RemoveFromNoLocation'])->name('removefromnolocation');
 	Route::get('all-moves', [ItemsController::class, 'getAllMoves'])->name('getAllMoves');
 	Route::get('all-moves/get', [ItemsController::class, 'getAllMovesData'])->name('getAllMovesData');
+	Route::get('Items/export', [ItemsController::class, 'itemtoexport'])->name('itemtoexport');
+	Route::get('Items/export/get', [ItemsController::class, 'getitemtoexport'])->name('getItemsexport');
+	Route::get('Items/export/csv', [ItemsController::class, 'exportCsvitem'])->name('csvItemsexport');
 
 
 // Skipped Items
