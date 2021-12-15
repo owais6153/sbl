@@ -129,6 +129,10 @@
                             <input id="scan_inventroy" type="checkbox" name="permission[scan_inventroy]" {!! in_array('scan_inventroy',$abilitiesarray) == true ?"checked":"" !!} >
                             Scan Inventory 
                         </label>
+                        <label for="scan_inventroy_u">
+                            <input id="scan_inventroy_u" type="checkbox" name="permission[scan_inventroy_u]" {!! in_array('scan_inventroy_u',$abilitiesarray) == true ?"checked":"" !!}>
+                            Scan Inventory Unique
+                        </label>
 
                         <label class="ml-4" for="inventory_location">
                             <input id="inventory_location" type="checkbox" name="permission[inventory_location]" {!! in_array('inventory_location',$abilitiesarray) == true ?"checked":"" !!} >
