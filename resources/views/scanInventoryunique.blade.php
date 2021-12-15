@@ -38,6 +38,7 @@
 					    <input type="number" class="form-control" min="1" id="quantity" placeholder="Enter Quantity" name="quantity">
 					  </div>
 					  <input type="hidden" name="from_id" id="from_id" value="">
+					  <input type="hidden" name="unique_in" value="unique_in">
 					  <div class="form-group col-half">
 					    <label for="from">From Location</label>		
 					    <select class="form-control" id="from" placeholder="From Location" name="from">
@@ -328,17 +329,23 @@
 	             },
 			     url: "{{route('getlocationbybarcode')}}", 
 			     type: 'post',
-			     data: {'barcode': barcode, 'page': 'unique'},
+			     data: {'barcode': barcode},
 			     dataType: 'json',
 			     success: function (response) {
 					$('#barcode_loader').hide();
 					$('#from_loader').hide();
 			       if (response.status == 'success') {
 			       	   let html = '';
-			       	   if (response.locations.length > 0){
-			       	   		alert('This barcode already exsist');
-			       	   		$('button#submitForm').attr('disabled', 'disabled');
+			       	   if (response.locations.length == undefined && response.locations[1] != '') {
+			       	   		html+='<option value="'+response.locations[1]+'">' + response.locations[1] + '</option>';
 			       	   }
+			       	   else{
+				       	   for(var index = 0; index < response.locations.length; index++) {
+				       	   		html+= '<option value="'+response.locations[index]+'">' + response.locations[index] + '</option>';
+					       }			       	   	
+			       	   }
+				       $('#options').html(html); 
+				       $('#from').select2();
 			       }
 			       else if (response.status == 'error') {
 			       	$('#from').select2();
