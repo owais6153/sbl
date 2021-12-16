@@ -86,6 +86,10 @@
                             <input id="removenolocation" type="checkbox" name="permission[removenolocation]" {!! in_array('removenolocation',$abilitiesarray) == true ?"checked":"" !!}>
                             Remove Ridgetfield Inventory From Nolocation
                         </label>
+                        <label class="ml-4" for="all_moves">
+                            <input id="all_moves" type="checkbox" name="permission[all_moves]" {!! in_array('all_moves',$abilitiesarray) == true ?"checked":"" !!}>
+                            All moves
+                        </label>
                         
                       </div>
                       <p>Replen Batches </p>

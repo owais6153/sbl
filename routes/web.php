@@ -73,7 +73,7 @@ Route::middleware(['is_admin'])->group(function (){
 	Route::get('/items/getItems', [ItemsController::class, 'getItems'])->name('getItems');
 	Route::get('/items/add/NoLocation', [ItemsController::class, 'onHoldToNoLocation'])->name('addtonolocation');
 	Route::get('/items//remove/NoLocation', [ItemsController::class, 'RemoveFromNoLocation'])->name('removefromnolocation');
-	Route::get('all-moves', [ItemsController::class, 'getAllMoves'])->name('getAllMoves');
+	Route::get('all-moves', [ItemsController::class, 'getAllMoves'])->name('getAllMoves')->middleware('role:all_moves');
 	Route::get('all-moves/get', [ItemsController::class, 'getAllMovesData'])->name('getAllMovesData');
 
 
