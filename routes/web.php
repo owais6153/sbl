@@ -26,10 +26,12 @@ use App\Http\Controllers\ReplenController;
 	Route::get('/', [HomeController::class, 'index']);
 	Route::post('/adminlogin', [HomeController::class, 'authenticate'])->name('admin_login');
 	Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
-
-// If login
-Route::middleware(['is_admin'])->group(function (){
-// Logout
+	
+	
+	// If login
+	Route::middleware(['is_admin'])->group(function (){
+		// Logout
+		
 	Route::get('/logout', [HomeController::class, 'logout'])->name('logout');
 // Users
 	Route::get('/users', [HomeController::class, 'users'])->name('user_list')->middleware('role:view_all_users');
@@ -65,9 +67,10 @@ Route::middleware(['is_admin'])->group(function (){
 	Route::get('/inventory/add', [InventoryLocationTrackingController::class, 'create'])->name('addInventory')->middleware('role:scan_inventroy');
 	Route::get('/inventory/deletemove/{id}', [InventoryLocationTrackingController::class, 'deletemove'])->name('deletemove');
 
-	Route::get('/inventory/add/unique', [InventoryLocationTrackingController::class, 'createUnique'])->name('addUniqueInventory')->middleware('role:scan_inventroy_u');
+	Route::get('/export/inventory', [InventoryLocationTrackingController::class, 'exportCsvitembybarcode'])->name('inventoryByBarcodeexport')->middleware('role:inventory_location');	
+	Route::get('/export/inventory/bybarcode', [InventoryLocationTrackingController::class, 'exportCsvitem'])->name('inventoryexport')->middleware('role:inventory_location');
+  Route::get('/inventory/add/unique', [InventoryLocationTrackingController::class, 'createUnique'])->name('addUniqueInventory')->middleware('role:scan_inventroy_u');
 
-	
 // Items
 	Route::get('/items', [ItemsController::class, 'index'])->name('listitems')->middleware('role:view_all_item');	
 	Route::get('/items/getItems', [ItemsController::class, 'getItems'])->name('getItems');
@@ -75,6 +78,9 @@ Route::middleware(['is_admin'])->group(function (){
 	Route::get('/items//remove/NoLocation', [ItemsController::class, 'RemoveFromNoLocation'])->name('removefromnolocation');
 	Route::get('all-moves', [ItemsController::class, 'getAllMoves'])->name('getAllMoves')->middleware('role:all_moves');
 	Route::get('all-moves/get', [ItemsController::class, 'getAllMovesData'])->name('getAllMovesData');
+	Route::get('Items/export', [ItemsController::class, 'itemtoexport'])->name('itemtoexport');
+	Route::get('Items/export/get', [ItemsController::class, 'getitemtoexport'])->name('getItemsexport');
+	Route::get('Items/export/csv', [ItemsController::class, 'exportCsvitem'])->name('csvItemsexport');
 
 
 // Skipped Items

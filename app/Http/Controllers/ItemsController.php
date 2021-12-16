@@ -12,7 +12,7 @@ use App\Models\InventoryLocation;
 use Illuminate\Support\Facades\Bus;
 use App\Jobs\ImportToNoLocation;
 use App\Models\User;
-
+use League\Fractal\Resource\Item;
 
 class ItemsController extends Controller
 {
@@ -160,5 +160,70 @@ class ItemsController extends Controller
         ->toJson();
 
     }
+    public function itemtoexport(){
+       
+        return view('itemslistexport');
 
+    }
+    public function getitemtoexport(){
+        $model = Items::query()->leftJoin('item_identifiers', 'item_identifiers.item_id', '=', 'item.id');
+        
+        return DataTables::eloquent($model) 
+
+        ->addColumn('totalqty', function($row){
+            if($row->inventoryLocationTracking ){
+                return $row->inventoryLocationTracking->sum('quantity');
+            }
+            return 0;
+        })
+        
+        ->toJson();
+    }
+    public function exportCsvitem()
+    {
+       $fileName = 'items.csv';
+       $data = Items::all();
+       
+    
+            $headers = array(
+                "Content-type"        => "text/csv",
+                "Content-Disposition" => "attachment; filename=$fileName",
+                "Pragma"              => "no-cache",
+                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                "Expires"             => "0"
+            );
+    
+            $columns = array('Item Name', 'Barcode', 'Total', 'Onhand');
+    
+            $callback = function() use($data, $columns) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, $columns);
+    
+                foreach ($data as $item) {
+                    $row['Item Name']  = $item->item_number;
+                    if($item->itemidentifier && isset($item->itemidentifier->productIdentifier)){
+                        $row['Barcode'] = $item->itemidentifier->productIdentifier;
+                    }else{
+                        $row['Barcode'] = 'NOt Found';
+                    }
+                    if($item->inventoryLocationTracking ){
+                        $row['Total']    = $item->inventoryLocationTracking->sum('quantity');
+                    }
+                    else{
+                        $row['Total']    =0;
+                    }
+                    
+                    $row['Onhand']  = $item->ridgefield_onhand;
+                    
+                    
+                    fputcsv($file, array($row['Item Name'], $row['Barcode'], $row['Total'], $row['Onhand']));
+                }
+    
+                fclose($file);
+            };
+    
+            return response()->stream($callback, 200, $headers);
+        }
+    
+    
 }
