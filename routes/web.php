@@ -66,15 +66,17 @@ use App\Http\Controllers\ReplenController;
 	Route::get('/inventory/detail/{barcode}', [InventoryLocationTrackingController::class, 'getInventoryDetailsView'])->name('getInventoryDetailsView');
 	Route::get('/inventory/add', [InventoryLocationTrackingController::class, 'create'])->name('addInventory')->middleware('role:scan_inventroy');
 	Route::get('/inventory/deletemove/{id}', [InventoryLocationTrackingController::class, 'deletemove'])->name('deletemove');
+
 	Route::get('/export/inventory', [InventoryLocationTrackingController::class, 'exportCsvitembybarcode'])->name('inventoryByBarcodeexport')->middleware('role:inventory_location');	
 	Route::get('/export/inventory/bybarcode', [InventoryLocationTrackingController::class, 'exportCsvitem'])->name('inventoryexport')->middleware('role:inventory_location');
+  Route::get('/inventory/add/unique', [InventoryLocationTrackingController::class, 'createUnique'])->name('addUniqueInventory')->middleware('role:scan_inventroy_u');
 
 // Items
 	Route::get('/items', [ItemsController::class, 'index'])->name('listitems')->middleware('role:view_all_item');	
 	Route::get('/items/getItems', [ItemsController::class, 'getItems'])->name('getItems');
 	Route::get('/items/add/NoLocation', [ItemsController::class, 'onHoldToNoLocation'])->name('addtonolocation');
 	Route::get('/items//remove/NoLocation', [ItemsController::class, 'RemoveFromNoLocation'])->name('removefromnolocation');
-	Route::get('all-moves', [ItemsController::class, 'getAllMoves'])->name('getAllMoves');
+	Route::get('all-moves', [ItemsController::class, 'getAllMoves'])->name('getAllMoves')->middleware('role:all_moves');
 	Route::get('all-moves/get', [ItemsController::class, 'getAllMovesData'])->name('getAllMovesData');
 	Route::get('Items/export', [ItemsController::class, 'itemtoexport'])->name('itemtoexport');
 	Route::get('Items/export/get', [ItemsController::class, 'getitemtoexport'])->name('getItemsexport');
