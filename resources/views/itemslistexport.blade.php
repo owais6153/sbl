@@ -51,9 +51,9 @@
 		          type: 'GET',
 		         },
 		         columns: [
-		                  { data: 'id', name: 'id', 'visible': false},
+		                  { data: 'id', name: 'item.id', 'visible': false},
 		                  { data: 'item_number', name: 'item_number' },
-		                  { data: 'productIdentifier', name: 'productIdentifier' },
+		                  { data: 'productIdentifier', name: 'item_identifiers.productIdentifier' },
 		                  { data: 'totalqty', name: 'totalqty' },
 		                  { data: 'ridgefield_onhand', name: 'ridgefield_onhand' },
 		               ],

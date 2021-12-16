@@ -166,15 +166,10 @@ class ItemsController extends Controller
 
     }
     public function getitemtoexport(){
-        $model = Items::query();
+        $model = Items::query()->leftJoin('item_identifiers', 'item_identifiers.item_id', '=', 'item.id');
         
         return DataTables::eloquent($model) 
-        ->addColumn('productIdentifier', function($row){
-            if($row->itemidentifier && isset($row->itemidentifier->productIdentifier)){
-                return $row->itemidentifier->productIdentifier;
-            }
-            return "Not Found";
-        })
+
         ->addColumn('totalqty', function($row){
             if($row->inventoryLocationTracking ){
                 return $row->inventoryLocationTracking->sum('quantity');
