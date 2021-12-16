@@ -64,12 +64,16 @@ Route::middleware(['is_admin'])->group(function (){
 	Route::get('/inventory/detail/{barcode}', [InventoryLocationTrackingController::class, 'getInventoryDetailsView'])->name('getInventoryDetailsView');
 	Route::get('/inventory/add', [InventoryLocationTrackingController::class, 'create'])->name('addInventory')->middleware('role:scan_inventroy');
 	Route::get('/inventory/deletemove/{id}', [InventoryLocationTrackingController::class, 'deletemove'])->name('deletemove');
+
+	Route::get('/inventory/add/unique', [InventoryLocationTrackingController::class, 'createUnique'])->name('addUniqueInventory')->middleware('role:scan_inventroy_u');
+
+	
 // Items
 	Route::get('/items', [ItemsController::class, 'index'])->name('listitems')->middleware('role:view_all_item');	
 	Route::get('/items/getItems', [ItemsController::class, 'getItems'])->name('getItems');
 	Route::get('/items/add/NoLocation', [ItemsController::class, 'onHoldToNoLocation'])->name('addtonolocation');
 	Route::get('/items//remove/NoLocation', [ItemsController::class, 'RemoveFromNoLocation'])->name('removefromnolocation');
-	Route::get('all-moves', [ItemsController::class, 'getAllMoves'])->name('getAllMoves');
+	Route::get('all-moves', [ItemsController::class, 'getAllMoves'])->name('getAllMoves')->middleware('role:all_moves');
 	Route::get('all-moves/get', [ItemsController::class, 'getAllMovesData'])->name('getAllMovesData');
 
 
