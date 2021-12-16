@@ -65,7 +65,7 @@ Route::middleware(['is_admin'])->group(function (){
 	Route::get('/inventory/add', [InventoryLocationTrackingController::class, 'create'])->name('addInventory')->middleware('role:scan_inventroy');
 	Route::get('/inventory/deletemove/{id}', [InventoryLocationTrackingController::class, 'deletemove'])->name('deletemove');
 
-	Route::get('/inventory/add/unique', [InventoryLocationTrackingController::class, 'createUnique'])->name('addUniqueInventory');
+	Route::get('/inventory/add/unique', [InventoryLocationTrackingController::class, 'createUnique'])->name('addUniqueInventory')->middleware('role:scan_inventroy_u');
 
 	
 // Items

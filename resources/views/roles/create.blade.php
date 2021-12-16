@@ -124,6 +124,10 @@
                             <input id="scan_inventroy" type="checkbox" name="permission[scan_inventroy]" >
                             Scan Inventory 
                         </label>
+                        <label for="scan_inventroy_u">
+                            <input id="scan_inventroy_u" type="checkbox" name="permission[scan_inventroy_u]" >
+                            Scan Inventory Unique
+                        </label>
 
                         <label class="ml-4" for="inventory_location">
                             <input id="inventory_location" type="checkbox" name="permission[inventory_location]" >
