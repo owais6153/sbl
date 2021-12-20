@@ -620,7 +620,7 @@ class InventoryLocationTrackingController extends Controller
                      ->select(DB::raw('SUM(`count`) as qty'))
                      ->where('location', '=', $checkFrom)
                      ->where('barcode', '=', $request->barcode)
-                    //  ->where('expiration_date', '=', $request->expiration_date)
+                     ->where('expiration_date', '=', $request->expiration_date)
                      ->where('deleted_at', '=', null)
                     //  ->groupBy('expiration_date')
                      ->first();
@@ -830,7 +830,7 @@ class InventoryLocationTrackingController extends Controller
              ->where('location', '=', $from)
              ->where('barcode', '=', $barcode)
              ->where('deleted_at', '=', null)
-            //  ->groupBy('expiration_date')
+             ->groupBy('expiration_date')
              ->get();
 
         if (!empty($getLocationDetails)) {
