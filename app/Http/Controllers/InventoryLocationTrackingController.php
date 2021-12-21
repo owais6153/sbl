@@ -588,13 +588,14 @@ class InventoryLocationTrackingController extends Controller
         if ($request->from != 'receiving' && $request->from != 'adjustment') {
             $checkFrom = ($request->from == 'adjustment') ? $request->to : $request->from;
             $LocationDetails = DB::table('inventory_location')
-                ->select(DB::raw('SUM(`count`) as qty'))
-                ->where('location', '=', $checkFrom)
-                ->where('barcode', '=', $request->barcode)
-                //  ->where('expiration_date', '=', $request->expiration_date)
-                ->where('deleted_at', '=', null)
-                //  ->groupBy('expiration_date')
-                ->first();
+
+                     ->select(DB::raw('SUM(`count`) as qty'))
+                     ->where('location', '=', $checkFrom)
+                     ->where('barcode', '=', $request->barcode)
+                     ->where('expiration_date', '=', $request->expiration_date)
+                     ->where('deleted_at', '=', null)
+                    //  ->groupBy('expiration_date')
+                     ->first();
             if (!empty($LocationDetails)) {
                 if ($LocationDetails->qty < $request->quantity) {
                     return response()->json(["error" => $request->from . " doesn't have enough items.", 'status' => 'error']);
@@ -790,12 +791,13 @@ class InventoryLocationTrackingController extends Controller
         $data = array();
         // $getLocationDetails = DB::select("select , SUM(`count`) as `quantity`, expiration_date from `inventory_location` where `location` = '".$from."' and `barcode` = '".$barcode."' group by `expiration_date`");
         $getLocationDetails =  DB::table('inventory_location')
-            ->select(DB::raw('SUM(`count`) as `quantity`, id as `from_id`, expiration_date'))
-            ->where('location', '=', $from)
-            ->where('barcode', '=', $barcode)
-            ->where('deleted_at', '=', null)
-            //  ->groupBy('expiration_date')
-            ->get();
+
+             ->select(DB::raw('SUM(`count`) as `quantity`, id as `from_id`, expiration_date'))
+             ->where('location', '=', $from)
+             ->where('barcode', '=', $barcode)
+             ->where('deleted_at', '=', null)
+             ->groupBy('expiration_date')
+             ->get();
 
         if (!empty($getLocationDetails)) {
             foreach ($getLocationDetails as $key => $locationDeatail) {
