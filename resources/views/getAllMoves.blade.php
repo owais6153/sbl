@@ -94,7 +94,7 @@
 		                  { data: 'from', name: 'from' },
 		                  { data: 'to', name: 'to' },
 		                  { data: 'expiration_date', name: 'expiration_date' },
-		                  { data: 'time', name: 'created_at' },
+		                  { data: 'time', name: 'inventory_location_tracking.created_at' },
 		               ],
 		        order: [[7, 'desc']]
 		  });
