@@ -96,7 +96,7 @@
 		                  { data: 'expiration_date', name: 'expiration_date' },
 		                  { data: 'time', name: 'created_at' },
 		               ],
-		        order: [[7, 'desc']]
+		        order: []
 		  });
 		  
 		});

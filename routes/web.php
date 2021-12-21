@@ -66,8 +66,8 @@ use App\Http\Controllers\ReplenController;
 	Route::get('/inventory/detail/{barcode}', [InventoryLocationTrackingController::class, 'getInventoryDetailsView'])->name('getInventoryDetailsView');
 	Route::get('/inventory/add', [InventoryLocationTrackingController::class, 'create'])->name('addInventory')->middleware('role:scan_inventroy');
 	Route::get('/inventory/deletemove/{id}', [InventoryLocationTrackingController::class, 'deletemove'])->name('deletemove');
-	Route::get('/export/inventory', [InventoryLocationTrackingController::class, 'exportCsvitembybarcode'])->name('inventoryByBarcodeexport')->middleware('role:inventory_location');	
-	Route::get('/export/inventory/bybarcode', [InventoryLocationTrackingController::class, 'exportCsvitem'])->name('inventoryexport')->middleware('role:inventory_location');
+	Route::get('/export/inventory/bybarcode', [InventoryLocationTrackingController::class, 'exportCsvitembybarcode'])->name('inventoryByBarcodeexport')->middleware('role:inventory_location');	
+	Route::get('/export/inventory', [InventoryLocationTrackingController::class, 'exportCsvitem'])->name('inventoryexport')->middleware('role:inventory_location');
 
 // Items
 	Route::get('/items', [ItemsController::class, 'index'])->name('listitems')->middleware('role:view_all_item');	

@@ -20,4 +20,7 @@ class ItemIdentifier extends Model
         return $this->belongsTo('App\Models\Items','item_id'); 
         
     }
+    public function  allitems(){
+        return $this->item()->withTrashed();
+    }
 }
