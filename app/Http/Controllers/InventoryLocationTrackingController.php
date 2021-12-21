@@ -604,20 +604,22 @@ class InventoryLocationTrackingController extends Controller
         }
 
 
-        if (isset($request->unique_in) && ($request->to != 'production' && $request->to != 'shipping'  && $request->to != 'adjustment')) {
+
+        if (isset($request->unique_in) && ($request->to != 'production' && $request->to != 'shipping'  && $request->to != 'adjustment') ) {
             $toLocationDetails = DB::table('inventory_location')
-                ->select(DB::raw('SUM(`count`) as qty'))
-                ->where('location', '=', $request->to)
-                ->where('barcode', '=', $request->barcode)
-                ->where('expiration_date', '=', $request->expiration_date)
-                ->where('deleted_at', '=', null)
-                ->first();
-            if (!empty($toLocationDetails)) {
+                     ->select(DB::raw('SUM(`count`) as qty'))
+                     ->where('location', '=', $request->to)
+                     ->where('barcode', '=', $request->barcode)
+                     ->where('expiration_date', '=', $request->expiration_date)
+                     ->where('deleted_at', '=', null)
+                     ->first();
+            if(!empty($toLocationDetails)){
                 if ($toLocationDetails->qty > 0) {
-                    return response()->json(["error" => $request->barcode . " Barcode already exsist in " . $request->to, 'status' => 'error']);
+                    return response()->json(["error" => $request->barcode . " Barcode already exsist in " . $request->to , 'status' => 'error']);
                 }
             }
-        }
+        }            
+                         
 
         // All moves   
         $Inventory = new InventoryModel();
@@ -1159,5 +1161,9 @@ class InventoryLocationTrackingController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+    public function createUnique()
+    {
+        return view('scanInventoryunique');        
     }
 }

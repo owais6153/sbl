@@ -50,7 +50,7 @@
 			          <a href="{{route('replenBatch')}}"><i class="fas fa-users"></i>Replen Batches</a>
 			        </li>
 					@endcan
-					@if (Bouncer::can('view_all_item') || Bouncer::can('item_skip') )
+					@if (Bouncer::can('view_all_item') || Bouncer::can('item_skip') || Bouncer::can('all_moves') )
 
 			        <li class="dropdown {{ ( request()->is('items') ) ? 'active' : '' }}">
 			          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fas fa-box-open"></i>Items</a>
@@ -61,9 +61,11 @@
 						@can('item_skip')
 							<li><a href="{{route('listSkippedItems')}}"><i class="fas fa-user-plus"></i>Skipped Items</a></li>
 						@endcan
-							<li><a href="{{route('getAllMoves')}}"><i class="fas fa-user-plus"></i>All Moves</a></li>
-							<li><a href="{{route('itemtoexport')}}"><i class="fas fa-user-plus"></i>Item Export</a></li>
-							
+						@can('all_moves')
+							<li><a href="{{route('getAllMoves')}}"><i class="fas fa-user-plus"></i>All Moves</a></li>							
+						@endcan
+            <li><a href="{{route('itemtoexport')}}"><i class="fas fa-user-plus"></i>Item Export</a></li>
+
 					</ul>
 			        </li>		
 					@endif
@@ -85,23 +87,23 @@
 					</ul>
 				</li>
 				@endif
-				@if (Bouncer::can('scan_inventroy') || Bouncer::can('inventory_location') )
-
-				<li class="dropdown {{ (request()->is('inventory/*') || request()->is('inventory')) ? 'active' : '' }}">
-				<a class="dropdown-toggle" data-toggle="dropdown" href="{{route('user_list')}}"><i class="fas fa-users"></i>Inventory Location Tracking</a>
-					<ul class="dropdown-menu">
-						@can('scan_inventroy')
-							<li><a href="{{route('addInventory')}}"><i class="fas fa-user"></i>Scan Inventory</a></li>						
-						@endcan
+				@if (Bouncer::can('scan_inventroy') || Bouncer::can('inventory_location')  || Bouncer::can('scan_inventroy_u') )
+					<li class="dropdown {{ (request()->is('inventory/*') || request()->is('inventory')) ? 'active' : '' }}">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="{{route('user_list')}}"><i class="fas fa-users"></i>Inventory Location Tracking</a>
+						<ul class="dropdown-menu">
+							@can('scan_inventroy')
+								<li><a href="{{route('addInventory')}}"><i class="fas fa-user"></i>Scan Inventory</a></li>						
+							@endcan
+							@can('scan_inventroy_u')
+								<li><a href="{{route('addUniqueInventory')}}"><i class="fas fa-user"></i>Scan Inventory Unique</a></li>
+							@endcan
+							@can('inventory_location')
+								<li><a href="{{route('inventory')}}" ><i class="fas fa-user-plus"></i>Location</a></li>
+							@endcan
 						
-						@can('inventory_location')
-							<li><a href="{{route('inventory')}}" ><i class="fas fa-user-plus"></i>Location</a></li>
-						@endcan
-					
-					</ul>
-				</li>
-
-@endif
+						</ul>
+					</li>
+				@endif
 			        <li><a href="{{route('logout')}}"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
 			        
 			      </ul>
