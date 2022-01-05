@@ -260,7 +260,7 @@ class InventoryLocationTrackingController extends Controller
             }
         }
 
-        
+
 
         $filter = 'item';
         if (isset($request->output) && $request->output = 'html') {
@@ -282,7 +282,6 @@ class InventoryLocationTrackingController extends Controller
     public function index(Request $request)
     {
         // Search for in all columns
-       
         $InventoryModel = new InventoryModel();
         $tablename = $InventoryModel->getTable();
         $columns = Schema::getColumnListing($tablename);
@@ -588,7 +587,6 @@ class InventoryLocationTrackingController extends Controller
         if ($request->from != 'receiving' && $request->from != 'adjustment') {
             $checkFrom = ($request->from == 'adjustment') ? $request->to : $request->from;
             $LocationDetails = DB::table('inventory_location')
-
                      ->select(DB::raw('SUM(`count`) as qty'))
                      ->where('location', '=', $checkFrom)
                      ->where('barcode', '=', $request->barcode)
@@ -596,6 +594,7 @@ class InventoryLocationTrackingController extends Controller
                      ->where('deleted_at', '=', null)
                     //  ->groupBy('expiration_date')
                      ->first();
+
             if (!empty($LocationDetails)) {
                 if ($LocationDetails->qty < $request->quantity) {
                     return response()->json(["error" => $request->from . " doesn't have enough items.", 'status' => 'error']);
@@ -799,6 +798,7 @@ class InventoryLocationTrackingController extends Controller
              ->groupBy('expiration_date')
              ->get();
 
+
         if (!empty($getLocationDetails)) {
             foreach ($getLocationDetails as $key => $locationDeatail) {
 
@@ -838,7 +838,7 @@ class InventoryLocationTrackingController extends Controller
 
 
         //Getting all barcodes         
-        $barcodes = $query->groupBy('barcode')->paginate(10);
+        $barcodes = $query->groupBy('barcode')->get();
         if (empty($barcodes)) {
             return response()->json(["error" => 'Barcode not found', 'status' => '404']);
         }
@@ -940,7 +940,7 @@ class InventoryLocationTrackingController extends Controller
 
 
 
-
+        // dd($inventories['data']);
 
         $fileName = 'inventory.csv';
         if (!isset($inventories['data'])) {
@@ -965,9 +965,9 @@ class InventoryLocationTrackingController extends Controller
 
             foreach ($data as $item) {
                 if ($item['item'][0] == 'Not Found') {
-                    $row['Item Name']  = $item['item'][0];
-                } else {
                     $row['Item Name']  = $item['barcode'];
+                } else {
+                    $row['Item Name']  = $item['item'][0];
                 }
 
                 $row['Total']  = $item['total'];
@@ -976,7 +976,7 @@ class InventoryLocationTrackingController extends Controller
                 $row['Difference']  = $item['diference'];
 
 
-                fputcsv($file, array($row['Item Name'], $row['Total'], $row['Onhand'], $row['diference']));
+                fputcsv($file, array($row['Item Name'], $row['Total'], $row['Onhand'], $row['Difference']));
             }
 
             fclose($file);
@@ -995,7 +995,7 @@ class InventoryLocationTrackingController extends Controller
 
 
         //Getting all barcodes         
-        $barcodes = $query->groupBy('item_id')->paginate(10);
+        $barcodes = $query->groupBy('item_id')->get();
 
 
         if (empty($barcodes)) {
@@ -1121,7 +1121,7 @@ class InventoryLocationTrackingController extends Controller
 
 
 
-
+        // dd($inventories['data']);
 
         $fileName = 'inventory.csv';
         if (!isset($inventories['data'])) {
@@ -1146,9 +1146,9 @@ class InventoryLocationTrackingController extends Controller
 
             foreach ($data as $item) {
                 if ($item['item'][0] == 'Not Found') {
-                    $row['Item Name']  = $item['item'][0];
-                } else {
                     $row['Item Name']  = $item['barcode'];
+                } else {
+                    $row['Item Name']  = $item['item'][0];
                 }
 
                 $row['Total']  = $item['total'];
@@ -1157,7 +1157,7 @@ class InventoryLocationTrackingController extends Controller
                 $row['Difference']  = $item['diference'];
 
 
-                fputcsv($file, array($row['Item Name'], $row['Total'], $row['Onhand'], $row['diference']));
+                fputcsv($file, array($row['Item Name'], $row['Total'], $row['Onhand'], $row['Difference']));
             }
 
             fclose($file);
