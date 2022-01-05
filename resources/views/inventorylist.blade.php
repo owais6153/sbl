@@ -30,7 +30,6 @@
 					<a href="{{route('inventoryByBarcodeexport')}}" class="btn btn-primary mb-3 pull-end">Export</a>
 				@else
 				<a href="{{route('inventoryexport')}}" class="btn btn-primary mb-3 pull-end">Export</a>
-
 				@endif
 
 				<div class="custom_data_filter"><label>Search:<input type="search" value="{{ Request::get('search') }}" class="" placeholder="">					  	</label></div>
