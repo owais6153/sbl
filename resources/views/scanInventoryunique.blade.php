@@ -185,6 +185,10 @@
 		if($('#from').val() == 'Adjustment' || $('input#to').val().toLowerCase() == 'adjustment'){
             flag = confirm('Are you sure you want to do Adjustment?');
         }
+        if(parseInt($('#quantity').val()) > 5000) {
+            alert("You can not move more then 5000 Items.");
+            flag = false;
+        }
         if (flag && typeof max !== 'undefined' && max !== false) {
             if(parseInt(max) < parseInt($('#quantity').val())){
                 alert("You can not move more then " + max + " Items.");
