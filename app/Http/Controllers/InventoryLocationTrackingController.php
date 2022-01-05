@@ -790,6 +790,7 @@ class InventoryLocationTrackingController extends Controller
         $data = array();
         // $getLocationDetails = DB::select("select , SUM(`count`) as `quantity`, expiration_date from `inventory_location` where `location` = '".$from."' and `barcode` = '".$barcode."' group by `expiration_date`");
         $getLocationDetails =  DB::table('inventory_location')
+
              ->select(DB::raw('SUM(`count`) as `quantity`, id as `from_id`, expiration_date'))
              ->where('location', '=', $from)
              ->where('barcode', '=', $barcode)
