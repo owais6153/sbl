@@ -294,7 +294,7 @@ class ImportItems extends Command
             }
         }
         
-        if ($totalRocordsFoundInLastImport > $offset) {
+        if ($totalRocordsFoundInLastImport > ($offset + $limit)) {
             $offset = $offset + 1000;
         }
         else{
