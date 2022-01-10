@@ -50,12 +50,18 @@ class ImportItems extends Command
      */
     public function handle()
     {
+        ini_set('memory_limit', '-1');
         $offset = 0;
         $limit = 1000;
         $lastImport = ItemsCron::latest()->first();
-        if (!empty($lastImport) && $lastImport->remaining != 0 ) {
-            $offset = 1000 + $lastImport->item_offset;
-        }
+        $totalRocordsFoundInLastImport = (!empty($lastImport)) ? $lastImport->totalRecords : 25000;
+        $isRemaining = true;
+        while($isRemaining):
+
+
+        // if (!empty($lastImport) && $lastImport->remaining != 0 ) {
+        //     $offset = 1000 + $lastImport->item_offset;
+        // }
 
 
 
@@ -113,41 +119,41 @@ class ImportItems extends Command
                             }
                             $items->save();
 
-                            if (!empty($item->listings)) {
-                                foreach ($item->listings as $listings) {
-                                    $list = new Itemlisting();
-                                    $list->item_id = $items->id;
-                                    $list->_id = $listings->_id;
-                                    $list->storeSKU = $listings->storeSKU;
-                                    $list->listingId = $listings->listingId;
-                                    $list->fnSKU = $listings->fnSKU;
-                                    $list->listingName = $listings->listingName;
-                                    $list->store = $listings->store;
-                                    $list->urlId = $listings->urlId;
-                                    $list->fulfilledBy = $listings->fulfilledBy;
-                                    $list->save();
-                                }
-                            }
-                            if (!empty($item->productChildren)) {
-                                $available_to_build=array();
-                                foreach ($item->productChildren as $pchild) {
-                                    $child = new ItemChildren();
-                                    $child->kit_item_id = $items->id;
-                                    $check = Items::where('item_number', $pchild->childItemNumber)->first();
-                                    if ($check) {
-                                        $child->child_item_id = $check->id;
-                                        $available_to_build[] = $check->ridgefield_onhand /$pchild->childQuantity;
-                                    }
-                                    $child->qty = $pchild->childQuantity;
-                                    $child->item_type = 'kit';
-                                    $child->save();
-                                }
-                                if(!empty($available_to_build)){
-                                    $items->available_to_build = min($available_to_build);
-                                    $items->save();
-                                }
+                            // if (!empty($item->listings)) {
+                            //     foreach ($item->listings as $listings) {
+                            //         $list = new Itemlisting();
+                            //         $list->item_id = $items->id;
+                            //         $list->_id = $listings->_id;
+                            //         $list->storeSKU = $listings->storeSKU;
+                            //         $list->listingId = $listings->listingId;
+                            //         $list->fnSKU = $listings->fnSKU;
+                            //         $list->listingName = $listings->listingName;
+                            //         $list->store = $listings->store;
+                            //         $list->urlId = $listings->urlId;
+                            //         $list->fulfilledBy = $listings->fulfilledBy;
+                            //         $list->save();
+                            //     }
+                            // }
+                            // if (!empty($item->productChildren)) {
+                            //     $available_to_build=array();
+                            //     foreach ($item->productChildren as $pchild) {
+                            //         $child = new ItemChildren();
+                            //         $child->kit_item_id = $items->id;
+                            //         $check = Items::where('item_number', $pchild->childItemNumber)->first();
+                            //         if ($check) {
+                            //             $child->child_item_id = $check->id;
+                            //             $available_to_build[] = $check->ridgefield_onhand /$pchild->childQuantity;
+                            //         }
+                            //         $child->qty = $pchild->childQuantity;
+                            //         $child->item_type = 'kit';
+                            //         $child->save();
+                            //     }
+                            //     if(!empty($available_to_build)){
+                            //         $items->available_to_build = min($available_to_build);
+                            //         $items->save();
+                            //     }
                                 
-                            }
+                            // }
                             if (empty($item->productChildren)) {
                                 foreach ($item->productIdentifiers as $productIdentifier) {
                                     if ($productIdentifier->identifierType == 'UPC' || $productIdentifier->identifierType == 'EAN') {
@@ -157,16 +163,17 @@ class ImportItems extends Command
                                             $ItemIdentifier->item_id = $items->id;
                                             $ItemIdentifier->productIdentifier = $productIdentifier->productIdentifier;
                                             $ItemIdentifier->save();
-                                        } else {
+                                        } 
+                                        // else {
 
-                                            $getIdentifier = ItemIdentifier::select('item_id', 'id', 'productIdentifier')->where('productIdentifier', '=', $productIdentifier->productIdentifier)->first();
-                                            $SkippedItemIdentifiers = new SkippedItemIdentifiers();
-                                            $SkippedItemIdentifiers->item_id = $getIdentifier->item_id;
-                                            $SkippedItemIdentifiers->identifier_id = $getIdentifier->id;
-                                            $SkippedItemIdentifiers->barcode = $getIdentifier->productIdentifier;
-                                            $SkippedItemIdentifiers->duplicate_item_id = $items->id;
-                                            $SkippedItemIdentifiers->save();
-                                        }
+                                        //     $getIdentifier = ItemIdentifier::select('item_id', 'id', 'productIdentifier')->where('productIdentifier', '=', $productIdentifier->productIdentifier)->first();
+                                        //     $SkippedItemIdentifiers = new SkippedItemIdentifiers();
+                                        //     $SkippedItemIdentifiers->item_id = $getIdentifier->item_id;
+                                        //     $SkippedItemIdentifiers->identifier_id = $getIdentifier->id;
+                                        //     $SkippedItemIdentifiers->barcode = $getIdentifier->productIdentifier;
+                                        //     $SkippedItemIdentifiers->duplicate_item_id = $items->id;
+                                        //     $SkippedItemIdentifiers->save();
+                                        // }
 
                                         $InventoryLocationTracking = InventoryModel::where('barcode', 'LIKE', $productIdentifier->productIdentifier)->orWhere('barcode', 'LIKE', '0' . $productIdentifier->productIdentifier)->orWhere('barcode', 'LIKE',  substr($productIdentifier->productIdentifier, 1))
                                             ->update(['item_id' => $items->id]);
@@ -192,72 +199,72 @@ class ImportItems extends Command
                             }
                             $checkItem->save();
                            
-                            if (!empty($item->listings)) {
-                                foreach ($item->listings as $listings) {
+                            // if (!empty($item->listings)) {
+                            //     foreach ($item->listings as $listings) {
                                    
 
-                                    if (!empty($listings->fnSKU) && !empty($listings->store)) {
-                                        $list = Itemlisting::where('fnSKU', '=', $listings->fnSKU)->where('store','=',$listings->store)->where('item_id', '=', $checkItem->id)->first();
-                                        if ($list) {
-                                            $list->_id = $listings->_id;
-                                            $list->storeSKU = empty($listings->storeSKU) == false ? $listings->storeSKU : $list->storeSKU;
-                                            $list->listingId = isset($listings->listingId) == true ? $listings->listingId : $list->listingId;
-                                            $list->listingName = isset($listings->listingName) == true ? $listings->listingName : $list->listingName;
-                                            $list->urlId = isset($listings->urlId) == true ? $listings->urlId : $list->urlId;
-                                            $list->fulfilledBy = isset($listings->fulfilledBy) == true ? $listings->fulfilledBy : $list->fulfilledBy;
-                                            $list->save();
-                                        } else {
-                                            $list = new Itemlisting();
-                                            $list->item_id = $checkItem->id;
-                                            $list->_id = $listings->_id;
-                                            $list->storeSKU = $listings->storeSKU;
-                                            $list->listingId = $listings->listingId;
-                                            $list->fnSKU = $listings->fnSKU;
-                                            $list->listingName = $listings->listingName;
-                                            $list->store = $listings->store;
-                                            $list->urlId = $listings->urlId;
-                                            $list->fulfilledBy = $listings->fulfilledBy;
-                                            $list->save();
-                                        }
-                                    }
-                                }
-                            }
-                            if (!empty($item->productChildren)) {
-                                $available_to_build=array();
-                                foreach ($item->productChildren as $pchild) {
+                            //         if (!empty($listings->fnSKU) && !empty($listings->store)) {
+                            //             $list = Itemlisting::where('fnSKU', '=', $listings->fnSKU)->where('store','=',$listings->store)->where('item_id', '=', $checkItem->id)->first();
+                            //             if ($list) {
+                            //                 $list->_id = $listings->_id;
+                            //                 $list->storeSKU = empty($listings->storeSKU) == false ? $listings->storeSKU : $list->storeSKU;
+                            //                 $list->listingId = isset($listings->listingId) == true ? $listings->listingId : $list->listingId;
+                            //                 $list->listingName = isset($listings->listingName) == true ? $listings->listingName : $list->listingName;
+                            //                 $list->urlId = isset($listings->urlId) == true ? $listings->urlId : $list->urlId;
+                            //                 $list->fulfilledBy = isset($listings->fulfilledBy) == true ? $listings->fulfilledBy : $list->fulfilledBy;
+                            //                 $list->save();
+                            //             } else {
+                            //                 $list = new Itemlisting();
+                            //                 $list->item_id = $checkItem->id;
+                            //                 $list->_id = $listings->_id;
+                            //                 $list->storeSKU = $listings->storeSKU;
+                            //                 $list->listingId = $listings->listingId;
+                            //                 $list->fnSKU = $listings->fnSKU;
+                            //                 $list->listingName = $listings->listingName;
+                            //                 $list->store = $listings->store;
+                            //                 $list->urlId = $listings->urlId;
+                            //                 $list->fulfilledBy = $listings->fulfilledBy;
+                            //                 $list->save();
+                            //             }
+                            //         }
+                            //     }
+                            // }
+                            // if (!empty($item->productChildren)) {
+                            //     $available_to_build=array();
+                            //     foreach ($item->productChildren as $pchild) {
 
-                                    $child = ItemChildren::where('childitem_number', '=', $pchild->childItemNumber)->where('kit_item_id', '=', $checkItem->id)->first();
-                                    if ($child) {
+                            //         $child = ItemChildren::where('childitem_number', '=', $pchild->childItemNumber)->where('kit_item_id', '=', $checkItem->id)->first();
+                            //         if ($child) {
                                         
-                                        $check = Items::where('item_number', $pchild->childItemNumber)->first();
-                                        if ($check) {
-                                            $child->child_item_id = $check->id;
-                                            $available_to_build[] = $check->ridgefield_onhand /$pchild->childQuantity;
+                            //             $check = Items::where('item_number', $pchild->childItemNumber)->first();
+                            //             if ($check) {
+                            //                 $child->child_item_id = $check->id;
+                            //                 $available_to_build[] = $check->ridgefield_onhand /$pchild->childQuantity;
                                             
-                                        }
-                                        $child->qty = $pchild->childQuantity;
-                                        $child->item_type = 'kit';
-                                        $child->save();
-                                    } else {
-                                        $child = new ItemChildren();
-                                        $child->kit_item_id = $checkItem->id;
-                                        $child->childitem_number =$pchild->childItemNumber;
-                                        $check = Items::where('item_number', $pchild->childItemNumber)->first();
-                                        if ($check) {
-                                            $child->child_item_id = $check->id;
-                                            $available_to_build[] = $check->ridgefield_onhand /$pchild->childQuantity;
+                            //             }
+                            //             $child->qty = $pchild->childQuantity;
+                            //             $child->item_type = 'kit';
+                            //             $child->save();
+                            //         } else {
+                            //             $child = new ItemChildren();
+                            //             $child->kit_item_id = $checkItem->id;
+                            //             $child->childitem_number =$pchild->childItemNumber;
+                            //             $check = Items::where('item_number', $pchild->childItemNumber)->first();
+                            //             if ($check) {
+                            //                 $child->child_item_id = $check->id;
+                            //                 $available_to_build[] = $check->ridgefield_onhand /$pchild->childQuantity;
 
-                                        }
-                                        $child->qty = $pchild->childQuantity;
-                                        $child->item_type = 'kit';
-                                        $child->save();
-                                    }
-                                }
-                                if(!empty($available_to_build)){
-                                $checkItem->available_to_build = min($available_to_build);
-                                $checkItem->save();
-                                }
-                            }
+                            //             }
+                            //             $child->qty = $pchild->childQuantity;
+                            //             $child->item_type = 'kit';
+                            //             $child->save();
+                            //         }
+                            //     }
+                            //     if(!empty($available_to_build)){
+                            //     $checkItem->available_to_build = min($available_to_build);
+                            //     $checkItem->save();
+                            //     }
+                            // }
                             if (empty($item->productChildren)) {
                                 foreach ($item->productIdentifiers as $productIdentifier) {
                                     if ($productIdentifier->identifierType == 'UPC' || $productIdentifier->identifierType == 'EAN') {
@@ -286,6 +293,14 @@ class ImportItems extends Command
                 }
             }
         }
+        
+        if ($totalRocordsFoundInLastImport > $offset) {
+            $offset = $offset + 1000;
+        }
+        else{
+            $isRemaining = false;
+        }
+        endwhile;
 
         $this->info('Items Imported successfully!');
         // \Log::info("Items Imported. ");                 
